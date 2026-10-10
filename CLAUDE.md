@@ -5,7 +5,7 @@ Site pédagogique façon **Duolingo** pour apprendre le JavaScript **de zéro** 
 ## État actuel
 
 - **Programme complet** : 15 unités, 64 leçons, 75 fiches de théorie, 15 jeux, 15 quiz, 46 boss (exercices du cours), 757 questions. **Tous les exercices des trois TP** (Fonctions, Tableaux : nombres, chaînes, jeu de cartes ; DOM) sont des boss. Détail et correspondance avec les TP : `docs/programme.md`.
-- `content/pages/cards.css` est le fichier du prof ; `cards.html` a été **reconstruit** à partir d'un export texte de la page (structure décrite par le TP : ids `SUIT-RANK`, classes `rank-… suit`, `data-face-card`, boutons, `.deck`, `#hand`). Si l'élève envoie le vrai HTML (« Page web, HTML uniquement »), le remplacer et relancer les tests.
+- `content/pages/cards.html` et `cards.css` sont les fichiers du prof (TP DOM). `cards.html` ne garde que le contenu du `<body>` : `js/dom.js` fournit le `<head>` et injecte le CSS.
 - Source des énoncés : pages du cours enregistrées le 10 octobre 2026, copiées dans `docs/cours/` (tp1-fonctions, tp2-tableaux, tp3-dom). Les boss reprennent les énoncés tels quels.
 - 23 types d'exercices (dont 4 avec du code exécuté et testé), éditeur de code mobile, deux bacs à sable (Web Worker pour le JavaScript, iframe isolée avec la page du TP pour le DOM), console qui comprend les couleurs ANSI, tests automatiques, diagnostics et erreurs JavaScript traduits en français.
 - Gamification de Pampre : XP, 7 rangs, badges, série de jours, défi du jour, graphique 7 jours. **Pas de vies**, volontairement (choix de l'élève).
