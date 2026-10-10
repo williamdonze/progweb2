@@ -1,0 +1,653 @@
+{
+  "id": "u03",
+  "titre": "Les fonctions",
+  "sousTitre": "TP 1 : Initiation aux fonctions",
+  "objectif": "Créer, appeler, retourner (et pas seulement afficher), écrire des fonctions fléchées.",
+  "icone": "f()",
+  "fiches": [
+    {
+      "id": "fonction",
+      "titre": "Créer et appeler une fonction",
+      "icone": "f()",
+      "resume": "Une fonction est une **recette** : on l'écrit une fois, on l'exécute (l'appelle) autant qu'on veut avec des parenthèses.",
+      "analogie": "La fonction est une **recette** écrite dans un livre. L'écrire ne prépare rien. On cuisine seulement quand on l'**appelle** : `nomDeLaRecette()`, avec les parenthèses.",
+      "texte": "**Déclarer** : `function saluer() { console.log(\"Salut\"); }` — rien ne s'exécute encore.\n**Appeler** : `saluer();` — là, le code entre les `{ }` s'exécute.\n\n- `saluer` (sans parenthèses) désigne la recette elle-même.\n- `saluer()` (avec parenthèses) l'exécute.\n\nC'est pourquoi `console.log(saluer)` affiche `[Function: saluer]` (la recette) au lieu du résultat.",
+      "exemples": [
+        { "code": ["function saluer() {", "  console.log(\"Salut !\");", "}", "saluer();", "saluer();", "console.log(saluer);"] }
+      ],
+      "pieges": ["`console.log(maFonction)` sans parenthèses affiche la fonction, pas son résultat.", "Déclarer la fonction sans jamais l'appeler : il ne se passe rien."]
+    },
+    {
+      "id": "parametres",
+      "titre": "Paramètres et arguments",
+      "icone": "(x)",
+      "resume": "Les **paramètres** sont les noms entre les parenthèses de la déclaration ; les **arguments** sont les valeurs données à l'appel.",
+      "analogie": "Les paramètres sont les **ingrédients** prévus par la recette (« de la farine, des œufs »). Les arguments sont les vrais ingrédients que tu poses sur le plan de travail au moment de cuisiner.",
+      "texte": "`function aire(largeur, hauteur) { … }` : `largeur` et `hauteur` sont des paramètres.\n`aire(3, 4)` : 3 et 4 sont les arguments. 3 va dans `largeur`, 4 dans `hauteur` : **l'ordre compte**, pas les noms.\n\nUn paramètre n'existe qu'à l'intérieur de la fonction. Son nom est libre : choisis un nom qui dit ce qu'il contient.\n\nSi un argument manque, le paramètre vaut `undefined`.",
+      "exemples": [
+        { "code": ["function aire(largeur, hauteur) {", "  return largeur * hauteur;", "}", "console.log(aire(3, 4));", "console.log(aire(10, 2));"] }
+      ]
+    },
+    {
+      "id": "return",
+      "titre": "return ou console.log ?",
+      "icone": "↩",
+      "resume": "`return` **tend** le résultat à celui qui appelle. `console.log` le **montre** dans la console, mais ne le donne à personne.",
+      "analogie": "Le cuisinier peut **te tendre le plat** (`return`) : tu peux le manger, le mettre au frigo, le partager. Ou il peut juste **le montrer par la fenêtre** (`console.log`) : tu l'as vu, mais tu ne l'as pas. Une fonction qui fait `console.log` sans `return` te laisse les mains vides : `undefined`.",
+      "texte": "Les exercices du cours disent « **Retourner** un tableau… » : il faut `return`. « **Afficher** » veut dire `console.log`.\n\n- `return valeur;` : la fonction s'arrête et l'appel `maFonction(…)` **vaut** cette valeur.\n- On récupère le résultat dans une variable : `const r = maFonction(…);`\n- Pour le voir, on l'affiche **à l'extérieur** : `console.log(maFonction(…));`\n\nUne fonction sans `return` retourne `undefined`.",
+      "exemples": [
+        { "titre": "Avec return : on récupère le plat", "code": ["function double(n) {", "  return n * 2;", "}", "const resultat = double(21);", "console.log(resultat);", "console.log(double(5) + 1);"] },
+        { "titre": "Avec console.log seulement : les mains vides", "code": ["function doubleAffiche(n) {", "  console.log(n * 2);", "}", "const resultat = doubleAffiche(21);", "console.log(resultat);"] }
+      ],
+      "pieges": ["Mettre `console.log` à la place de `return` dans une fonction qui doit « retourner ».", "Écrire du code après `return` : il n'est jamais exécuté."]
+    },
+    {
+      "id": "portee",
+      "titre": "La portée : où vit une variable",
+      "icone": "{…}",
+      "resume": "Une variable créée **dans** une fonction (ou un bloc `{ }`) n'existe qu'à l'intérieur. Dehors, elle est introuvable.",
+      "analogie": "Chaque fonction est une **pièce** avec ses propres étiquettes. Depuis la pièce, on voit aussi les étiquettes du couloir (les variables du dehors). Mais depuis le couloir, on ne voit pas ce qui est collé dans la pièce.",
+      "texte": "- Une variable déclarée dans une fonction n'existe que pendant l'exécution de cette fonction, et seulement à l'intérieur.\n- Les paramètres aussi sont « dans la pièce ».\n- Une fonction voit les variables déclarées à l'extérieur (au-dessus).\n- Pour faire sortir une valeur d'une fonction : `return`.\n\nUtiliser hors de la fonction une variable créée dedans donne `x is not defined`.",
+      "exemples": [
+        { "code": ["const taux = 0.1;", "function taxe(prix) {", "  const montant = prix * taux;", "  return montant;", "}", "console.log(taxe(50));"] },
+        { "titre": "Erreur : montant n'existe pas dehors", "code": ["function taxe(prix) {", "  const montant = prix * 0.1;", "  return montant;", "}", "taxe(50);", "console.log(montant);"] }
+      ]
+    },
+    {
+      "id": "fleche",
+      "titre": "Les fonctions fléchées =>",
+      "icone": "=>",
+      "resume": "`const double = (n) => n * 2;` : une fonction courte. Sans accolades, la valeur après `=>` est retournée automatiquement.",
+      "texte": "Trois écritures de la même fonction :\n- `function double(n) { return n * 2; }`\n- `const double = (n) => { return n * 2; };` (accolades : il faut `return`)\n- `const double = (n) => n * 2;` (sans accolades : retour automatique)\n\nOn s'en sert énormément avec `map`, `filter`, `reduce`… où on écrit la fonction directement entre les parenthèses : `numbers.map((n) => n * 2)`.\n\nAvec des accolades, `return` redevient obligatoire.",
+      "exemples": [
+        { "code": ["const double = (n) => n * 2;", "const somme = (a, b) => a + b;", "const salut = () => \"Salut !\";", "console.log(double(4), somme(2, 3), salut());"] }
+      ],
+      "pieges": ["`(n) => { n * 2 }` : accolades sans `return`, la fonction retourne `undefined`.", "Oublier les parenthèses à l'appel : `double` au lieu de `double(4)`."]
+    },
+    {
+      "id": "fleche-objet",
+      "titre": "Retourner un objet : (x) => ({ … })",
+      "icone": "({})",
+      "resume": "Pour qu'une fléchée courte retourne un objet, on entoure l'objet de **parenthèses** : `(nom) => ({ nom: nom })`.",
+      "texte": "Un **objet** regroupe des valeurs nommées : `{ nom: \"Léa\", note: 5 }` (on les détaillera à l'unité Objets).\n\nProblème : après `=>`, une accolade `{` est lue comme le **début du corps** de la fonction, pas comme un objet. `(n) => { valeur: n }` retourne donc `undefined`.\n\nSolution : des parenthèses autour de l'objet : `(n) => ({ valeur: n })`.\n\nAvec la version longue, pas de problème : `(n) => { return { valeur: n }; }`.",
+      "exemples": [
+        { "code": ["const fiche = (nom, note) => ({ nom: nom, note: note });", "console.log(fiche(\"Léa\", 5));"] }
+      ],
+      "pieges": ["`(x) => { cle: x }` sans parenthèses : retourne `undefined`."]
+    },
+    {
+      "id": "fonction-en-parametre",
+      "titre": "Une fonction donnée à une autre fonction",
+      "icone": "f(g)",
+      "resume": "Une fonction est une valeur : on peut la passer en argument (**sans** parenthèses) à une autre fonction, qui l'appellera.",
+      "analogie": "Tu donnes ta **recette** (pas le plat) à un chef : c'est lui qui la cuisinera, autant de fois qu'il faut. C'est exactement ce qu'on fait avec `map` : on lui donne la recette « doubler », il l'applique à chaque œuf.",
+      "texte": "`transform(5, double)` : on passe la fonction `double` elle-même (sans parenthèses). À l'intérieur, `transform` l'appelle : `fct(n)`.\n\nOn peut aussi écrire la fonction directement à l'appel : `transform(5, (n) => n + 1)`.\n\nUne fonction peut même **retourner** une fonction (c'est l'exercice `curryAdd` du TP).",
+      "exemples": [
+        { "code": ["function double(n) {", "  return n * 2;", "}", "function transform(n, fct) {", "  return fct(n);", "}", "console.log(transform(5, double));", "console.log(transform(5, (n) => n + 100));"] }
+      ],
+      "pieges": ["`transform(5, double())` : avec parenthèses, on passe le **résultat** de double (appelée sans argument), pas la fonction."]
+    }
+  ],
+  "lecons": [
+    {
+      "id": "u03-l1",
+      "titre": "La recette : créer et appeler",
+      "duree": 5,
+      "notions": ["fonction"],
+      "cartes": [
+        {
+          "titre": "Écrire une recette",
+          "texte": "Une **fonction** regroupe des instructions sous un nom. On la déclare avec `function`, un nom, des parenthèses, puis le corps entre `{ }`.",
+          "code": ["function saluer() {", "  console.log(\"Salut !\");", "}"],
+          "apres": "Exécute : il ne se passe **rien**. Écrire une recette ne prépare pas le plat.",
+          "analogie": "La fonction est une recette dans un livre. Tant qu'on ne l'appelle pas, rien ne cuit.",
+          "fiche": "fonction"
+        },
+        {
+          "titre": "Appeler : les parenthèses",
+          "texte": "Pour exécuter la fonction, on l'**appelle** : son nom suivi de parenthèses. Autant de fois qu'on veut.",
+          "code": ["function saluer() {", "  console.log(\"Salut !\");", "}", "saluer();", "saluer();"]
+        },
+        {
+          "titre": "Sans parenthèses : la recette elle-même",
+          "texte": "`saluer` sans parenthèses désigne la fonction, pas son exécution. L'afficher montre `[Function: saluer]`.",
+          "code": ["function saluer() {", "  return \"Salut !\";", "}", "console.log(saluer);", "console.log(saluer());"],
+          "piege": "`console.log(maFonction)` affiche la **recette**. Pour le **plat**, ajoute les parenthèses : `console.log(maFonction())`."
+        },
+        {
+          "titre": "Bien nommer une fonction",
+          "texte": "Une fonction **fait** quelque chose : on lui donne un nom de verbe, en camelCase. Dans le cours : `getMax`, `getRandomInt`, `compareA`, `square`, `twice`.\n\n`get…` veut dire « obtenir » : la fonction retourne une valeur."
+        }
+      ],
+      "exercices": [
+        { "id": "u03-l1-e1", "type": "predire", "notions": ["fonction"], "question": "Que va afficher ce code ?", "code": ["function bip() {", "  console.log(\"bip\");", "}", "bip();", "bip();", "bip();"], "explication": "Trois appels, trois exécutions du corps." },
+        { "id": "u03-l1-e2", "type": "qcm", "notions": ["fonction"], "question": "Combien de lignes s'affichent ?", "code": ["function bonjour() {", "  console.log(\"Bonjour\");", "}"], "choix": ["Aucune : la fonction n'est jamais appelée", "Une", "Deux", "Une erreur"], "bonne": 0, "explication": "La fonction est déclarée, mais personne ne l'appelle avec `bonjour()`." },
+        { "id": "u03-l1-e3", "type": "predire", "notions": ["fonction"], "question": "Que va afficher ce code ?", "code": ["function prenom() {", "  return \"Léa\";", "}", "console.log(prenom);"], "explication": "Sans parenthèses, on affiche la fonction elle-même, pas son résultat." },
+        { "id": "u03-l1-e4", "type": "pointer-code", "notions": ["fonction"], "question": "Touche l'endroit où la fonction est **appelée** (exécutée).", "code": ["function bip() {", "  console.log(\"bip\");", "}", "⟦bip()⟧;"], "explication": "Ligne 1 : la déclaration. Ligne 4 : l'appel, avec les parenthèses." },
+        { "id": "u03-l1-e5", "type": "bug", "notions": ["fonction"], "question": "Ce code doit afficher `Bonjour !`, mais affiche `[Function: message]`. Quelle ligne corriger ?", "code": ["function message() {", "  return \"Bonjour !\";", "}", "console.log(message);"], "ligne": 4, "choix": ["Il faut appeler la fonction : `message()`", "Il faut `console.log` dans la fonction au lieu de `return`", "Il faut des guillemets autour de message", "Il faut déclarer la fonction avec `const`"], "bonne": 0, "explication": "`message` est la recette ; `message()` est le plat." },
+        {
+          "id": "u03-l1-e6", "type": "parsons", "notions": ["fonction"],
+          "question": "Reconstitue un programme qui déclare `crier` puis l'appelle deux fois.",
+          "lignes": ["function crier() {", "  console.log(\"Ho !\");", "}", "crier();", "crier();"],
+          "distracteurs": ["crier;"],
+          "explication": "D'abord la déclaration (les trois premières lignes), puis les appels **avec** parenthèses. `crier;` sans parenthèses ne fait rien."
+        }
+      ]
+    },
+    {
+      "id": "u03-l2",
+      "titre": "Les paramètres : les ingrédients",
+      "duree": 5,
+      "notions": ["parametres", "fonction"],
+      "cartes": [
+        {
+          "titre": "Des ingrédients variables",
+          "texte": "Les **paramètres** sont des noms entre les parenthèses de la déclaration. À l'appel, on donne les **arguments** : les vraies valeurs.",
+          "code": ["function saluer(prenom) {", "  console.log(\"Salut \" + prenom);", "}", "saluer(\"Léa\");", "saluer(\"Sami\");"],
+          "analogie": "Le paramètre `prenom` est l'ingrédient prévu par la recette. `\"Léa\"` est l'ingrédient réel posé sur la table au moment de cuisiner.",
+          "fiche": "parametres"
+        },
+        {
+          "titre": "Plusieurs paramètres : l'ordre compte",
+          "texte": "Les arguments remplissent les paramètres **dans l'ordre**. Les noms des variables à l'appel n'y changent rien.",
+          "code": ["function soustraire(a, b) {", "  return a - b;", "}", "console.log(soustraire(10, 3));", "console.log(soustraire(3, 10));"]
+        },
+        {
+          "titre": "Le nom du paramètre est libre",
+          "texte": "Le paramètre est une étiquette **locale** : la fonction l'utilise à l'intérieur, quel que soit le nom de ce qu'on lui passe. Choisis un nom qui décrit la valeur reçue.",
+          "code": ["function prixTTC(prixHT) {", "  return prixHT * 1.081;", "}", "const tshirt = 20;", "console.log(prixTTC(tshirt));"],
+          "astuce": "Dans le cours, on écrit souvent `function getDoubled(numbers)` alors qu'il existe aussi une variable `numbers` dehors. À l'intérieur, c'est le **paramètre** qui compte : la fonction marche avec n'importe quel tableau qu'on lui donne."
+        },
+        {
+          "titre": "Un argument manquant",
+          "texte": "Si on donne moins d'arguments que de paramètres, les paramètres en trop valent `undefined`.",
+          "code": ["function somme(a, b) {", "  return a + b;", "}", "console.log(somme(5));"],
+          "apres": "`5 + undefined` donne `NaN` (*Not a Number*, « pas un nombre »)."
+        }
+      ],
+      "exercices": [
+        { "id": "u03-l2-e1", "type": "predire", "notions": ["parametres"], "question": "Que va afficher ce code ?", "code": ["function diviser(a, b) {", "  return a / b;", "}", "console.log(diviser(2, 8));"], "explication": "2 va dans `a`, 8 dans `b` : 2 / 8 = 0.25." },
+        { "id": "u03-l2-e2", "type": "pointer-code", "notions": ["parametres"], "question": "Touche le **paramètre** de la fonction.", "code": ["function carre(⟦n⟧) {", "  return n * n;", "}", "console.log(carre(7));"], "explication": "Le paramètre est déclaré entre les parenthèses de `function`. Le 7 de la dernière ligne est l'argument." },
+        { "id": "u03-l2-e3", "type": "pointer-code", "notions": ["parametres"], "question": "Touche l'**argument** donné à la fonction.", "code": ["function carre(n) {", "  return n * n;", "}", "console.log(carre(⟦7⟧));"], "explication": "L'argument est la valeur posée dans les parenthèses de l'appel." },
+        { "id": "u03-l2-e4", "type": "predire", "notions": ["parametres"], "question": "Que va afficher ce code ?", "code": ["function presenter(nom, age) {", "  return nom + \" (\" + age + \")\";", "}", "const age = 30;", "const nom = \"Ana\";", "console.log(presenter(age, nom));"], "explication": "L'ordre compte : `age` (30) va dans le premier paramètre `nom`, et `nom` (\"Ana\") dans `age`. Les noms des variables à l'appel n'y changent rien." },
+        {
+          "id": "u03-l2-e5", "type": "trous", "notions": ["parametres", "fonction"],
+          "question": "Complète la fonction `aireRectangle` pour qu'elle retourne largeur × hauteur.",
+          "code": ["function aireRectangle(___, hauteur) {", "  return largeur * ___;", "}", "console.log(aireRectangle(3, 4));"],
+          "tests": { "fonction": "aireRectangle", "cas": [ { "args": [3, 4], "attendu": 12 }, { "args": [10, 0.5], "attendu": 5 } ] },
+          "indices": ["Le corps utilise `largeur` : il faut que ce soit un paramètre."],
+          "solution": ["largeur", "hauteur"],
+          "erreursTypiques": [ { "trous": ["l", "hauteur"], "attendu": "erreur" } ],
+          "explication": "Les noms utilisés dans le corps doivent être ceux déclarés entre les parenthèses."
+        },
+        {
+          "id": "u03-l2-e6", "type": "ecrire", "notions": ["parametres", "fonction", "return"],
+          "question": "Écris une fonction `prixTotal(prix, quantite)` qui **retourne** le prix multiplié par la quantité.",
+          "depart": ["function prixTotal(prix, quantite) {", "  ", "}", "", "console.log(prixTotal(2.5, 4));"],
+          "tests": { "fonction": "prixTotal", "cas": [ { "args": [2.5, 4], "attendu": 10 }, { "args": [3, 0], "attendu": 0 }, { "args": [19.9, 3], "attendu": 59.7 } ] },
+          "indices": ["« Retourne » : il faut le mot `return`.", { "code": "return ___ * ___;" }],
+          "solution": ["function prixTotal(prix, quantite) {", "  return prix * quantite;", "}", "", "console.log(prixTotal(2.5, 4));"],
+          "erreursTypiques": [
+            { "code": "function prixTotal(prix, quantite) {\n  console.log(prix * quantite);\n}", "attendu": "echec", "diagnostic": "return-vs-log" },
+            { "code": "function prixTotal(prix, quantite) {\n  return 2.5 * 4;\n}", "attendu": "echec" }
+          ],
+          "explication": "`return` tend le résultat à celui qui appelle. Le `console.log` de la dernière ligne l'affiche, à l'extérieur."
+        }
+      ]
+    },
+    {
+      "id": "u03-l3",
+      "titre": "return : tendre le plat",
+      "duree": 6,
+      "notions": ["return", "fonction"],
+      "cartes": [
+        {
+          "titre": "Le cuisinier et la fenêtre",
+          "illu": "cuisinier",
+          "texte": "Une fonction peut **retourner** un résultat (`return`) ou juste l'**afficher** (`console.log`). Ce n'est pas du tout pareil.",
+          "analogie": "`return`, c'est le cuisinier qui **te tend le plat** : tu peux le manger, le garder, le partager. `console.log`, c'est le cuisinier qui **montre le plat par la fenêtre** : tu l'as vu, mais tes mains sont vides.",
+          "fiche": "return"
+        },
+        {
+          "titre": "return : on récupère le résultat",
+          "texte": "Avec `return`, l'appel de la fonction **vaut** le résultat. On peut le ranger dans une variable, l'utiliser dans un calcul, l'afficher.",
+          "code": ["function double(n) {", "  return n * 2;", "}", "const resultat = double(21);", "console.log(resultat);", "console.log(double(5) + 1);"]
+        },
+        {
+          "titre": "console.log seul : les mains vides",
+          "texte": "Même calcul, mais la fonction **affiche** au lieu de retourner. Le 42 s'affiche… et la variable reçoit `undefined`.",
+          "code": ["function doubleAffiche(n) {", "  console.log(n * 2);", "}", "const resultat = doubleAffiche(21);", "console.log(resultat);"],
+          "piege": "C'est le piège le plus fréquent du cours : quand l'énoncé dit **« Retourner »**, il faut `return`. Les tests appellent ta fonction et regardent ce qu'elle **tend**, pas ce qu'elle affiche."
+        },
+        {
+          "titre": "return arrête la fonction",
+          "texte": "Dès que `return` s'exécute, la fonction s'arrête et tend sa valeur. Ce qui suit n'est jamais exécuté.",
+          "code": ["function test() {", "  return \"premier\";", "  console.log(\"jamais affiché\");", "}", "console.log(test());"]
+        },
+        {
+          "titre": "Afficher, c'est dehors",
+          "texte": "La bonne habitude : la fonction **retourne**, et c'est le code **à l'extérieur** qui affiche (pour vérifier).",
+          "code": ["function getMoyenne(a, b) {", "  return (a + b) / 2;", "}", "", "console.log(getMoyenne(4, 6));"]
+        }
+      ],
+      "exercices": [
+        { "id": "u03-l3-e1", "type": "predire", "notions": ["return"], "question": "Que va afficher ce code ? (deux lignes)", "code": ["function f(n) {", "  console.log(n + 1);", "}", "const x = f(1);", "console.log(x);"], "explication": "`f(1)` affiche 2… mais ne retourne rien. `x` vaut donc `undefined`." },
+        { "id": "u03-l3-e2", "type": "predire", "notions": ["return"], "question": "Que va afficher ce code ?", "code": ["function g(n) {", "  return n + 1;", "}", "const x = g(1);", "console.log(x * 10);"], "explication": "`g(1)` vaut 2, rangé dans `x`. 2 × 10 = 20." },
+        { "id": "u03-l3-e3", "type": "qcm", "notions": ["return"], "question": "L'énoncé dit : « Écrire une fonction qui **retourne** la somme de deux nombres ». Laquelle est correcte ?", "choix": ["function somme(a, b) { return a + b; }", "function somme(a, b) { console.log(a + b); }", "function somme(a, b) { a + b; }", "function somme(a, b) { return console.log(a + b); }"], "bonne": 0, "mono": true, "explication": "Seule la première tend le résultat. La deuxième l'affiche, la troisième le calcule et le jette, la quatrième retourne ce que retourne `console.log`, c'est-à-dire `undefined`." },
+        { "id": "u03-l3-e4", "type": "pointer-code", "notions": ["return"], "question": "Touche ce qui est **retourné** par la fonction.", "code": ["function prixReduit(prix) {", "  const rabais = prix * 0.2;", "  return ⟦prix - rabais⟧;", "}"], "explication": "Ce qui suit `return` est la valeur tendue à l'appelant." },
+        { "id": "u03-l3-e5", "type": "predire", "notions": ["return"], "question": "Que va afficher ce code ?", "code": ["function etat(n) {", "  return \"positif\";", "  return \"négatif\";", "}", "console.log(etat(-3));"], "explication": "Le premier `return` arrête la fonction : le second n'est jamais atteint (d'où le bug)." },
+        {
+          "id": "u03-l3-e6", "type": "corriger", "notions": ["return"],
+          "question": "La fonction `getTriple` doit **retourner** le triple de `n`. Les tests échouent. Corrige-la.",
+          "depart": ["function getTriple(n) {", "  console.log(n * 3);", "}", "", "console.log(getTriple(4));"],
+          "tests": { "fonction": "getTriple", "cas": [ { "args": [4], "attendu": 12 }, { "args": [0], "attendu": 0 }, { "args": [-2], "attendu": -6 } ] },
+          "indices": ["Exécute : que vaut `getTriple(4)` d'après la dernière ligne ?", "Afficher ≠ retourner."],
+          "solution": ["function getTriple(n) {", "  return n * 3;", "}", "", "console.log(getTriple(4));"],
+          "erreursTypiques": [ { "code": "function getTriple(n) {\n  const t = n * 3;\n}", "attendu": "echec", "diagnostic": "sans-return" } ],
+          "explication": "Avec `return`, `getTriple(4)` vaut 12 : la dernière ligne l'affiche."
+        },
+        {
+          "id": "u03-l3-e7", "type": "ecrire", "notions": ["return", "comparaisons"],
+          "question": "Écris `estMajeur(age)` qui **retourne** `true` si l'âge est au moins 18, sinon `false`. Puis, sous la fonction, range le résultat de `estMajeur(20)` dans une constante `reponse` et affiche-la.",
+          "depart": [""],
+          "tests": { "cas": [ { "titre": "reponse", "variables": { "reponse": true }, "sortie": ["true"] }, { "fonction": "estMajeur", "args": [20], "attendu": true }, { "fonction": "estMajeur", "args": [18], "attendu": true }, { "fonction": "estMajeur", "args": [17], "attendu": false } ] },
+          "indices": ["Une comparaison donne déjà true ou false : `return age >= 18;`", { "code": "function estMajeur(age) {\n  return ___;\n}\nconst reponse = ___;\nconsole.log(reponse);" }],
+          "solution": ["function estMajeur(age) {", "  return age >= 18;", "}", "const reponse = estMajeur(20);", "console.log(reponse);"],
+          "erreursTypiques": [
+            { "code": "function estMajeur(age) {\n  console.log(age >= 18);\n}\nconst reponse = estMajeur(20);\nconsole.log(reponse);", "attendu": "echec", "diagnostic": "return-vs-log" },
+            { "code": "function estMajeur(age) {\n  return age > 18;\n}", "attendu": "echec" },
+            { "code": "function estMajeur(age) {\n  if (age >= 18) {\n    return \"true\";\n  }\n  return \"false\";\n}", "attendu": "echec" }
+          ],
+          "explication": "La fonction tend le booléen ; `const reponse = estMajeur(20);` le récupère."
+        }
+      ]
+    },
+    {
+      "id": "u03-l4",
+      "titre": "Où vivent les variables",
+      "duree": 5,
+      "notions": ["portee", "ordre-execution"],
+      "cartes": [
+        {
+          "titre": "Chaque fonction est une pièce",
+          "illu": "portee",
+          "texte": "Une variable créée **dans** une fonction n'existe qu'à l'intérieur. Depuis la fonction, on voit aussi les variables du dehors.",
+          "analogie": "La fonction est une **pièce** : on y voit les étiquettes du couloir (variables du dehors), mais depuis le couloir, on ne voit pas celles collées dans la pièce.",
+          "fiche": "portee"
+        },
+        {
+          "titre": "Dedans → invisible dehors",
+          "texte": "`montant` est créé dans `taxe`. Dehors, il n'existe pas.",
+          "code": ["function taxe(prix) {", "  const montant = prix * 0.1;", "  return montant;", "}", "taxe(50);", "console.log(montant);"],
+          "erreurVoulue": true,
+          "apres": "`montant is not defined`. Pour récupérer la valeur dehors, on passe par `return` : `const t = taxe(50);`."
+        },
+        {
+          "titre": "Dehors → visible dedans",
+          "texte": "Une variable déclarée au-dessus, à l'extérieur, est visible dans la fonction.",
+          "code": ["const TVA = 0.081;", "function prixTTC(prix) {", "  return prix * (1 + TVA);", "}", "console.log(prixTTC(100));"]
+        },
+        {
+          "titre": "Les blocs { } aussi",
+          "texte": "Une variable `const` ou `let` créée dans un bloc `{ }` (if, boucle…) n'existe que dans ce bloc. Si tu en as besoin après, déclare-la **avant** le bloc.",
+          "code": ["const n = 7;", "let parite;", "if (n % 2 === 0) {", "  parite = \"pair\";", "} else {", "  parite = \"impair\";", "}", "console.log(parite);"]
+        }
+      ],
+      "exercices": [
+        { "id": "u03-l4-e1", "type": "bug", "notions": ["portee"], "question": "Ce code plante. Pourquoi ?", "code": ["function calculer() {", "  const resultat = 6 * 7;", "}", "calculer();", "console.log(resultat);"], "ligne": 5, "choix": ["`resultat` n'existe que dans la fonction : il fallait la retourner", "Il faut `let` au lieu de `const`", "La fonction doit s'appeler avant d'être déclarée", "6 * 7 doit être entre guillemets"], "bonne": 0, "explication": "`resultat` vit dans la fonction. Avec `return resultat;` et `const r = calculer();`, on le récupère dehors." },
+        { "id": "u03-l4-e2", "type": "predire", "notions": ["portee"], "question": "Que va afficher ce code ?", "code": ["const bonus = 5;", "function total(points) {", "  return points + bonus;", "}", "console.log(total(10));"], "explication": "La fonction voit `bonus`, déclaré dehors, au-dessus." },
+        { "id": "u03-l4-e3", "type": "predire", "notions": ["portee", "parametres"], "question": "Que va afficher ce code ?", "code": ["const x = 1;", "function f(x) {", "  return x * 100;", "}", "console.log(f(3));"], "explication": "Dans la fonction, `x` désigne le **paramètre** (3), qui cache le `x` du dehors." },
+        { "id": "u03-l4-e4", "type": "vf", "notions": ["portee"], "question": "Une variable créée avec `const` dans une fonction peut être utilisée après l'appel de la fonction, en dehors.", "bonne": false, "explication": "Elle n'existe que dans la fonction. Pour faire sortir une valeur : `return`." },
+        {
+          "id": "u03-l4-e5", "type": "corriger", "notions": ["portee", "return"],
+          "question": "On veut afficher la moyenne calculée par `calculerMoyenne`. Le code plante (`moyenne is not defined`). Corrige-le : la fonction doit **retourner** la moyenne, et le code du dehors doit la récupérer dans une constante `moyenne`.",
+          "depart": ["function calculerMoyenne(a, b) {", "  const moyenne = (a + b) / 2;", "}", "", "calculerMoyenne(4, 5);", "console.log(moyenne);"],
+          "tests": { "cas": [ { "titre": "Affichage", "sortie": ["4.5"], "variables": { "moyenne": 4.5 } }, { "titre": "calculerMoyenne(2, 6)", "fonction": "calculerMoyenne", "args": [2, 6], "attendu": 4 } ] },
+          "indices": ["Dans la fonction : `return …;`", "Dehors : `const moyenne = calculerMoyenne(4, 5);`"],
+          "solution": ["function calculerMoyenne(a, b) {", "  return (a + b) / 2;", "}", "", "const moyenne = calculerMoyenne(4, 5);", "console.log(moyenne);"],
+          "erreursTypiques": [ { "code": "function calculerMoyenne(a, b) {\n  const moyenne = (a + b) / 2;\n  return moyenne;\n}\n\ncalculerMoyenne(4, 5);\nconsole.log(moyenne);", "attendu": "erreur" } ],
+          "explication": "La valeur sort de la fonction par `return`, et on lui colle une étiquette dehors."
+        }
+      ]
+    },
+    {
+      "id": "u03-l5",
+      "titre": "Les fonctions fléchées",
+      "duree": 6,
+      "notions": ["fleche", "fleche-objet", "return"],
+      "cartes": [
+        {
+          "titre": "La même fonction, en plus court",
+          "illu": "fleche",
+          "texte": "Une **fonction fléchée** s'écrit avec `=>`. On la range dans une constante.",
+          "code": ["function doubleA(n) {", "  return n * 2;", "}", "const doubleB = (n) => n * 2;", "console.log(doubleA(4), doubleB(4));"],
+          "fiche": "fleche"
+        },
+        {
+          "titre": "Sans accolades : retour automatique",
+          "texte": "Après `=>`, s'il n'y a **pas** d'accolades, la valeur est **retournée automatiquement**. Pas besoin d'écrire `return`.",
+          "code": ["const somme = (a, b) => a + b;", "const estPair = (n) => n % 2 === 0;", "console.log(somme(2, 3), estPair(7));"]
+        },
+        {
+          "titre": "Avec accolades : return obligatoire",
+          "texte": "Si on met des accolades (pour écrire plusieurs lignes), on revient à une fonction normale : il faut `return`.",
+          "code": ["const ttc = (prix) => {", "  const taxe = prix * 0.081;", "  return prix + taxe;", "};", "console.log(ttc(100));"],
+          "piege": "`(n) => { n * 2 }` : accolades **sans** `return` → la fonction retourne `undefined`."
+        },
+        {
+          "titre": "Retourner un objet : des parenthèses",
+          "texte": "Un **objet** regroupe des valeurs nommées : `{ nom: \"Léa\", note: 5 }`. Pour qu'une fléchée courte le retourne, entoure-le de **parenthèses**. Sinon, les accolades sont lues comme le corps de la fonction.",
+          "code": ["const fiche = (nom, note) => ({ nom: nom, note: note });", "console.log(fiche(\"Léa\", 5));"],
+          "fiche": "fleche-objet"
+        },
+        {
+          "titre": "Pourquoi les fléchées ?",
+          "texte": "Parce qu'à partir de l'unité 5, on va écrire des petites fonctions **directement** dans `map`, `filter`, `reduce`… La fléchée courte est parfaite pour ça :",
+          "code": ["const prix = [10, 20, 30];", "console.log(prix.map((p) => p * 2));"],
+          "astuce": "Tu reconnais `(p) => p * 2` ? C'est une fonction qui double. `map` l'applique à chaque élément."
+        }
+      ],
+      "exercices": [
+        { "id": "u03-l5-e1", "type": "predire", "notions": ["fleche"], "question": "Que va afficher ce code ?", "code": ["const triple = (n) => n * 3;", "console.log(triple(7));"], "explication": "Sans accolades, `n * 3` est retourné : 21." },
+        { "id": "u03-l5-e2", "type": "predire", "notions": ["fleche", "return"], "question": "Que va afficher ce code ?", "code": ["const triple = (n) => { n * 3 };", "console.log(triple(7));"], "explication": "Accolades sans `return` : la fonction calcule 21 puis le jette, et retourne `undefined`." },
+        { "id": "u03-l5-e3", "type": "pointer-code", "notions": ["fleche"], "question": "Touche ce que cette fonction fléchée **retourne**.", "code": ["const aire = (largeur, hauteur) => ⟦largeur * hauteur⟧;"], "explication": "Sans accolades, tout ce qui suit `=>` est retourné." },
+        { "id": "u03-l5-e4", "type": "pointer-code", "notions": ["fleche", "parametres"], "question": "Touche **les paramètres** de la fonction fléchée.", "multi": true, "code": ["const somme = (⟦a⟧, ⟦b⟧) => a + b;"], "explication": "Les paramètres sont entre les parenthèses avant `=>`." },
+        { "id": "u03-l5-e5", "type": "assoc", "notions": ["fleche"], "question": "Associe chaque fonction classique à sa version fléchée.", "mono": true, "paires": [["function f(x) { return x + 1; }", "(x) => x + 1"], ["function f(a, b) { return a * b; }", "(a, b) => a * b"], ["function f() { return 42; }", "() => 42"], ["function f(x) { return x > 0; }", "(x) => x > 0"]], "explication": "Les paramètres avant `=>`, ce qui est retourné après." },
+        { "id": "u03-l5-e6", "type": "qcm", "notions": ["fleche-objet"], "question": "Laquelle retourne bien l'objet `{ prenom: \"Léa\" }` ?", "choix": ["(p) => ({ prenom: p })", "(p) => { prenom: p }", "(p) => { return prenom: p }", "(p) => [prenom: p]"], "bonne": 0, "mono": true, "explication": "Sans parenthèses, `{ prenom: p }` est lu comme le corps de la fonction, qui ne retourne rien." },
+        {
+          "id": "u03-l5-e7", "type": "objet", "notions": ["fleche-objet", "types"],
+          "question": "La fonction `creerEleve(nom, note)` retourne un objet. Remplis-le avec les **paramètres** (pas des valeurs écrites à la main).",
+          "code": ["const creerEleve = (nom, note) => ({", "  nom: …,", "  note: …,", "});"],
+          "cles": ["nom", "note"],
+          "etiquettes": ["nom", "note", "\"nom\"", "\"note\"", "\"Léa\"", "5"],
+          "bonnes": { "nom": ["nom"], "note": ["note"] },
+          "explication": "Les valeurs de l'objet sont les paramètres `nom` et `note`, sans guillemets. `\"nom\"` serait le mot « nom » ; `\"Léa\"` ne marcherait que pour Léa."
+        },
+        {
+          "id": "u03-l5-e8", "type": "ecrire", "notions": ["fleche"],
+          "question": "Écris une fonction **fléchée** `estPositif` qui retourne `true` si son paramètre est supérieur ou égal à 0.",
+          "depart": ["const estPositif = ", "", "console.log(estPositif(5), estPositif(-2));"],
+          "tests": { "fonction": "estPositif", "cas": [ { "args": [5], "attendu": true }, { "args": [0], "attendu": true }, { "args": [-2], "attendu": false } ], "obligatoire": ["=>"] },
+          "indices": ["`(n) => …` : que doit-on retourner ?", { "code": "const estPositif = (n) => n ___ 0;" }],
+          "solution": ["const estPositif = (n) => n >= 0;", "", "console.log(estPositif(5), estPositif(-2));"],
+          "erreursTypiques": [
+            { "code": "const estPositif = (n) => { n >= 0 };", "attendu": "echec" },
+            { "code": "const estPositif = (n) => n > 0;", "attendu": "echec" },
+            { "code": "function estPositif(n) {\n  return n >= 0;\n}", "attendu": "echec" }
+          ],
+          "explication": "Sans accolades, la comparaison est retournée directement."
+        },
+        {
+          "id": "u03-l5-e9", "type": "ecrire", "notions": ["fleche-objet"],
+          "question": "Écris une fonction fléchée `creerProduit(nom, prix)` qui retourne un objet `{ nom: …, prix: … }` avec les valeurs reçues.",
+          "depart": ["const creerProduit = ", "", "console.log(creerProduit(\"t-shirt\", 25));"],
+          "tests": { "fonction": "creerProduit", "cas": [ { "args": ["t-shirt", 25], "attendu": { "nom": "t-shirt", "prix": 25 } }, { "args": ["casquette", 15.5], "attendu": { "nom": "casquette", "prix": 15.5 } } ], "obligatoire": ["=>"] },
+          "indices": ["Un objet : `{ cle: valeur, cle: valeur }`.", "Fléchée courte qui retourne un objet : des parenthèses autour.", { "code": "const creerProduit = (nom, prix) => ({ nom: ___, prix: ___ });" }],
+          "solution": ["const creerProduit = (nom, prix) => ({ nom: nom, prix: prix });", "", "console.log(creerProduit(\"t-shirt\", 25));"],
+          "erreursTypiques": [
+            { "code": "const creerProduit = (nom, prix) => { nom: nom, prix: prix };", "attendu": "erreur" },
+            { "code": "const creerProduit = (nom, prix) => { nom: nom };", "attendu": "echec", "diagnostic": "objet-sans-parentheses" },
+            { "code": "const creerProduit = (nom, prix) => ({ nom: \"nom\", prix: \"prix\" });", "attendu": "echec" }
+          ],
+          "explication": "`(nom, prix) => ({ nom: nom, prix: prix })` : les parenthèses font de `{ }` un objet. (On peut même écrire `({ nom, prix })` : on le verra à l'unité Objets.)"
+        }
+      ]
+    },
+    {
+      "id": "u03-l6",
+      "titre": "Donner une fonction à une fonction",
+      "duree": 5,
+      "notions": ["fonction-en-parametre", "fleche", "return"],
+      "cartes": [
+        {
+          "titre": "Une fonction est une valeur",
+          "texte": "On peut ranger une fonction dans une variable, et la **donner en argument** à une autre fonction, comme un nombre ou un texte. On la passe **sans** parenthèses : on donne la recette, pas le plat.",
+          "code": ["function double(n) {", "  return n * 2;", "}", "function transform(n, fct) {", "  return fct(n);", "}", "console.log(transform(5, double));"],
+          "analogie": "Tu confies ta **recette** à un chef. C'est lui qui la cuisinera (`fct(n)`), quand il en aura besoin.",
+          "fiche": "fonction-en-parametre"
+        },
+        {
+          "titre": "Écrire la fonction sur place",
+          "texte": "Pas besoin de nommer la fonction : on peut l'écrire directement dans l'appel, en fléchée.",
+          "code": ["function transform(n, fct) {", "  return fct(n);", "}", "console.log(transform(5, (n) => n + 100));", "console.log(transform(5, (n) => n * n));"],
+          "astuce": "C'est exactement la forme de `numbers.map((n) => n * 2)` : `map` reçoit une fonction et l'appelle sur chaque élément."
+        },
+        {
+          "titre": "Appliquer deux fois",
+          "texte": "Le TP te demande `twice` : appliquer la fonction reçue deux fois. On appelle `fct` une première fois, puis on lui redonne le résultat.",
+          "code": ["const ajouter1 = (n) => n + 1;", "console.log(ajouter1(ajouter1(5)));"]
+        },
+        {
+          "titre": "Une fonction qui fabrique une fonction",
+          "texte": "Une fonction peut aussi **retourner** une fonction. Ici, `creerSalutation` fabrique des fonctions de salutation sur mesure (c'est l'idée de `curryAdd` dans le TP).",
+          "code": ["function creerSalutation(mot) {", "  return (prenom) => mot + \" \" + prenom;", "}", "const direBonjour = creerSalutation(\"Bonjour\");", "console.log(direBonjour(\"Léa\"));", "console.log(creerSalutation(\"Hello\")(\"Sami\"));"]
+        }
+      ],
+      "exercices": [
+        { "id": "u03-l6-e1", "type": "predire", "notions": ["fonction-en-parametre"], "question": "Que va afficher ce code ?", "code": ["function appliquer(x, f) {", "  return f(x);", "}", "console.log(appliquer(3, (n) => n * 10));"], "explication": "`f` reçoit la fonction `(n) => n * 10` ; `f(3)` vaut 30." },
+        { "id": "u03-l6-e2", "type": "bug", "notions": ["fonction-en-parametre"], "question": "Ce code plante. Où est l'erreur ?", "code": ["function carre(n) {", "  return n * n;", "}", "function transform(n, fct) {", "  return fct(n);", "}", "console.log(transform(4, carre()));"], "ligne": 7, "choix": ["On passe `carre()` (son résultat) au lieu de `carre` (la fonction)", "`transform` doit être déclarée avant `carre`", "Il faut `return` ligne 7", "`fct` est un mot réservé"], "bonne": 0, "explication": "`carre()` exécute la fonction sans argument (résultat `NaN`) : `fct` reçoit un nombre, pas une fonction. On passe la recette : `transform(4, carre)`." },
+        { "id": "u03-l6-e3", "type": "predire", "notions": ["fonction-en-parametre", "fleche"], "question": "Que va afficher ce code ?", "code": ["const plus3 = (n) => n + 3;", "console.log(plus3(plus3(1)));"], "explication": "`plus3(1)` vaut 4, puis `plus3(4)` vaut 7." },
+        { "id": "u03-l6-e4", "type": "predire", "notions": ["fonction-en-parametre", "return"], "question": "Que va afficher ce code ?", "code": ["function multiplierPar(k) {", "  return (n) => n * k;", "}", "const fois3 = multiplierPar(3);", "console.log(fois3(5));"], "explication": "`multiplierPar(3)` fabrique la fonction `(n) => n * 3`. Appliquée à 5 : 15." },
+        {
+          "id": "u03-l6-e5", "type": "ecrire", "notions": ["fonction-en-parametre"],
+          "question": "Écris `appliquerTrois(x, f)` qui applique la fonction `f` **trois fois** de suite à `x`, et retourne le résultat.",
+          "depart": ["function appliquerTrois(x, f) {", "  ", "}", "", "console.log(appliquerTrois(1, (n) => n * 2));"],
+          "tests": { "fonction": "appliquerTrois", "cas": [ { "titre": "doubler 3 fois 1", "argsCode": "[1, (n) => n * 2]", "attendu": 8 }, { "titre": "ajouter 10 trois fois à 0", "argsCode": "[0, (n) => n + 10]", "attendu": 30 }, { "titre": "avec une chaîne", "argsCode": "[\"a\", (s) => s + \"!\"]", "attendu": "a!!!" } ] },
+          "indices": ["`f(x)` applique une fois. Puis on redonne le résultat à `f`…", { "code": "return f(f(___));" }],
+          "solution": ["function appliquerTrois(x, f) {", "  return f(f(f(x)));", "}", "", "console.log(appliquerTrois(1, (n) => n * 2));"],
+          "erreursTypiques": [ { "code": "function appliquerTrois(x, f) {\n  return f(x) * 3;\n}", "attendu": "echec" }, { "code": "function appliquerTrois(x, f) {\n  f(f(f(x)));\n}", "attendu": "echec", "diagnostic": "sans-return" } ],
+          "explication": "On emboîte les appels : le résultat de l'un devient l'argument du suivant."
+        }
+      ]
+    }
+  ],
+  "jeux": [
+    {
+      "id": "u03-erreurs",
+      "titre": "Le traducteur d'erreurs",
+      "description": "Les messages d'erreur sont en anglais et très courts. Apprends à les lire.",
+      "tours": 8,
+      "badge": "traducteur",
+      "seuilBadge": 6,
+      "questions": [
+        { "id": "u03-j1-1", "type": "erreurs", "notions": ["portee", "variables"], "question": "Associe chaque message d'erreur à sa cause.", "paires": [["x is not defined", "x n'a jamais été créée (ou faute de frappe)"], ["Assignment to constant variable", "on modifie une const"], ["x is not a function", "on met des () après autre chose qu'une fonction"], ["Cannot access 'x' before initialization", "x est utilisée avant sa ligne de création"]], "explication": "Ces quatre messages couvrent la majorité des erreurs de débutant." },
+        { "id": "u03-j1-2", "type": "qcm", "notions": ["fonction"], "question": "`Uncaught TypeError: prenom is not a function`. Que s'est-il passé ?", "code": ["const prenom = \"Léa\";", "prenom();"], "choix": ["On a mis des parenthèses après un texte, comme si c'était une fonction", "La variable prenom n'existe pas", "Il manque des guillemets", "La fonction prenom ne retourne rien"], "bonne": 0, "explication": "`prenom` est un texte : on ne peut pas l'« appeler »." },
+        { "id": "u03-j1-3", "type": "qcm", "notions": ["portee"], "question": "`ReferenceError: total is not defined` à la dernière ligne. Pourquoi ?", "code": ["function calcul() {", "  const total = 10;", "  return total;", "}", "console.log(total);"], "choix": ["`total` n'existe que dans la fonction", "La fonction n'est pas déclarée", "`total` est une const", "Il faut `return` dans console.log"], "bonne": 0, "explication": "Les variables créées dans une fonction restent dans la fonction." },
+        { "id": "u03-j1-4", "type": "qcm", "notions": ["return"], "question": "`TypeError: Cannot read properties of undefined (reading 'length')`. Cause la plus probable ?", "code": ["function getMots() {", "  const mots = [\"a\", \"b\"];", "}", "console.log(getMots().length);"], "choix": ["`getMots` ne retourne rien, donc `getMots()` vaut undefined", "Les tableaux n'ont pas de length", "Il faut des guillemets autour de length", "`mots` est mal écrit"], "bonne": 0, "explication": "Sans `return`, la fonction vaut `undefined`, et `undefined` n'a pas de `.length`." },
+        { "id": "u03-j1-5", "type": "qcm", "notions": ["variables"], "question": "`SyntaxError: Identifier 'x' has already been declared`. Que faire ?", "code": ["let x = 1;", "let x = 2;"], "choix": ["Enlever le deuxième `let` : `x = 2;`", "Remplacer `let` par `const` partout", "Mettre x entre guillemets", "Ajouter un point-virgule"], "bonne": 0, "explication": "On déclare une fois, on modifie ensuite sans `let`." },
+        { "id": "u03-j1-6", "type": "qcm", "notions": ["fonction"], "question": "`SyntaxError: missing ) after argument list`. Que vérifier ?", "code": ["console.log(\"Résultat :\" 42);"], "choix": ["Une parenthèse ou une virgule manque dans l'appel", "La variable n'existe pas", "Le texte est trop long", "console.log doit être en majuscules"], "bonne": 0, "explication": "Il manque la virgule entre les deux arguments : `console.log(\"Résultat :\", 42);`." },
+        { "id": "u03-j1-7", "type": "erreurs", "notions": ["arithmetique", "types"], "question": "Associe le message (ou le résultat bizarre) à sa cause.", "paires": [["NaN", "un calcul avec undefined ou un texte non numérique"], ["undefined", "une fonction sans return, ou une case vide"], ["[Function: f]", "on affiche la fonction au lieu de l'appeler"], ["Unexpected end of input", "une parenthèse ou une accolade n'est pas refermée"]], "explication": "Ces valeurs étranges sont des indices précieux sur le bug." },
+        { "id": "u03-j1-8", "type": "qcm", "notions": ["fleche"], "question": "Ta fonction retourne `undefined` alors qu'elle calcule bien. Le coupable le plus probable ?", "code": ["const ttc = (prix) => {", "  prix * 1.081;", "};"], "choix": ["Accolades sans `return`", "Il faut `function` au lieu de `=>`", "1.081 doit être entre guillemets", "Il manque une virgule"], "bonne": 0, "explication": "Avec des accolades, il faut `return prix * 1.081;`. Ou sans accolades : `(prix) => prix * 1.081`." },
+        { "id": "u03-j1-9", "type": "qcm", "notions": ["types"], "question": "Une fonction doit retourner 14, et les tests disent : « On attend 14, tu retournes \"14\" ». Que corriger ?", "choix": ["Le type : du texte est retourné au lieu d'un nombre", "Rien, c'est pareil", "Il faut afficher au lieu de retourner", "Il faut retourner 15"], "bonne": 0, "explication": "Les guillemets font un texte. Les tests comparent aussi le type." }
+      ]
+    }
+  ],
+  "quiz": {
+    "titre": "Quiz : les fonctions",
+    "questions": [
+      { "id": "u03-q1", "type": "predire", "notions": ["fonction", "return"], "question": "Que va afficher ce code ?", "code": ["function f() {", "  return 5;", "}", "console.log(f() + f());"], "explication": "Chaque appel vaut 5." },
+      { "id": "u03-q2", "type": "predire", "notions": ["return"], "question": "Que va afficher ce code ?", "code": ["function h(n) {", "  console.log(n);", "}", "console.log(h(8));"], "explication": "`h(8)` affiche 8, puis retourne `undefined`, qui est affiché à son tour." },
+      { "id": "u03-q3", "type": "qcm", "notions": ["return"], "question": "Un énoncé dit « **Retourner** le plus grand nombre ». Que doit contenir ta fonction ?", "choix": ["return", "console.log", "les deux, obligatoirement", "ni l'un ni l'autre"], "bonne": 0, "mono": true, "explication": "« Retourner » = `return`. Le `console.log`, c'est à l'extérieur pour vérifier." },
+      { "id": "u03-q4", "type": "pointer-code", "notions": ["parametres"], "question": "Touche le **paramètre**.", "code": ["const carre = (⟦x⟧) => x * x;", "console.log(carre(9));"], "explication": "Le paramètre est déclaré avant `=>`. Le 9 est l'argument." },
+      { "id": "u03-q5", "type": "predire", "notions": ["fleche"], "question": "Que va afficher ce code ?", "code": ["const f = (a, b) => a - b;", "console.log(f(2, 10));"], "explication": "2 - 10 = -8 : l'ordre des arguments compte." },
+      { "id": "u03-q6", "type": "qcm", "notions": ["fleche"], "question": "Que retourne `(n) => { n + 1 }` ?", "choix": ["undefined", "n + 1", "une erreur", "1"], "bonne": 0, "mono": true, "explication": "Accolades sans `return`." },
+      { "id": "u03-q7", "type": "bug", "notions": ["portee"], "question": "Trouve la ligne qui plante.", "code": ["function f() {", "  const message = \"coucou\";", "  return message;", "}", "f();", "console.log(message);"], "ligne": 6, "choix": ["`message` n'existe que dans la fonction", "La fonction n'est pas appelée", "Il faut `let` ligne 2", "`return` est mal placé"], "bonne": 0, "explication": "On aurait dû écrire `console.log(f());`." },
+      { "id": "u03-q8", "type": "predire", "notions": ["fonction"], "question": "Que va afficher ce code ?", "code": ["const saluer = () => \"Salut\";", "console.log(saluer);"], "explication": "Sans parenthèses : on affiche la fonction elle-même." },
+      { "id": "u03-q9", "type": "qcm", "notions": ["fleche-objet"], "question": "Pour retourner un objet avec une fléchée courte, on écrit :", "choix": ["(x) => ({ valeur: x })", "(x) => { valeur: x }", "(x) => [{ valeur: x }]", "(x) => return { valeur: x }"], "bonne": 0, "mono": true, "explication": "Les parenthèses autour de l'objet évitent qu'il soit lu comme le corps de la fonction." },
+      { "id": "u03-q10", "type": "predire", "notions": ["fonction-en-parametre"], "question": "Que va afficher ce code ?", "code": ["const appliquer = (x, f) => f(x);", "console.log(appliquer(4, (n) => n * n));"], "explication": "`f` est la fonction carré : 4 × 4." },
+      { "id": "u03-q11", "type": "vf", "notions": ["return"], "question": "Une fonction sans `return` retourne `undefined`.", "bonne": true, "explication": "Toujours. C'est pour ça qu'un `console.log` à la place d'un `return` fait échouer les tests." },
+      { "id": "u03-q12", "type": "predire", "notions": ["parametres"], "question": "Que va afficher ce code ?", "code": ["function f(a, b) {", "  return a + b;", "}", "console.log(f(1));"], "explication": "`b` vaut `undefined` : 1 + undefined donne `NaN`." },
+      {
+        "id": "u03-q13", "type": "trous", "notions": ["return", "fleche"],
+        "question": "Complète pour que `moitie` retourne la moitié de son paramètre.",
+        "code": ["const moitie = (n) => ___;", "console.log(moitie(10));"],
+        "tests": { "fonction": "moitie", "cas": [ { "args": [10], "attendu": 5 }, { "args": [3], "attendu": 1.5 } ] },
+        "indices": ["Sans accolades, ce qui suit `=>` est retourné."],
+        "solution": ["n / 2"],
+        "erreursTypiques": [ { "trous": ["{ n / 2 }"], "attendu": "echec" }, { "trous": ["10 / 2"], "attendu": "echec" } ],
+        "explication": "`(n) => n / 2` retourne directement la moitié."
+      },
+      { "id": "u03-q14", "type": "predire", "notions": ["portee"], "question": "Que va afficher ce code ?", "code": ["const n = 2;", "function f(n) {", "  return n + 1;", "}", "console.log(f(10), n);"], "explication": "Dans `f`, `n` est le paramètre (10). Dehors, `n` vaut toujours 2." },
+      { "id": "u03-q15", "type": "bug", "notions": ["return"], "question": "`getDouble(5)` doit valoir 10, mais vaut undefined. Quelle ligne corriger ?", "code": ["function getDouble(n) {", "  const d = n * 2;", "  console.log(d);", "}"], "ligne": 3, "choix": ["Remplacer `console.log(d);` par `return d;`", "Remplacer `const` par `let`", "Mettre `n * 2` entre parenthèses", "Appeler la fonction ligne 1"], "bonne": 0, "explication": "La fonction affiche au lieu de tendre le résultat." }
+    ]
+  },
+  "boss": [
+    {
+      "id": "u03-b1",
+      "titre": "Le plus grand des trois",
+      "source": "TP Fonctions · exercice 1",
+      "notions": ["return", "comparaisons", "logique", "parametres"],
+      "enonce": "Écrire une fonction qui **retourne** la plus grande valeur parmi les trois nombres fournis en paramètre.\n\nNomme-la `getMax(a, b, c)`.",
+      "regles": ["« Retourne » : la fonction doit utiliser `return`.", "Elle sera testée avec beaucoup de trios différents, y compris des nombres égaux et négatifs."],
+      "depart": ["function getMax(a, b, c) {", "  ", "}", "", "console.log(getMax(4, 18, 3));"],
+      "tests": {
+        "fonction": "getMax",
+        "cas": [
+          { "args": [4, 18, 3], "attendu": 18 },
+          { "args": [2, 3, 4], "attendu": 4 },
+          { "args": [9, 6, 2], "attendu": 9 },
+          { "titre": "deux nombres égaux et les plus grands", "args": [5, 5, 2], "attendu": 5, "siEchec": "Avec 5, 5 et 2, ta fonction ne retourne pas 5. Quand deux nombres sont égaux, `a > b` est faux : pense à `>=`, ou garde le plus grand au fur et à mesure dans une variable `let max = a;`." },
+          { "titre": "le plus grand en double à la fin", "args": [1, 7, 7], "attendu": 7 },
+          { "titre": "nombres négatifs", "args": [-5, -2, -9], "attendu": -2 },
+          { "titre": "tous égaux", "args": [3, 3, 3], "attendu": 3 }
+        ]
+      },
+      "indices": [
+        "Une idée : garder « le plus grand vu jusqu'ici » dans une variable `let`, et le remplacer si on trouve mieux.",
+        "Attention aux égalités : avec 5, 5, 2, la réponse est 5. `a > b && a > c` ne suffit pas.",
+        { "texte": "Une structure possible :", "code": "function getMax(a, b, c) {\n  let max = a;\n  if (b > ___) max = b;\n  if (___) max = ___;\n  return ___;\n}" }
+      ],
+      "solution": ["function getMax(a, b, c) {", "  let max = a;", "  if (b > max) max = b;", "  if (c > max) max = c;", "  return max;", "}", "", "console.log(getMax(4, 18, 3));"],
+      "erreursTypiques": [
+        { "code": "function getMax(a, b, c) {\n  if (a > b && a > c) return a;\n  if (b > a && b > c) return b;\n  return c;\n}", "attendu": "echec", "diagnostic": "contenu" },
+        { "code": "function getMax(a, b, c) {\n  let max = a;\n  if (b > max) max = b;\n  if (c > max) max = c;\n  console.log(max);\n}", "attendu": "echec", "diagnostic": "return-vs-log" },
+        { "code": "function getMax(a, b, c) {\n  let max = 0;\n  if (a > max) max = a;\n  if (b > max) max = b;\n  if (c > max) max = c;\n  return max;\n}", "attendu": "echec" }
+      ],
+      "explication": "C'est l'exercice 1 du TP. Une autre façon : `return Math.max(a, b, c);`. Les deux sont justes."
+    },
+    {
+      "id": "u03-b2",
+      "titre": "Un entier au hasard",
+      "source": "TP Fonctions · exercice 2",
+      "notions": ["math-random", "return", "arithmetique"],
+      "enonce": "Écrire une fonction qui **retourne** un nombre entier pseudo-aléatoire entre une borne inférieure et une borne supérieure (bornes entières et **comprises** dans l'intervalle).\n\nNomme-la `getRandomInt(min, max)`.",
+      "regles": ["La fonction sera appelée des milliers de fois : chaque valeur entre min et max (comprises) doit pouvoir sortir, et aucune autre."],
+      "depart": ["function getRandomInt(min, max) {", "  ", "}", "", "console.log(getRandomInt(3, 7));"],
+      "tests": {
+        "fonction": "getRandomInt",
+        "cas": [
+          { "titre": "entre 3 et 7, 3 000 tirages", "args": [3, 7], "repetitions": 3000, "entier": true, "min": 3, "max": 7, "tous": true },
+          { "titre": "entre 1 et 6 (un dé)", "args": [1, 6], "repetitions": 3000, "entier": true, "min": 1, "max": 6, "tous": true },
+          { "titre": "entre -2 et 2", "args": [-2, 2], "repetitions": 3000, "entier": true, "min": -2, "max": 2, "tous": true },
+          { "titre": "entre 5 et 5", "args": [5, 5], "repetitions": 200, "entier": true, "min": 5, "max": 5, "tous": true }
+        ]
+      },
+      "indices": [
+        "Relis la fiche [[math-random]] : `Math.random()` va de 0 (compris) à 1 (exclu).",
+        "Combien de valeurs différentes entre min et max compris ? Entre 3 et 7, il y en a 5.",
+        { "texte": "La formule à compléter :", "code": "return Math.floor(Math.random() * (___ - ___ + 1)) + ___;" }
+      ],
+      "solution": ["function getRandomInt(min, max) {", "  return Math.floor(Math.random() * (max - min + 1)) + min;", "}", "", "console.log(getRandomInt(3, 7));"],
+      "erreursTypiques": [
+        { "code": "function getRandomInt(min, max) {\n  return Math.floor(Math.random() * (max - min)) + min;\n}", "attendu": "echec" },
+        { "code": "function getRandomInt(min, max) {\n  return Math.random() * (max - min + 1) + min;\n}", "attendu": "echec" },
+        { "code": "function getRandomInt(min, max) {\n  return Math.floor(Math.random() * max) + min;\n}", "attendu": "echec" }
+      ],
+      "explication": "`max - min + 1` est le nombre de valeurs possibles ; `Math.floor` coupe ; `+ min` décale. (Avec `Math.round`, les bornes sortiraient deux fois moins souvent que les autres valeurs.)"
+    },
+    {
+      "id": "u03-b3",
+      "titre": "compareA et compareB",
+      "source": "TP Fonctions · exercice 3",
+      "notions": ["egalite-stricte", "return"],
+      "enonce": "Écrire deux fonctions `compareA` et `compareB` qui retournent les mêmes résultats que dans les exemples suivants :\n\n- `compareA(4, '4')` → `true`\n- `compareA(4.0, '4')` → `true`\n- `compareA(4, 'quatre')` → `false`\n- `compareB(8, '8')` → `false`\n- `compareB(8, 'huit')` → `false`",
+      "regles": ["Chaque fonction prend deux paramètres et **retourne** un booléen."],
+      "depart": ["function compareA(a, b) {", "  ", "}", "", "function compareB(a, b) {", "  ", "}", "", "console.log(compareA(4, \"4\"), compareB(8, \"8\"));"],
+      "tests": {
+        "cas": [
+          { "fonction": "compareA", "args": [4, "4"], "attendu": true },
+          { "fonction": "compareA", "args": [4.0, "4"], "attendu": true },
+          { "fonction": "compareA", "args": [4, "quatre"], "attendu": false },
+          { "fonction": "compareA", "titre": "compareA(7, 7)", "args": [7, 7], "attendu": true },
+          { "fonction": "compareB", "args": [8, "8"], "attendu": false },
+          { "fonction": "compareB", "args": [8, "huit"], "attendu": false },
+          { "fonction": "compareB", "titre": "compareB(8, 8)", "args": [8, 8], "attendu": true, "siEchec": "`compareB(8, 8)` doit être true : deux valeurs identiques, de même type." }
+        ],
+        "sansConseil": ["egal-souple"]
+      },
+      "indices": [
+        "Regarde la fiche [[egalite-stricte]] : quelle comparaison dit que 4 et \"4\" sont égaux ? Laquelle dit le contraire ?",
+        "L'une des deux fonctions utilise la comparaison « souple », l'autre la stricte.",
+        { "code": "function compareA(a, b) {\n  return a ___ b;\n}" }
+      ],
+      "solution": ["function compareA(a, b) {", "  return a == b;", "}", "", "function compareB(a, b) {", "  return a === b;", "}", "", "console.log(compareA(4, \"4\"), compareB(8, \"8\"));"],
+      "erreursTypiques": [
+        { "code": "function compareA(a, b) {\n  return a === b;\n}\nfunction compareB(a, b) {\n  return a == b;\n}", "attendu": "echec" },
+        { "code": "function compareA(a, b) {\n  console.log(a == b);\n}\nfunction compareB(a, b) {\n  console.log(a === b);\n}", "attendu": "echec", "diagnostic": "return-vs-log" }
+      ],
+      "explication": "C'est **le** seul exercice où `==` est la bonne réponse : il montre pourquoi on utilise `===` partout ailleurs."
+    },
+    {
+      "id": "u03-b4",
+      "titre": "Somme et curryAdd",
+      "source": "TP Fonctions · exercices 8 et 9",
+      "notions": ["return", "fonction-en-parametre", "fleche"],
+      "enonce": "1. Écrire une fonction `sum(a, b)` qui **retourne** la somme de deux nombres.\n2. Écrire une fonction `curryAdd` qui retourne une **fonction** qui somme son unique paramètre au paramètre fourni en entrée (une *curryfication* de la fonction précédente).\n\nExemples :\n- `curryAdd(2)(40)` retourne 42\n- `const add2 = curryAdd(2);` puis `add2(41)` retourne 43",
+      "regles": ["`curryAdd(2)` doit retourner une fonction, pas un nombre."],
+      "depart": ["function sum(a, b) {", "  ", "}", "", "function curryAdd(a) {", "  ", "}", "", "console.log(sum(2, 40));", "console.log(curryAdd(2)(40));"],
+      "tests": {
+        "cas": [
+          { "fonction": "sum", "args": [2, 40], "attendu": 42 },
+          { "fonction": "sum", "args": [-1, 1], "attendu": 0 },
+          { "fonction": "curryAdd", "titre": "curryAdd(2)(40)", "args": [2], "puis": [40], "attendu": 42, "siEchec": "`curryAdd(2)` doit retourner une fonction, qui attend le deuxième nombre. Regarde la fiche [[fonction-en-parametre]]." },
+          { "fonction": "curryAdd", "titre": "curryAdd(2)(41)", "args": [2], "puis": [41], "attendu": 43 },
+          { "fonction": "curryAdd", "titre": "curryAdd(-10)(3)", "args": [-10], "puis": [3], "attendu": -7 }
+        ]
+      },
+      "indices": [
+        "`sum` est une fonction classique avec deux paramètres.",
+        "`curryAdd(a)` ne calcule rien : elle **retourne une fonction** qui, elle, recevra `b`.",
+        { "texte": "La forme de curryAdd :", "code": "function curryAdd(a) {\n  return (b) => ___;\n}" }
+      ],
+      "solution": ["function sum(a, b) {", "  return a + b;", "}", "", "function curryAdd(a) {", "  return (b) => sum(a, b);", "}", "", "console.log(sum(2, 40));", "console.log(curryAdd(2)(40));"],
+      "erreursTypiques": [
+        { "code": "function sum(a, b) {\n  return a + b;\n}\nfunction curryAdd(a, b) {\n  return a + b;\n}", "attendu": "erreur" },
+        { "code": "function sum(a, b) {\n  return a + b;\n}\nfunction curryAdd(a) {\n  return (b) => { a + b };\n}", "attendu": "echec" }
+      ],
+      "explication": "`curryAdd(2)` fabrique la fonction « ajouter 2 ». C'est l'idée qu'utilisent `map` et `filter` : des fonctions qu'on passe et qu'on fabrique."
+    },
+    {
+      "id": "u03-b5",
+      "titre": "square et twice, tout en flèches",
+      "source": "TP Fonctions · exercices 10, 11 et 12",
+      "notions": ["fleche", "fonction-en-parametre", "return"],
+      "enonce": "En utilisant **strictement des fonctions fléchées** :\n\n1. Écrire une fonction `square` qui retourne le carré du nombre passé en paramètre.\n2. Écrire une fonction `twice` qui applique deux fois la fonction passée en premier paramètre sur le deuxième paramètre.\n\nExemple : `twice(square, 2)` → `square(square(2))` → 16",
+      "regles": ["Pas de mot-clé `function` : uniquement des `=>`.", "`twice` doit marcher avec n'importe quelle fonction, pas seulement `square`."],
+      "depart": ["const square = ", "", "const twice = ", "", "console.log(twice(square, 2));"],
+      "tests": {
+        "cas": [
+          { "fonction": "square", "args": [3], "attendu": 9 },
+          { "fonction": "square", "args": [-4], "attendu": 16 },
+          { "fonction": "twice", "titre": "twice(square, 2)", "argsCode": "[square, 2]", "attendu": 16 },
+          { "fonction": "twice", "titre": "twice((x) => x + 1, 5)", "argsCode": "[(x) => x + 1, 5]", "attendu": 7, "siEchec": "`twice` doit appeler la fonction **reçue en paramètre**, pas `square` directement." },
+          { "fonction": "twice", "titre": "twice avec une chaîne", "argsCode": "[(s) => s + \"!\", \"Go\"]", "attendu": "Go!!" }
+        ],
+        "interdit": ["function"],
+        "obligatoire": ["=>"]
+      },
+      "indices": [
+        "`square` : un paramètre, on retourne le nombre multiplié par lui-même.",
+        "`twice` reçoit une fonction `f` et une valeur `x`. Appliquer une fois : `f(x)`. Deux fois : on redonne le résultat à `f`.",
+        { "code": "const square = (n) => ___;\nconst twice = (f, x) => ___;" }
+      ],
+      "solution": ["const square = (n) => n * n;", "", "const twice = (f, x) => f(f(x));", "", "console.log(twice(square, 2));"],
+      "erreursTypiques": [
+        { "code": "const square = (n) => n * n;\nconst twice = (f, x) => square(square(x));", "attendu": "echec", "diagnostic": "contenu" },
+        { "code": "function square(n) {\n  return n * n;\n}\nconst twice = (f, x) => f(f(x));", "attendu": "echec", "diagnostic": "interdit" },
+        { "code": "const square = (n) => n * 2;\nconst twice = (f, x) => f(f(x));", "attendu": "echec" },
+        { "code": "const square = (n) => { n * n };\nconst twice = (f, x) => f(f(x));", "attendu": "echec" }
+      ],
+      "explication": "Tu as écrit des fonctions qui prennent une fonction en paramètre : c'est exactement ce que sont `map`, `filter` et `reduce`. Place aux tableaux !"
+    }
+  ]
+}

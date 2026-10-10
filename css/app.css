@@ -507,3 +507,7 @@ textarea.save{width:100%;min-height:110px;border:2px solid var(--line);border-ra
 .code input.trou{font-family:var(--f-code);font-size:inherit;line-height:1.3;border:2px dashed var(--prim);border-radius:6px;background:var(--paper);color:var(--ink);padding:1px 4px;margin:1px 0;min-height:30px;vertical-align:baseline}
 .code input.trou:focus{outline:none;border-style:solid}
 .code input.trou:read-only{border-style:solid;border-color:var(--line)}
+/* pas de ligatures dans le code : => doit se lire comme les deux caractères qu'on tape */
+.code,.console,.symboles button,code,.chip.c,.choice.c,.objet,.saisie,.ed-entete,.ed-zone pre,.ed-zone textarea,.case,.reduce,.maillon,.parsons,.indice pre,.fiche-lien .ic,.uico{font-variant-ligatures:none;font-feature-settings:"liga" 0,"calt" 0}
+.choice .ct{min-width:0;overflow-wrap:anywhere}
+.choice .ct code{background:var(--code-bg);border:1px solid var(--code-line);border-radius:6px;padding:0 4px}

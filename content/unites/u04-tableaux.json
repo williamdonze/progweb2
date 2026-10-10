@@ -1,0 +1,404 @@
+{
+  "id": "u04",
+  "titre": "Les tableaux",
+  "sousTitre": "La boîte d'œufs",
+  "objectif": "Créer un tableau, lire une case par son indice, utiliser length et le dernier indice, ne jamais modifier l'original.",
+  "icone": "[ ]",
+  "fiches": [
+    {
+      "id": "tableau",
+      "titre": "Le tableau : une boîte d'œufs",
+      "icone": "[ ]",
+      "resume": "Un tableau range plusieurs valeurs dans l'ordre : `[3, 14, 15]`. Le **tableau** est la boîte, chaque **élément** est un œuf.",
+      "analogie": "Un tableau est une **boîte d'œufs**. La boîte a un nom (`fruits`) ; chaque case contient un œuf (un élément : `\"kiwi\"`). Le nom de la boîte n'est pas le nom d'un œuf : on dit « la boîte `fruits` » et « un `fruit` ».",
+      "texte": "On crée un tableau avec des crochets, éléments séparés par des virgules :\n`const fruits = [\"pomme\", \"kiwi\", \"mangue\"];`\n\n- Les éléments peuvent être des nombres, des textes, des booléens, des objets… même d'autres tableaux.\n- `[]` est un tableau **vide** (une boîte sans œuf).\n- Convention : le nom du tableau est au **pluriel** (`fruits`, `numbers`, `strings`), le nom d'un élément au **singulier** (`fruit`, `number`, `word`).",
+      "exemples": [
+        { "code": ["const fruits = [\"pomme\", \"kiwi\", \"mangue\"];", "const numbers = [3, 14, 15, 92];", "const vide = [];", "console.log(fruits);", "console.log(numbers.length, vide.length);"] }
+      ],
+      "pieges": ["Appeler un élément du même nom que le tableau (`fruits.forEach((fruits) => …)`) : on ne sait plus qui est la boîte et qui est l'œuf."]
+    },
+    {
+      "id": "indice",
+      "titre": "Les indices : tab[i]",
+      "icone": "[i]",
+      "resume": "Chaque case a un numéro, l'**indice**, qui commence à **0**. `tab[0]` est le premier élément.",
+      "texte": "Dans `const fruits = [\"pomme\", \"kiwi\", \"mangue\"];` :\n- `fruits[0]` vaut `\"pomme\"` ;\n- `fruits[1]` vaut `\"kiwi\"` ;\n- `fruits[2]` vaut `\"mangue\"` ;\n- `fruits[3]` vaut `undefined` : il n'y a pas de 4e case.\n\nOn peut mettre une variable ou un calcul entre les crochets : `fruits[i]`, `fruits[i + 1]`.\n\n`tab.at(-1)` lit en partant de la fin : `-1` est le dernier, `-2` l'avant-dernier.",
+      "exemples": [
+        { "code": ["const fruits = [\"pomme\", \"kiwi\", \"mangue\"];", "console.log(fruits[0]);", "console.log(fruits[2]);", "console.log(fruits[3]);", "console.log(fruits.at(-1));"] }
+      ],
+      "pieges": ["Le premier indice est 0, pas 1.", "Un indice trop grand ne fait pas d'erreur : il donne `undefined`. L'erreur arrive plus loin (`Cannot read properties of undefined`)."]
+    },
+    {
+      "id": "length",
+      "titre": "length et le dernier indice",
+      "icone": "len",
+      "resume": "`tab.length` est le **nombre** d'éléments. Le **dernier indice** est `tab.length - 1`.",
+      "analogie": "Une boîte de 6 œufs a 6 cases, numérotées **de 0 à 5**. Le nombre d'œufs (6) n'est pas le numéro de la dernière case (5).",
+      "texte": "- `tab.length` : combien d'éléments (5 pour `[\"Sator\", \"Arepo\", \"Tenet\", \"Opera\", \"Rotas\"]`).\n- Dernier élément : `tab[tab.length - 1]` (ou `tab.at(-1)`).\n- `tab[tab.length]` vaut toujours `undefined` : une case après la dernière.\n\n**Indice du milieu** : `Math.floor((tab.length - 1) / 2)`.\n- 5 éléments → (5 - 1) / 2 = **2** : la case du milieu.\n- 4 éléments → (4 - 1) / 2 = 1.5 → **1** : la case juste **avant** le milieu (c'est ce que demande le TP pour un nombre pair de mots).",
+      "exemples": [
+        { "code": ["const strings = [\"Sator\", \"Arepo\", \"Tenet\", \"Opera\", \"Rotas\"];", "console.log(strings.length);", "console.log(strings[strings.length - 1]);", "const milieu = Math.floor((strings.length - 1) / 2);", "console.log(milieu, strings[milieu]);"] }
+      ],
+      "pieges": ["`tab[tab.length]` au lieu de `tab[tab.length - 1]`.", "`tab.length()` avec des parenthèses : `length` n'est pas une fonction."]
+    },
+    {
+      "id": "immutabilite",
+      "titre": "Ne pas modifier l'original : Object.freeze",
+      "icone": "❄",
+      "resume": "`Object.freeze(tab)` **gèle** le tableau : impossible de le modifier. Le cours l'impose : on fabrique de **nouveaux** tableaux.",
+      "analogie": "La boîte d'origine est sous **vitrine** : on peut regarder les œufs, en copier le contenu dans une nouvelle boîte, mais pas toucher à l'original.",
+      "texte": "`const` empêche de recoller l'étiquette, mais **pas** de changer le contenu de la boîte : `const t = [1]; t.push(2);` marche.\n\n`Object.freeze([...])` rend le tableau vraiment intouchable : `push`, `pop`, `sort`, `reverse`, `splice`, `tab[0] = …` échouent tous.\n\nDans le TP : `const numbers = Object.freeze([3, 14, 15, 92, 65, 35, 89, 79, 32, 38]);` puis « la structure de données initiale ne doit pas être modifiée ». On utilisera donc des méthodes qui **retournent un nouveau tableau** : `map`, `filter`, `slice`, `toSorted`, `[...tab, x]`…\n\nMéthodes **mutantes** (interdites sur l'original) : `push`, `pop`, `shift`, `unshift`, `splice`, `sort`, `reverse`, `fill`.",
+      "exemples": [
+        { "titre": "const n'empêche pas de modifier le contenu", "code": ["const t = [1, 2];", "t.push(3);", "console.log(t);"] },
+        { "titre": "Avec Object.freeze, toute modification échoue (erreur voulue)", "code": ["const numbers = Object.freeze([3, 14, 15]);", "numbers.push(92);"] }
+      ],
+      "pieges": ["Croire que `const` protège le contenu d'un tableau.", "Utiliser `sort` ou `reverse` (mutants) au lieu de `toSorted` ou `toReversed`."]
+    },
+    {
+      "id": "comparer-tableaux",
+      "titre": "Comparer deux tableaux",
+      "icone": "≠",
+      "resume": "`[1, 2] === [1, 2]` vaut **false** : `===` compare les boîtes, pas leur contenu.",
+      "analogie": "Deux boîtes d'œufs différentes restent deux boîtes différentes, même si elles contiennent exactement les mêmes œufs. `===` demande « est-ce **la même boîte** ? », pas « est-ce le même contenu ? ».",
+      "texte": "- `const a = [1, 2]; const b = a;` : `a === b` vaut true (deux étiquettes sur la **même** boîte).\n- `[1, 2] === [1, 2]` vaut false (deux boîtes).\n\nPour comparer le contenu, on compare les éléments un par un, ou on transforme en texte : `a.join() === b.join()` (pour des tableaux simples). Pour le palindrome du TP, on comparera deux **chaînes**, pas deux tableaux.",
+      "exemples": [
+        { "code": ["const a = [1, 2];", "const b = [1, 2];", "const c = a;", "console.log(a === b);", "console.log(a === c);", "console.log(a.join() === b.join());"] }
+      ]
+    }
+  ],
+  "lecons": [
+    {
+      "id": "u04-l1",
+      "titre": "La boîte d'œufs",
+      "duree": 5,
+      "notions": ["tableau"],
+      "cartes": [
+        {
+          "titre": "Plusieurs valeurs, une seule boîte",
+          "illu": "boite",
+          "tableau": ["pomme", "kiwi", "mangue"],
+          "nom": "fruits",
+          "texte": "Un **tableau** range plusieurs valeurs **dans l'ordre**, sous un seul nom. On l'écrit avec des crochets `[ ]`.",
+          "code": ["const fruits = [\"pomme\", \"kiwi\", \"mangue\"];", "console.log(fruits);"],
+          "analogie": "Le tableau est une **boîte d'œufs** : `fruits` est la boîte, `\"kiwi\"` est un œuf (un **élément**).",
+          "fiche": "tableau"
+        },
+        {
+          "titre": "Tout peut aller dans une boîte",
+          "texte": "Des nombres, des textes, des booléens… et même rien du tout : `[]` est une boîte vide. C'est un cas que les tests du cours essaient toujours.",
+          "code": ["const numbers = [3, 14, 15, 92];", "const reponses = [true, false, true];", "const vide = [];", "console.log(numbers, reponses, vide);"]
+        },
+        {
+          "titre": "La boîte et l'œuf ont des noms différents",
+          "texte": "Prends l'habitude : la **boîte** au pluriel, un **œuf** au singulier.\n- `fruits` → un `fruit`\n- `numbers` → un `number` (ou `n`)\n- `strings` → un `word` (un mot)\n- `prix` → un `p`\n\nÇa paraît un détail. C'est ce qui évitera la moitié des bugs des unités suivantes.",
+          "piege": "Écrire `fruits.forEach((fruits) => …)` : l'œuf porte le nom de la boîte, et on ne sait plus de quoi on parle."
+        },
+        {
+          "titre": "Un tableau, c'est quel type ?",
+          "texte": "`typeof` répond `\"object\"` pour un tableau (un tableau est une sorte d'objet). Pour savoir si c'est un tableau, on demande `Array.isArray(…)`.",
+          "code": ["const fruits = [\"pomme\"];", "console.log(typeof fruits);", "console.log(Array.isArray(fruits));"]
+        }
+      ],
+      "exercices": [
+        { "id": "u04-l1-e1", "type": "predire", "notions": ["tableau"], "question": "Que va afficher ce code ?", "code": ["const notes = [5, 4.5, 6];", "console.log(notes);"], "explication": "La console affiche le tableau entier, entre crochets." },
+        { "id": "u04-l1-e2", "type": "pointer-code", "notions": ["tableau"], "question": "Touche le **nom du tableau** (la boîte).", "code": ["const ⟦eleves⟧ = [\"Léa\", \"Sami\", \"Noé\"];"], "explication": "Le nom de la boîte est entre `const` et `=`. `\"Léa\"`, `\"Sami\"`, `\"Noé\"` sont les éléments (les œufs)." },
+        { "id": "u04-l1-e3", "type": "qcm", "notions": ["tableau"], "question": "Dans `const tshirts = [\"S\", \"M\", \"L\"];`, quel serait un bon nom pour **un** élément ?", "choix": ["tshirt (ou taille)", "tshirts", "tableau", "elements"], "bonne": 0, "explication": "Un œuf, au singulier : `tshirt`, ou mieux encore ce qu'il représente, `taille`." },
+        { "id": "u04-l1-e4", "type": "tri", "notions": ["tableau", "types"], "mono": true, "question": "Tableau ou pas tableau ?", "categories": ["tableau", "pas un tableau"], "items": [["[1, 2, 3]", 0], ["[]", 0], ["\"[1, 2]\"", 1], ["[\"a\"]", 0], ["123", 1], ["{ nom: \"Léa\" }", 1]], "explication": "Les crochets font le tableau. `\"[1, 2]\"` est un texte, `{ … }` est un objet." },
+        { "id": "u04-l1-e5", "type": "vf", "notions": ["tableau"], "question": "Un tableau peut contenir zéro élément.", "bonne": true, "explication": "`[]` est un tableau vide. Les tests du cours vérifient souvent que ta solution marche aussi avec lui." },
+        {
+          "id": "u04-l1-e6", "type": "ecrire", "notions": ["tableau"],
+          "question": "Crée un tableau `jours` contenant les textes `\"lundi\"`, `\"mardi\"` et `\"mercredi\"`, dans cet ordre, puis affiche-le.",
+          "depart": [""],
+          "tests": { "cas": [ { "sortie": ["[\"lundi\", \"mardi\", \"mercredi\"]"], "variables": { "jours": ["lundi", "mardi", "mercredi"] } } ] },
+          "indices": ["Des crochets, des virgules entre les éléments, des guillemets autour de chaque texte.", { "code": "const jours = [___, ___, ___];\nconsole.log(jours);" }],
+          "solution": ["const jours = [\"lundi\", \"mardi\", \"mercredi\"];", "console.log(jours);"],
+          "erreursTypiques": [ { "code": "const jours = [lundi, mardi, mercredi];\nconsole.log(jours);", "attendu": "erreur" }, { "code": "const jours = [\"lundi mardi mercredi\"];\nconsole.log(jours);", "attendu": "echec" } ],
+          "explication": "Chaque texte a ses propres guillemets, et une virgule les sépare."
+        }
+      ]
+    },
+    {
+      "id": "u04-l2",
+      "titre": "Les indices commencent à 0",
+      "duree": 5,
+      "notions": ["indice"],
+      "cartes": [
+        {
+          "titre": "Chaque case a un numéro",
+          "illu": "boite",
+          "tableau": ["Sator", "Arepo", "Tenet", "Opera", "Rotas"],
+          "nom": "strings",
+          "texte": "Chaque case a un numéro, son **indice**. Le premier indice est **0** : c'est le décalage depuis le début de la boîte.",
+          "fiche": "indice"
+        },
+        {
+          "titre": "Lire une case : tab[i]",
+          "texte": "On lit un élément avec le nom du tableau et l'indice entre crochets.",
+          "code": ["const strings = [\"Sator\", \"Arepo\", \"Tenet\", \"Opera\", \"Rotas\"];", "console.log(strings[0]);", "console.log(strings[1]);", "console.log(strings[4]);"]
+        },
+        {
+          "titre": "Hors de la boîte : undefined",
+          "texte": "Un indice qui n'existe pas ne provoque pas d'erreur : on obtient `undefined`, la case vide.",
+          "code": ["const fruits = [\"pomme\", \"kiwi\"];", "console.log(fruits[2]);", "console.log(fruits[-1]);"],
+          "piege": "`fruits[-1]` ne lit pas le dernier élément (c'est `undefined`). Pour partir de la fin, utilise `.at(-1)`."
+        },
+        {
+          "titre": "Partir de la fin : at",
+          "texte": "`tab.at(i)` fait comme `tab[i]`, mais accepte les indices **négatifs** : -1 est le dernier, -2 l'avant-dernier… On retrouvera les indices négatifs avec `slice` (TP : « sans le dernier élément »).",
+          "illu": "boite",
+          "tableau": ["pomme", "kiwi", "mangue", "poire"],
+          "nom": "fruits",
+          "negatifs": true,
+          "code": ["const fruits = [\"pomme\", \"kiwi\", \"mangue\", \"poire\"];", "console.log(fruits.at(-1));", "console.log(fruits.at(-2));"]
+        },
+        {
+          "titre": "Un indice calculé",
+          "texte": "Entre les crochets, on peut mettre une variable ou un calcul.",
+          "code": ["const numbers = [3, 14, 15, 92, 65];", "const i = 2;", "console.log(numbers[i]);", "console.log(numbers[i + 1]);"]
+        }
+      ],
+      "exercices": [
+        { "id": "u04-l2-e1", "type": "pointer-tableau", "notions": ["indice"], "question": "Touche `fruits[1]`.", "tableau": ["pomme", "kiwi", "mangue", "poire"], "nom": "fruits", "bonnes": [1], "explication": "Indice 1 : la **deuxième** case (on compte à partir de 0)." },
+        { "id": "u04-l2-e2", "type": "pointer-tableau", "notions": ["indice"], "question": "Touche l'élément d'indice **-1** (avec `.at(-1)`).", "tableau": [3, 14, 15, 92, 65, 35], "nom": "numbers", "negatifs": true, "bonnes": [5], "explication": "-1 désigne le dernier élément. Les indices négatifs sont écrits en couleur sous chaque case." },
+        { "id": "u04-l2-e3", "type": "predire", "notions": ["indice"], "question": "Que va afficher ce code ?", "code": ["const notes = [4, 5.5, 6, 3.5];", "console.log(notes[2]);"], "explication": "Indice 2 : troisième case." },
+        { "id": "u04-l2-e4", "type": "predire", "notions": ["indice"], "question": "Que va afficher ce code ?", "code": ["const notes = [4, 5.5, 6, 3.5];", "console.log(notes[4]);"], "explication": "Quatre éléments : indices 0 à 3. L'indice 4 n'existe pas." },
+        { "id": "u04-l2-e5", "type": "pointer-tableau", "notions": ["indice"], "question": "Touche l'élément d'indice **-2**.", "tableau": ["Sator", "Arepo", "Tenet", "Opera", "Rotas"], "nom": "strings", "negatifs": true, "bonnes": [3], "explication": "-1 est le dernier, -2 l'avant-dernier : `\"Opera\"`." },
+        { "id": "u04-l2-e6", "type": "qcm", "notions": ["indice"], "question": "Comment lire le **premier** élément de `prix` ?", "choix": ["prix[0]", "prix[1]", "prix(0)", "prix.first"], "bonne": 0, "mono": true, "explication": "Crochets et indice 0." },
+        {
+          "id": "u04-l2-e7", "type": "ecrire", "notions": ["indice", "fonction", "return"],
+          "question": "Écris `getSecond(tab)` qui **retourne** le deuxième élément du tableau reçu.",
+          "depart": ["function getSecond(tab) {", "  ", "}", "", "console.log(getSecond([\"pomme\", \"kiwi\", \"mangue\"]));"],
+          "tests": { "fonction": "getSecond", "cas": [ { "args": [["pomme", "kiwi", "mangue"]], "attendu": "kiwi" }, { "args": [[10, 20]], "attendu": 20 }, { "titre": "un seul élément : pas de deuxième", "args": [["seul"]], "attenduUndefined": true } ] },
+          "indices": ["Deuxième élément = indice 1.", { "code": "return tab[___];" }],
+          "solution": ["function getSecond(tab) {", "  return tab[1];", "}", "", "console.log(getSecond([\"pomme\", \"kiwi\", \"mangue\"]));"],
+          "erreursTypiques": [ { "code": "function getSecond(tab) {\n  return tab[2];\n}", "attendu": "echec" }, { "code": "function getSecond(tab) {\n  console.log(tab[1]);\n}", "attendu": "echec", "diagnostic": "return-vs-log" } ],
+          "explication": "Le deuxième élément a l'indice 1."
+        }
+      ]
+    },
+    {
+      "id": "u04-l3",
+      "titre": "length et le dernier indice",
+      "duree": 6,
+      "notions": ["length", "indice"],
+      "cartes": [
+        {
+          "titre": "Combien d'œufs ?",
+          "texte": "`tab.length` donne le **nombre** d'éléments. Sans parenthèses : ce n'est pas une fonction, c'est une propriété.",
+          "code": ["const strings = [\"Sator\", \"Arepo\", \"Tenet\", \"Opera\", \"Rotas\"];", "console.log(strings.length);", "console.log([].length);"],
+          "fiche": "length"
+        },
+        {
+          "titre": "Nombre d'éléments ≠ dernier indice",
+          "illu": "boite",
+          "tableau": [3, 14, 15, 92, 65, 35],
+          "nom": "numbers",
+          "texte": "Six œufs, numérotés **de 0 à 5**. Le dernier indice est donc `length - 1`.",
+          "code": ["const numbers = [3, 14, 15, 92, 65, 35];", "console.log(numbers.length);", "console.log(numbers[numbers.length - 1]);", "console.log(numbers[numbers.length]);"],
+          "analogie": "Une boîte de 6 a des cases numérotées de 0 à 5 : la case « 6 » n'existe pas."
+        },
+        {
+          "titre": "Le milieu",
+          "texte": "Le TP te demande de remplacer « le mot du milieu », et, si le nombre de mots est pair, « le mot juste **avant** le milieu ». Une seule formule couvre les deux cas :\n\n`Math.floor((tab.length - 1) / 2)`",
+          "code": ["const cinq = [\"a\", \"b\", \"c\", \"d\", \"e\"];", "const quatre = [\"a\", \"b\", \"c\", \"d\"];", "console.log(Math.floor((cinq.length - 1) / 2));", "console.log(Math.floor((quatre.length - 1) / 2));"],
+          "astuce": "5 mots : (5 - 1) / 2 = 2, le vrai milieu. 4 mots : (4 - 1) / 2 = 1.5 → 1, la case juste avant le milieu."
+        },
+        {
+          "titre": "Les textes ont aussi un length",
+          "texte": "Une chaîne se comporte un peu comme un tableau de caractères : `mot.length`, `mot[0]`…",
+          "code": ["const mot = \"Tenet\";", "console.log(mot.length, mot[0], mot[mot.length - 1]);"]
+        }
+      ],
+      "exercices": [
+        { "id": "u04-l3-e1", "type": "predire", "notions": ["length"], "question": "Que va afficher ce code ?", "code": ["const fruits = [\"pomme\", \"kiwi\", \"mangue\", \"poire\"];", "console.log(fruits.length);"], "explication": "Quatre éléments." },
+        { "id": "u04-l3-e2", "type": "qcm", "notions": ["length", "indice"], "question": "Un tableau a 7 éléments. Quel est l'indice du dernier ?", "choix": ["6", "7", "8", "-7"], "bonne": 0, "explication": "Les indices vont de 0 à `length - 1`, donc de 0 à 6." },
+        { "id": "u04-l3-e3", "type": "pointer-tableau", "notions": ["length", "indice"], "question": "Touche `numbers[numbers.length - 1]`.", "tableau": [3, 14, 15, 92, 65, 35, 89], "nom": "numbers", "bonnes": [6], "explication": "length vaut 7 ; 7 - 1 = 6, le dernier indice." },
+        { "id": "u04-l3-e4", "type": "pointer-tableau", "notions": ["length"], "question": "Touche le mot **du milieu** (indice `Math.floor((length - 1) / 2)`).", "tableau": ["Sator", "Arepo", "Tenet", "Opera", "Rotas"], "nom": "strings", "bonnes": [2], "explication": "5 mots : (5 - 1) / 2 = 2 : `\"Tenet\"`." },
+        { "id": "u04-l3-e5", "type": "pointer-tableau", "notions": ["length"], "question": "Ici, le nombre de mots est **pair**. Touche le mot **juste avant le milieu** (même formule).", "tableau": ["un", "deux", "trois", "quatre", "cinq", "six"], "nom": "mots", "bonnes": [2], "explication": "6 mots : (6 - 1) / 2 = 2.5 → `Math.floor` → 2 : `\"trois\"`, juste avant le milieu (qui tombe entre « trois » et « quatre »)." },
+        { "id": "u04-l3-e6", "type": "bug", "notions": ["length", "indice"], "question": "Ce code affiche `undefined` au lieu du dernier prix. Quelle ligne corriger ?", "code": ["const prix = [12, 8, 25];", "const dernier = prix[prix.length];", "console.log(dernier);"], "ligne": 2, "choix": ["Le dernier indice est `prix.length - 1`", "Il faut `prix.length()` avec des parenthèses", "Il faut `prix[0]`", "Il faut `let` au lieu de `const`"], "bonne": 0, "explication": "length vaut 3 : la case 3 n'existe pas. La dernière est la case 2." },
+        {
+          "id": "u04-l3-e7", "type": "ecrire", "notions": ["length", "indice", "return"],
+          "question": "Écris `getLast(tab)` qui **retourne** le dernier élément du tableau reçu (`undefined` s'il est vide), avec `length`.",
+          "depart": ["function getLast(tab) {", "  ", "}", "", "console.log(getLast([3, 14, 15]));"],
+          "tests": { "fonction": "getLast", "cas": [ { "args": [[3, 14, 15]], "attendu": 15 }, { "args": [["Sator", "Arepo", "Tenet", "Opera", "Rotas"]], "attendu": "Rotas" }, { "titre": "un seul élément", "args": [["seul"]], "attendu": "seul" }, { "titre": "tableau vide", "args": [[]], "attenduUndefined": true } ] },
+          "indices": ["Le dernier indice, ce n'est pas `tab.length`.", { "code": "return tab[tab.length ___];" }],
+          "solution": ["function getLast(tab) {", "  return tab[tab.length - 1];", "}", "", "console.log(getLast([3, 14, 15]));"],
+          "erreursTypiques": [ { "code": "function getLast(tab) {\n  return tab[tab.length];\n}", "attendu": "echec" }, { "code": "function getLast(tab) {\n  return tab[2];\n}", "attendu": "echec" }, { "code": "function getLast(tab) {\n  return tab[tab.length() - 1];\n}", "attendu": "erreur" } ],
+          "explication": "`tab[tab.length - 1]` marche pour n'importe quelle longueur. (`tab.at(-1)` aussi.)"
+        },
+        {
+          "id": "u04-l3-e8", "type": "trous", "notions": ["length", "arithmetique"],
+          "question": "Complète `getMiddleIndex(tab)` : l'indice du milieu, ou juste avant le milieu si la longueur est paire.",
+          "code": ["function getMiddleIndex(tab) {", "  return Math.floor((tab.length ___) / ___);", "}"],
+          "tests": { "fonction": "getMiddleIndex", "cas": [ { "titre": "5 éléments", "args": [["Sator", "Arepo", "Tenet", "Opera", "Rotas"]], "attendu": 2 }, { "titre": "4 éléments", "args": [["a", "b", "c", "d"]], "attendu": 1 }, { "titre": "1 élément", "args": [["a"]], "attendu": 0 }, { "titre": "6 éléments", "args": [[1, 2, 3, 4, 5, 6]], "attendu": 2 } ] },
+          "indices": ["Le dernier indice est `length - 1`. Le milieu, c'est la moitié du dernier indice."],
+          "solution": ["- 1", "2"],
+          "erreursTypiques": [ { "trous": ["", "2"], "attendu": "echec" }, { "trous": ["+ 1", "2"], "attendu": "echec" } ],
+          "explication": "`Math.floor((length - 1) / 2)` : le milieu exact pour une longueur impaire, la case juste avant pour une longueur paire."
+        }
+      ]
+    },
+    {
+      "id": "u04-l4",
+      "titre": "Gelé : ne pas modifier l'original",
+      "duree": 5,
+      "notions": ["immutabilite", "tableau"],
+      "cartes": [
+        {
+          "titre": "const ne protège pas le contenu",
+          "texte": "`const` empêche de recoller l'étiquette sur une autre boîte. Mais on peut encore changer les œufs **dans** la boîte :",
+          "code": ["const fruits = [\"pomme\"];", "fruits.push(\"kiwi\");", "fruits[0] = \"poire\";", "console.log(fruits);"],
+          "fiche": "immutabilite"
+        },
+        {
+          "titre": "Object.freeze : la vitrine",
+          "texte": "Le cours gèle les données avec `Object.freeze`. Après ça, toute modification provoque une erreur.",
+          "code": ["const numbers = Object.freeze([3, 14, 15]);", "numbers.push(92);"],
+          "erreurVoulue": true,
+          "analogie": "La boîte est sous **vitrine** : on regarde, on recopie dans une nouvelle boîte, mais on ne touche pas.",
+          "apres": "« object is not extensible » : on ne peut rien ajouter à un tableau gelé."
+        },
+        {
+          "titre": "Les méthodes mutantes",
+          "texte": "Certaines méthodes **modifient** le tableau sur lequel on les appelle : elles sont interdites sur les données du cours.\n\n- `push` / `pop` : ajouter / retirer à la fin\n- `unshift` / `shift` : ajouter / retirer au début\n- `splice` : retirer / insérer au milieu\n- `sort` / `reverse` : trier / inverser **en place**\n\nÀ la place, on utilisera des méthodes qui **fabriquent un nouveau tableau** : `map`, `filter`, `slice`, `toSorted`, `toReversed`, `with`, et le spread `[...tab, x]`.",
+          "piege": "Le TP dit : « La structure de données initiale ne doit pas être modifiée ». Les tests vérifient que le tableau d'origine est intact."
+        },
+        {
+          "titre": "Une nouvelle boîte",
+          "texte": "Pour « ajouter » un élément sans toucher l'original, on fabrique une nouvelle boîte avec les anciens œufs et le nouveau. On verra le spread `...` en détail plus tard ; voici un avant-goût :",
+          "code": ["const numbers = Object.freeze([3, 14, 15]);", "const plus = [...numbers, 92];", "console.log(numbers);", "console.log(plus);"]
+        }
+      ],
+      "exercices": [
+        { "id": "u04-l4-e1", "type": "tri", "notions": ["immutabilite"], "mono": true, "question": "Ces méthodes modifient-elles le tableau d'origine ?", "categories": ["mutante (interdite)", "non mutante (nouveau tableau)"], "items": [["push", 0], ["sort", 0], ["reverse", 0], ["splice", 0], ["map", 1], ["filter", 1], ["slice", 1], ["toSorted", 1]], "explication": "Les mutantes changent la boîte d'origine ; les non mutantes en fabriquent une nouvelle." },
+        { "id": "u04-l4-e2", "type": "vf", "notions": ["immutabilite"], "question": "Avec `const fruits = [\"pomme\"];`, la ligne `fruits.push(\"kiwi\");` provoque une erreur.", "bonne": false, "explication": "`const` n'empêche pas de modifier le contenu. Il faudrait `Object.freeze` pour l'interdire." },
+        { "id": "u04-l4-e3", "type": "bug", "notions": ["immutabilite"], "question": "Ce code plante. Quelle ligne, et pourquoi ?", "code": ["const numbers = Object.freeze([3, 14, 15]);", "numbers.push(92);", "console.log(numbers);"], "ligne": 2, "choix": ["Le tableau est gelé : on ne peut pas lui ajouter d'élément", "Il faut `let` au lieu de `const`", "`push` s'écrit `Push`", "92 doit être entre guillemets"], "bonne": 0, "explication": "`Object.freeze` interdit toute modification, même avec `let`. On fabrique un nouveau tableau : `[...numbers, 92]`." },
+        { "id": "u04-l4-e4", "type": "erreurs", "notions": ["immutabilite"], "question": "Associe le message d'erreur à la ligne qui l'a provoqué (sur un tableau gelé).", "paires": [["Cannot add property 3, object is not extensible", "numbers.push(92);"], ["Cannot assign to read only property '0'", "numbers[0] = 1;"], ["Cannot delete property '2'", "numbers.pop();"]], "explication": "Trois façons de modifier un tableau gelé, trois messages. Ils veulent tous dire : « ne touche pas à l'original »." },
+        {
+          "id": "u04-l4-e5", "type": "corriger", "notions": ["immutabilite", "tableau"],
+          "question": "`addFruit(fruits, fruit)` doit **retourner un nouveau tableau** avec le fruit ajouté à la fin, sans modifier `fruits`. Le code actuel modifie l'original. Corrige-le.",
+          "depart": ["function addFruit(fruits, fruit) {", "  fruits.push(fruit);", "  return fruits;", "}"],
+          "tests": { "fonction": "addFruit", "cas": [ { "args": [["pomme", "kiwi"], "mangue"], "attendu": ["pomme", "kiwi", "mangue"] }, { "titre": "tableau vide", "args": [[], "poire"], "attendu": ["poire"] } ], "interdit": ["push"] },
+          "indices": ["Le tableau reçu est gelé : impossible de faire `push` dessus.", "Fabrique une nouvelle boîte : `[...fruits, fruit]`."],
+          "solution": ["function addFruit(fruits, fruit) {", "  return [...fruits, fruit];", "}"],
+          "erreursTypiques": [ { "code": "function addFruit(fruits, fruit) {\n  return [fruits, fruit];\n}", "attendu": "echec" }, { "code": "function addFruit(fruits, fruit) {\n  const copie = fruits;\n  copie.push(fruit);\n  return copie;\n}", "attendu": "echec" } ],
+          "explication": "`[...fruits, fruit]` : les œufs de l'ancienne boîte, puis le nouveau, dans une boîte neuve. (`const copie = fruits` ne copie rien : c'est une deuxième étiquette sur la **même** boîte.)"
+        }
+      ]
+    },
+    {
+      "id": "u04-l5",
+      "titre": "Comparer deux tableaux",
+      "duree": 4,
+      "notions": ["comparer-tableaux", "egalite-stricte"],
+      "cartes": [
+        {
+          "titre": "=== compare les boîtes",
+          "texte": "Deux tableaux avec le même contenu ne sont **pas** `===` : ce sont deux boîtes différentes.",
+          "code": ["console.log([1, 2] === [1, 2]);", "const a = [1, 2];", "const b = a;", "console.log(a === b);"],
+          "analogie": "`===` demande « est-ce **la même boîte** ? ». Deux boîtes identiques posées côte à côte restent deux boîtes.",
+          "fiche": "comparer-tableaux"
+        },
+        {
+          "titre": "Deux étiquettes, une boîte",
+          "texte": "`const b = a;` ne copie pas le tableau : ça colle une **deuxième étiquette** sur la même boîte. Modifier par `b` modifie aussi ce qu'on voit par `a`.",
+          "code": ["const a = [1, 2];", "const b = a;", "b.push(3);", "console.log(a);"]
+        },
+        {
+          "titre": "Comparer le contenu",
+          "texte": "Pour des tableaux simples (nombres, textes), on peut comparer leurs versions texte avec `join` (on verra `join` en détail plus tard).",
+          "code": ["const a = [1, 2];", "const b = [1, 2];", "console.log(a.join() === b.join());"],
+          "astuce": "Pour le palindrome du TP, on comparera deux **chaînes** (`===` marche très bien sur les textes), pas deux tableaux."
+        }
+      ],
+      "exercices": [
+        { "id": "u04-l5-e1", "type": "predire", "notions": ["comparer-tableaux"], "question": "Que va afficher ce code ?", "code": ["const x = [\"a\"];", "const y = [\"a\"];", "console.log(x === y);"], "explication": "Deux boîtes différentes : false, même avec le même contenu." },
+        { "id": "u04-l5-e2", "type": "predire", "notions": ["comparer-tableaux"], "question": "Et celui-ci ?", "code": ["const x = [\"a\"];", "const y = x;", "console.log(x === y);"], "explication": "`y` est une deuxième étiquette sur la même boîte." },
+        { "id": "u04-l5-e3", "type": "predire", "notions": ["comparer-tableaux"], "question": "Que va afficher ce code ?", "code": ["const x = \"radar\";", "const y = \"radar\";", "console.log(x === y);"], "explication": "Les **chaînes** se comparent par leur contenu : true." },
+        { "id": "u04-l5-e4", "type": "vf", "notions": ["comparer-tableaux"], "question": "`[] === []` vaut true.", "bonne": false, "explication": "Deux boîtes vides, mais deux boîtes : false." }
+      ]
+    }
+  ],
+  "jeux": [
+    {
+      "id": "u04-indices",
+      "titre": "Indices et cases",
+      "description": "Premier, dernier, milieu, -1 : vise la bonne case du premier coup.",
+      "tours": 10,
+      "badge": "indices-pro",
+      "seuilBadge": 8,
+      "questions": [
+        { "id": "u04-j1-1", "type": "pointer-tableau", "notions": ["indice"], "question": "Touche `tab[0]`.", "tableau": [38, 32, 79, 89, 35], "nom": "tab", "bonnes": [0], "explication": "Indice 0 : le premier." },
+        { "id": "u04-j1-2", "type": "pointer-tableau", "notions": ["indice"], "question": "Touche `tab[3]`.", "tableau": [38, 32, 79, 89, 35], "nom": "tab", "bonnes": [3], "explication": "Indice 3 : la quatrième case." },
+        { "id": "u04-j1-3", "type": "pointer-tableau", "notions": ["indice"], "question": "Touche `tab.at(-1)`.", "tableau": ["S", "M", "L", "XL"], "nom": "tab", "negatifs": true, "bonnes": [3], "explication": "-1 : le dernier." },
+        { "id": "u04-j1-4", "type": "pointer-tableau", "notions": ["length"], "question": "Touche `tab[tab.length - 2]`.", "tableau": ["lun", "mar", "mer", "jeu", "ven"], "nom": "tab", "bonnes": [3], "explication": "length vaut 5 ; 5 - 2 = 3 : l'avant-dernier." },
+        { "id": "u04-j1-5", "type": "pointer-tableau", "notions": ["length"], "question": "Touche l'élément d'indice `Math.floor((tab.length - 1) / 2)`.", "tableau": [10, 20, 30, 40, 50, 60, 70], "nom": "tab", "bonnes": [3], "explication": "(7 - 1) / 2 = 3 : le milieu exact." },
+        { "id": "u04-j1-6", "type": "pointer-tableau", "notions": ["length"], "question": "Touche l'élément d'indice `Math.floor((tab.length - 1) / 2)`.", "tableau": ["a", "b", "c", "d", "e", "f", "g", "h"], "nom": "tab", "bonnes": [3], "explication": "(8 - 1) / 2 = 3.5 → 3 : juste avant le milieu." },
+        { "id": "u04-j1-7", "type": "predire", "notions": ["indice", "length"], "question": "Que va afficher ce code ?", "code": ["const t = [5, 10, 15];", "console.log(t[t.length - 1] + t[0]);"], "explication": "15 + 5." },
+        { "id": "u04-j1-8", "type": "predire", "notions": ["indice"], "question": "Que va afficher ce code ?", "code": ["const t = [\"x\", \"y\"];", "console.log(t[2]);"], "explication": "L'indice 2 n'existe pas." },
+        { "id": "u04-j1-9", "type": "qcm", "notions": ["length"], "question": "`[\"Sator\", \"Arepo\"].length` vaut :", "choix": ["2", "1", "10", "\"2\""], "bonne": 0, "mono": true, "explication": "Deux éléments, et length est un nombre." },
+        { "id": "u04-j1-10", "type": "pointer-tableau", "notions": ["indice"], "question": "Touche `tab.at(-3)`.", "tableau": [3, 14, 15, 92, 65, 35], "nom": "tab", "negatifs": true, "bonnes": [3], "explication": "-1 : 35, -2 : 65, -3 : 92." },
+        { "id": "u04-j1-11", "type": "predire", "notions": ["length"], "question": "Que va afficher ce code ?", "code": ["const mot = \"Opera\";", "console.log(mot[mot.length - 1]);"], "explication": "Le dernier caractère de \"Opera\"." },
+        { "id": "u04-j1-12", "type": "pointer-tableau", "notions": ["indice", "length"], "question": "Touche **toutes** les cases d'indice pair (0, 2, 4…).", "tableau": ["a", "b", "c", "d", "e"], "nom": "tab", "bonnes": [0, 2, 4], "explication": "Indices 0, 2 et 4 : la 1re, la 3e et la 5e case." }
+      ]
+    }
+  ],
+  "quiz": {
+    "titre": "Quiz : les tableaux",
+    "questions": [
+      { "id": "u04-q1", "type": "predire", "notions": ["indice"], "question": "Que va afficher ce code ?", "code": ["const t = [\"rouge\", \"vert\", \"bleu\"];", "console.log(t[1]);"], "explication": "Indice 1 : le deuxième." },
+      { "id": "u04-q2", "type": "pointer-tableau", "notions": ["length", "indice"], "question": "Touche le dernier élément.", "tableau": [3, 14, 15, 92, 65, 35, 89, 79, 32, 38], "nom": "numbers", "bonnes": [9], "explication": "Indice 9 = length (10) - 1." },
+      { "id": "u04-q3", "type": "qcm", "notions": ["length"], "question": "Que vaut le dernier indice d'un tableau de 10 éléments ?", "choix": ["9", "10", "11", "0"], "bonne": 0, "explication": "length - 1." },
+      { "id": "u04-q4", "type": "predire", "notions": ["indice"], "question": "Que va afficher ce code ?", "code": ["const t = [1, 2, 3];", "console.log(t.at(-1));"], "explication": "-1 : le dernier." },
+      { "id": "u04-q5", "type": "bug", "notions": ["length"], "question": "Trouve la ligne fautive.", "code": ["const mots = [\"Sator\", \"Arepo\", \"Tenet\"];", "const nb = mots.length();", "console.log(nb);"], "ligne": 2, "choix": ["`length` s'écrit sans parenthèses", "Il manque l'indice", "Il faut `let`", "`mots` doit être gelé"], "bonne": 0, "explication": "`length` n'est pas une fonction : `mots.length`." },
+      { "id": "u04-q6", "type": "tri", "notions": ["immutabilite"], "mono": true, "question": "Mutante ou non mutante ?", "categories": ["mutante", "non mutante"], "items": [["pop", 0], ["shift", 0], ["sort", 0], ["slice", 1], ["map", 1], ["toReversed", 1]], "explication": "Seules les non mutantes sont permises sur les données du cours." },
+      { "id": "u04-q7", "type": "predire", "notions": ["comparer-tableaux"], "question": "Que va afficher ce code ?", "code": ["console.log([3] === [3]);"], "explication": "Deux boîtes différentes." },
+      { "id": "u04-q8", "type": "vf", "notions": ["immutabilite"], "question": "`Object.freeze` empêche d'ajouter, de retirer et de modifier les éléments d'un tableau.", "bonne": true, "explication": "Toute modification échoue : c'est la vitrine." },
+      { "id": "u04-q9", "type": "pointer-tableau", "notions": ["length"], "question": "Touche l'élément d'indice `Math.floor((tab.length - 1) / 2)`.", "tableau": ["Sator", "Arepo", "Tenet", "Opera"], "nom": "tab", "bonnes": [1], "explication": "(4 - 1) / 2 = 1.5 → 1 : juste avant le milieu." },
+      { "id": "u04-q10", "type": "predire", "notions": ["indice"], "question": "Que va afficher ce code ?", "code": ["const t = [10, 20, 30];", "const i = 1;", "console.log(t[i + 1]);"], "explication": "i + 1 = 2 : la troisième case." },
+      { "id": "u04-q11", "type": "qcm", "notions": ["tableau"], "question": "Dans `numbers.forEach((…) => …)`, quel nom donner au paramètre ?", "choix": ["number (ou n)", "numbers", "tableau", "forEach"], "bonne": 0, "mono": true, "explication": "Un œuf, au singulier. On le verra à l'unité suivante." },
+      { "id": "u04-q12", "type": "predire", "notions": ["immutabilite", "tableau"], "question": "Que va afficher ce code ?", "code": ["const a = [1];", "const b = a;", "b.push(2);", "console.log(a);"], "explication": "`b` et `a` sont deux étiquettes sur la même boîte." },
+      { "id": "u04-q13", "type": "predire", "notions": ["length"], "question": "Que va afficher ce code ?", "code": ["console.log([].length);"], "explication": "Une boîte vide contient 0 élément." },
+      { "id": "u04-q14", "type": "qcm", "notions": ["immutabilite"], "question": "Comment obtenir un nouveau tableau avec 7 ajouté à la fin, sans toucher `t` ?", "choix": ["[...t, 7]", "t.push(7)", "[t, 7]", "t + 7"], "bonne": 0, "mono": true, "explication": "Le spread sort les œufs de `t` et les met dans une nouvelle boîte, suivis de 7. `[t, 7]` mettrait la boîte entière dans la nouvelle boîte." },
+      { "id": "u04-q15", "type": "pointer-tableau", "notions": ["indice"], "question": "Touche l'élément d'indice -2.", "tableau": ["a", "b", "c", "d"], "nom": "tab", "negatifs": true, "bonnes": [2], "explication": "-1 : d, -2 : c." }
+    ]
+  },
+  "boss": [
+    {
+      "id": "u04-b1",
+      "titre": "Premier, dernier, milieu",
+      "source": "Préparation au TP 2 (chaînes, exercice 5)",
+      "notions": ["indice", "length", "fonction", "return"],
+      "enonce": "Le TP te demandera de remplacer « le mot du milieu ». Prépare le terrain avec trois fonctions qui **retournent** :\n\n1. `getFirst(tab)` : le premier élément ;\n2. `getLast(tab)` : le dernier élément ;\n3. `getMiddle(tab)` : l'élément du milieu, ou celui **juste avant le milieu** si la longueur est paire.\n\nPour un tableau vide, les trois retournent `undefined` (ça se fait tout seul si tu utilises les indices).",
+      "regles": ["Tes fonctions seront testées avec d'autres tableaux que `strings`, y compris un tableau vide et un tableau de longueur paire.", "Le tableau reçu est gelé : ne le modifie pas (pas de `pop`, `shift`…)."],
+      "donnees": { "strings": ["Sator", "Arepo", "Tenet", "Opera", "Rotas"] },
+      "depart": ["function getFirst(tab) {", "  ", "}", "", "function getLast(tab) {", "  ", "}", "", "function getMiddle(tab) {", "  ", "}", "", "console.log(getFirst(strings), getLast(strings), getMiddle(strings));"],
+      "tests": {
+        "cas": [
+          { "fonction": "getFirst", "args": [["Sator", "Arepo", "Tenet", "Opera", "Rotas"]], "attendu": "Sator" },
+          { "fonction": "getLast", "args": [["Sator", "Arepo", "Tenet", "Opera", "Rotas"]], "attendu": "Rotas" },
+          { "fonction": "getMiddle", "args": [["Sator", "Arepo", "Tenet", "Opera", "Rotas"]], "attendu": "Tenet" },
+          { "fonction": "getMiddle", "titre": "longueur paire", "args": [["un", "deux", "trois", "quatre"]], "attendu": "deux", "siEchec": "Avec 4 mots, on veut le mot juste AVANT le milieu (indice 1). Relis la fiche [[length]] : `Math.floor((tab.length - 1) / 2)`." },
+          { "fonction": "getLast", "titre": "autres données", "args": [[3, 14, 15, 92]], "attendu": 92 },
+          { "fonction": "getMiddle", "titre": "un seul élément", "args": [["seul"]], "attendu": "seul" },
+          { "fonction": "getFirst", "titre": "tableau vide", "args": [[]], "attenduUndefined": true },
+          { "fonction": "getLast", "titre": "tableau vide", "args": [[]], "attenduUndefined": true },
+          { "fonction": "getMiddle", "titre": "tableau vide", "args": [[]], "attenduUndefined": true }
+        ],
+        "interdit": ["pop", "shift", "splice", "reverse"]
+      },
+      "indices": [
+        "Premier : indice 0. Dernier : indice `length - 1`.",
+        "Milieu : `Math.floor((tab.length - 1) / 2)` donne le bon indice dans les deux cas (longueur paire ou impaire).",
+        { "code": "function getMiddle(tab) {\n  const i = Math.floor((___) / 2);\n  return tab[___];\n}" }
+      ],
+      "solution": ["function getFirst(tab) {", "  return tab[0];", "}", "", "function getLast(tab) {", "  return tab[tab.length - 1];", "}", "", "function getMiddle(tab) {", "  return tab[Math.floor((tab.length - 1) / 2)];", "}", "", "console.log(getFirst(strings), getLast(strings), getMiddle(strings));"],
+      "erreursTypiques": [
+        { "code": "function getFirst(tab) {\n  return tab[0];\n}\nfunction getLast(tab) {\n  return tab[tab.length];\n}\nfunction getMiddle(tab) {\n  return tab[Math.floor((tab.length - 1) / 2)];\n}", "attendu": "echec" },
+        { "code": "function getFirst(tab) {\n  return tab[0];\n}\nfunction getLast(tab) {\n  return tab[tab.length - 1];\n}\nfunction getMiddle(tab) {\n  return tab[Math.floor(tab.length / 2)];\n}", "attendu": "echec", "diagnostic": "contenu" },
+        { "code": "function getFirst(tab) {\n  return tab[0];\n}\nfunction getLast(tab) {\n  return tab.pop();\n}\nfunction getMiddle(tab) {\n  return tab[Math.floor((tab.length - 1) / 2)];\n}", "attendu": "echec", "diagnostic": "interdit" },
+        { "code": "function getFirst(tab) {\n  return strings[0];\n}\nfunction getLast(tab) {\n  return strings[strings.length - 1];\n}\nfunction getMiddle(tab) {\n  return strings[2];\n}", "attendu": "echec" }
+      ],
+      "explication": "Tu sais viser n'importe quelle case d'un tableau de n'importe quelle longueur. Prochaine étape : parcourir **toutes** les cases."
+    }
+  ]
+}

@@ -26,7 +26,7 @@ Q.qcm = (q, onChange) => {
   const correct = q.choix[q.bonne];
   const ordre = melanger(q, q.choix.map((c, i) => i));
   const mono = q.mono || q.type === "methode";
-  const el = h(`<div>${q.code ? codeHTML(lignes(q.code)) : ""}<div class="choices ${q.type === "methode" ? "grille" : ""}">${ordre.map((i, k) => `<button type="button" class="choice ${mono ? "c" : ""}" aria-pressed="false" data-i="${i}">${q.type === "methode" ? "" : `<span class="k">${k + 1}</span>`}${mono ? esc(q.choix[i]) : richInline(q.choix[i])}</button>`).join("")}</div></div>`);
+  const el = h(`<div>${q.code ? codeHTML(lignes(q.code)) : ""}<div class="choices ${q.type === "methode" ? "grille" : ""}">${ordre.map((i, k) => `<button type="button" class="choice ${mono ? "c" : ""}" aria-pressed="false" data-i="${i}">${q.type === "methode" ? "" : `<span class="k">${k + 1}</span>`}<span class="ct">${mono ? esc(q.choix[i]) : richInline(q.choix[i])}</span></button>`).join("")}</div></div>`);
   let sel = null;
   el.addEventListener("click", e => { const b = e.target.closest(".choice"); if (!b || b.disabled) return; el.querySelectorAll(".choice").forEach(x => x.setAttribute("aria-pressed", "false")); b.setAttribute("aria-pressed", "true"); sel = +b.dataset.i; onChange(); });
   return { el, ready:() => sel !== null, key:k => el.querySelectorAll(".choice")[k]?.click(),
@@ -238,11 +238,13 @@ Q.predire = (q, onChange) => {
     const inner = Q.qcm(q, onChange);
     return inner;
   }
-  const multi = (q.reponse || "").includes("\n") || q.lignesReponse > 1;
-  const el = h(`<div>${codeHTML(lignes(q.code))}<label class="eyebrow" for="pred">${multi ? "Ce qui s'affiche (une ligne par console.log)" : "Ce qui s'affiche"}</label>${multi ? `<textarea id="pred" class="saisie" rows="${q.lignesReponse || 3}" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>` : `<input id="pred" class="saisie" spellcheck="false" autocapitalize="off" autocomplete="off" enterkeyhint="done">`}<p class="note">${q.aide ? richInline(q.aide) : "Écris exactement ce que la console afficherait. Les espaces autour des virgules ne comptent pas."}</p></div>`);
+  // toujours une zone de texte : on ne sait pas d'avance combien de lignes la console affichera (appels répétés, boucles)
+  const nbLog = (lignes(q.code).match(/console\.log\(/g) || []).length;
+  const rows = q.lignesReponse || Math.min(6, Math.max(1, nbLog, (q.reponse || "").split("\n").length));
+  const el = h(`<div>${codeHTML(lignes(q.code))}<label class="eyebrow" for="pred">Ce qui s'affiche${rows > 1 ? " (une ligne par affichage)" : ""}</label><textarea id="pred" class="saisie" rows="${rows}" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off"></textarea><p class="note">${q.aide ? richInline(q.aide) : "Écris exactement ce que la console afficherait, une ligne par affichage. Les espaces autour des virgules ne comptent pas."}</p></div>`);
   const inp = el.querySelector(".saisie");
   inp.addEventListener("input", onChange);
-  if (multi) inp.addEventListener("keydown", e => { if (e.key === "Enter") e.stopPropagation(); });
+  inp.addEventListener("keydown", e => { if (e.key === "Enter") e.stopPropagation(); });
   const attendu = async () => {
     if (q.reponse !== undefined) return [q.reponse, ...(q.accepte || [])];
     const r = await executer({ code: lignes(q.code) });

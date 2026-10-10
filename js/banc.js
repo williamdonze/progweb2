@@ -180,6 +180,21 @@ function verifierParentheses(code){
   return null;
 }
 
+/* deux mots qui se suivent sans opérateur ni virgule (Bonjour ProgWeb) : presque toujours du texte oublié sans guillemets */
+const MOTS_AVANT_NOM = new Set(["const","let","var","function","return","typeof","new","of","in","instanceof","else","await","async","case","throw","delete","void","class","extends","yield","import","export","from","do"]);
+function texteSansGuillemets(code){
+  const tous = jetons(code); let p2 = 0; const avecPos = tous.map(j => { const r = { ...j, pos:p2 }; p2 += j.v.length; return r; }).filter(j => j.t !== "ws" && j.t !== "com");
+  for (let i = 0; i + 1 < avecPos.length; i++) {
+    const a = avecPos[i], b = avecPos[i + 1];
+    const motA = a.t === "id" || a.t === "fn" || a.t === "lit", motB = b.t === "id" || b.t === "fn" || b.t === "lit" || b.t === "kw";
+    if (motA && motB && !MOTS_AVANT_NOM.has(a.v) && !MOTS_AVANT_NOM.has(b.v) && !(i > 0 && avecPos[i - 1].v === ".")) {
+      let fin = i + 1; while (fin + 1 < avecPos.length && ["id","fn","lit","kw"].includes(avecPos[fin + 1].t) && !MOTS_AVANT_NOM.has(avecPos[fin + 1].v)) fin++;
+      return { ligne: ligneDe(code, a.pos), texte: code.slice(a.pos, avecPos[fin].pos + avecPos[fin].v.length) };
+    }
+  }
+  return null;
+}
+
 /* ---------------- analyse statique : méthodes interdites ou attendues, pièges classiques ---------------- */
 const MUTANTES = ["push","pop","shift","unshift","splice","sort","reverse","fill","copyWithin"];
 const LIBELLE_INTERDIT = {
@@ -248,7 +263,8 @@ function analyseStatique(code, tests = {}, contexte = {}){
   // objet retourné par une fléchée courte : (x) => { nom: x } ne fait pas un objet
   const mo = /=>\s*\{\s*\w+\s*:/.exec(nu);
   if (mo) conseils.push({ id:"objet-sans-parentheses", ligne: ligneDe(code, mo.index), message: `Ligne ${ligneDe(code, mo.index)} : pour retourner un objet avec une fléchée courte, entoure-le de parenthèses : (x) => ({ nom: x }). Sans elles, les { } sont lues comme le corps de la fonction.` });
-  return { bloquants, conseils };
+  const ignores = tests.sansConseil || [];
+  return { bloquants, conseils: conseils.filter(c => !ignores.includes(c.id)) };
 }
 function singulier(nom){
   const s = { numbers:"number", strings:"word", words:"word", fruits:"fruit", prix:"p", notes:"note", eleves:"eleve", circles:"circle", cards:"card", ranks:"rank", suits:"suit", values:"value", nombres:"nombre", mots:"mot", tshirts:"tshirt" }[nom];
@@ -291,9 +307,11 @@ function diagnostiquer(cas, obtenu, logs, code, contexte){
     return d("map-longueur", `map garde toujours la même longueur : ${entree.length} œufs entrent, ${entree.length} œufs sortent. Pour en garder seulement certains, c'est filter.`);
   if (entree && Array.isArray(obtenu) && Array.isArray(att) && att.length === entree.length && obtenu.length < entree.length && /\.\s*filter\s*\(/.test(nu))
     return d("filter-transforme", `filter garde ou jette des éléments, il ne les transforme pas. Pour transformer chaque élément (même longueur), c'est map.`);
+  if (typeof att === "string" && typeof obtenu === "string" && obtenu.length > att.length && obtenu.endsWith(att) && /\.\s*reduce\s*\(/.test(nu))
+    return d("depart-texte", `Ton résultat commence par ${nomCode(obtenu.slice(0, obtenu.length - att.length))} en trop : c'est la valeur de départ du reduce. Pour coller des textes, le porte-monnaie commence vide : "" (une chaîne vide).`);
   if (typeof att === "number" && att < 0 && obtenu === 0 && /\.\s*reduce\s*\(/.test(nu))
     return d("depart-zero", `Ton porte-monnaie commence à 0 : avec uniquement des nombres négatifs, 0 reste toujours le plus grand. Pour un maximum, démarre avec le premier élément (sans valeur de départ, ou avec numbers[0]).`);
-  if (contexte && contexte.reussiCours && cas.index > 0)
+  if (contexte && contexte.reussiCours && cas.index > 0 && "attenduCours" in contexte && egal(obtenu, contexte.attenduCours) && !egal(att, contexte.attenduCours))
     return d("donnees-en-dur", `Ta solution marche avec les données du cours, mais pas avec d'autres. As-tu utilisé la variable du cours (comme numbers) au lieu du paramètre de la fonction, ou écrit une partie du résultat à la main ?`);
   if (typeof obtenu === "function") return d("fonction-retournee", `Ta fonction retourne une fonction au lieu d'un résultat. Il manque sans doute des parenthèses d'appel quelque part : maFonction(…).`);
   if (entree && entree.length === 0) return d("tableau-vide", `Pense au tableau vide [] : ta solution doit aussi fonctionner sans aucun élément.`);
@@ -337,7 +355,9 @@ function decrireErreur(err, code, donnees){
   let message = traduireErreur(err, ctx);
   if (err && err.name === "SyntaxError") {
     const p = verifierParentheses(code);
-    if (p) { message = p.message + " " + message; ligne = p.ligne; }
+    const t = texteSansGuillemets(code);
+    if (t) { message = `Ligne ${t.ligne} : on dirait du texte sans guillemets (${nomCode(t.texte)}). Un texte s'écrit entre guillemets : ${nomCode('"' + t.texte + '"')}. (Si ce sont deux valeurs différentes, il manque une virgule ou un opérateur entre elles.)`; ligne = t.ligne; }
+    else if (p) { message = p.message; ligne = p.ligne; }
   }
   return { type: err && err.name || "Error", titre: NOM_ERREUR[err && err.name] || "Erreur", original: String(err && err.message || err), message, ligne };
 }
@@ -392,9 +412,10 @@ function executerTout({ code, donnees, tests, contexte = {} }){
       try { obtenu = fn(...args); if (cas.puis) { if (typeof obtenu !== "function") throw new TypeError(`${nomFn}(…) is not a function`); obtenu = obtenu(...cas.puis); } }
       catch(e) { r.ok = false; r.erreur = decrireErreur(e, code, don); r.appel = `${nomFn}(${args.map(a => enCode(a)).join(", ")})`; res.cas.push(r); return; }
       r.appel = cas.appel || `${nomFn}(${cas.argsCode ? cas.argsCode.replace(/^\[|\]$/g, "") : (cas.args || []).map(a => enCode(a)).join(", ")})${cas.puis ? `(${cas.puis.map(a => enCode(a)).join(", ")})` : ""}`;
-      if ("attendu" in cas) {
-        r.attendu = enCode(cas.attendu); r.obtenu = enCode(obtenu);
-        if (!egal(obtenu, cas.attendu)) { r.ok = false; const dg = diagnostiquer({ ...cas, index }, obtenu, logsAppel, code, { reussiCours }); if (dg) r.diagnostic = dg; }
+      if ("attendu" in cas || cas.attenduUndefined) {   // JSON ne sait pas écrire undefined : "attenduUndefined": true
+        const att = cas.attenduUndefined ? undefined : cas.attendu;
+        r.attendu = enCode(att); r.obtenu = enCode(obtenu);
+        if (!egal(obtenu, att)) { r.ok = false; const dg = diagnostiquer({ ...cas, attendu: att, index }, obtenu, logsAppel, code, { reussiCours, ...(casListe[0] && "attendu" in casListe[0] && (casListe[0].fonction || tests.fonction) === nomFn ? { attenduCours: casListe[0].attendu } : {}) }); if (dg) r.diagnostic = dg; }
       }
       if (cas.sortie) {
         r.sortieAttendue = cas.sortie; r.sortieObtenue = logsAppel.slice();
@@ -448,7 +469,7 @@ function executerTout({ code, donnees, tests, contexte = {} }){
   });
   if (st.bloquants.length) res.diagnostics.push(...st.bloquants);
   // premier diagnostic utile : celui du premier cas raté
-  const rate = res.cas.find(c => !c.ok);
+  const rate = res.cas.find(c => !c.ok && c.diagnostic) || res.cas.find(c => !c.ok);
   if (rate && rate.diagnostic) res.diagnostics.push(rate.diagnostic);
   if (rate && !rate.diagnostic && !rate.erreur && casListe[res.cas.indexOf(rate)]?.siEchec) res.diagnostics.push({ id:"contenu", message: casListe[res.cas.indexOf(rate)].siEchec });
   // pas de diagnostic précis : un conseil de l'analyse statique explique peut-être l'échec

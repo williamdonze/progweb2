@@ -2,7 +2,11 @@
   "seuilValidation": 0.8,
   "unites": [
     "content/unites/u01-bases.json",
-    "content/unites/u02-operateurs.json"
+    "content/unites/u02-operateurs.json",
+    "content/unites/u03-fonctions.json",
+    "content/unites/u04-tableaux.json",
+    "content/unites/u05-parcourir.json",
+    "content/unites/u06-reduire.json"
   ],
   "aVenir": [
     {

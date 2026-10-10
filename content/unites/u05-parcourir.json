@@ -1,0 +1,524 @@
+{
+  "id": "u05",
+  "titre": "Parcourir et transformer",
+  "sousTitre": "TP 2 : Tableaux · forEach, map, filter",
+  "objectif": "Parcourir un tableau avec forEach, le transformer avec map, en garder une partie avec filter.",
+  "icone": "map",
+  "fiches": [
+    {
+      "id": "callback-param",
+      "titre": "Le paramètre de la fléchée : un œuf",
+      "icone": "(x)",
+      "resume": "Dans `fruits.forEach((fruit) => …)`, `fruit` est **un élément**, que la méthode remplit à chaque tour. Nom au singulier, différent du tableau.",
+      "analogie": "La méthode prend les œufs **un par un** dans la boîte et te tend chacun à son tour. Le paramètre est ta **main** : à chaque tour elle tient un œuf différent. Tu l'appelles `fruit` (un œuf), jamais `fruits` (la boîte).",
+      "texte": "`forEach`, `map`, `filter`, `some`, `every`, `reduce`… reçoivent une **fonction** et l'appellent une fois par élément, en lui donnant l'élément en paramètre.\n\n- Le nom du paramètre est **libre** : c'est toi qui le choisis. JavaScript ne le devine pas d'après le nom du tableau.\n- Choisis un nom **au singulier**, qui dit ce qu'est un élément : `fruits` → `fruit`, `numbers` → `n` ou `number`, `strings` → `word`, `prix` → `p`.\n- À l'intérieur de la fonction, on n'utilise que le paramètre (l'œuf), pas le tableau.\n\nLa fonction reçoit aussi l'**indice** en deuxième paramètre, si besoin : `(fruit, i) => …`.",
+      "exemples": [
+        { "code": ["const fruits = [\"pomme\", \"kiwi\"];", "fruits.forEach((fruit) => console.log(fruit));", "fruits.forEach((fruit, i) => console.log(i, fruit));"] }
+      ],
+      "pieges": ["`fruits.forEach((fruits) => …)` : l'œuf porte le nom de la boîte.", "`fruits.forEach((numbers) => …)` : un nom qui vient d'un autre exercice. Ça marche, mais tu ne sauras plus te relire.", "Utiliser le tableau dans la fonction (`numbers * 2`) au lieu de l'élément (`n * 2`)."]
+    },
+    {
+      "id": "foreach",
+      "titre": "forEach : visiter chaque élément",
+      "icone": "each",
+      "resume": "`tab.forEach((x) => …)` exécute la fonction pour chaque élément. Il ne fabrique rien : il retourne toujours `undefined`.",
+      "texte": "`forEach` sert à **faire quelque chose** avec chaque élément, typiquement l'afficher.\n\nC'est l'exercice 1 du TP : « Afficher tous les nombres dans la console » → `numbers.forEach((n) => console.log(n));`\n\n`forEach` ne retourne **rien** (`undefined`). Pour obtenir un nouveau tableau, c'est `map` ou `filter`.",
+      "exemples": [
+        { "code": ["const numbers = [3, 14, 15];", "numbers.forEach((n) => console.log(n));", "const r = numbers.forEach((n) => n * 2);", "console.log(r);"] }
+      ]
+    },
+    {
+      "id": "map",
+      "titre": "map : transformer chaque élément",
+      "icone": "map",
+      "resume": "`tab.map((x) => …)` retourne un **nouveau tableau, de la même longueur**, où chaque élément est remplacé par ce que retourne la fonction.",
+      "analogie": "Une **machine** à transformer les œufs : chaque œuf qui entre ressort transformé (peint, cuit…) dans une nouvelle boîte. Autant d'œufs sortent que d'œufs entrés. La boîte d'origine ne bouge pas.",
+      "texte": "`const doubles = numbers.map((n) => n * 2);`\n\n- La fonction est appelée pour chaque élément ; **ce qu'elle retourne** devient l'élément du nouveau tableau.\n- Toujours la **même longueur** que l'original.\n- L'original n'est pas modifié (parfait pour `Object.freeze`).\n- Si la fonction ne retourne rien (accolades sans `return`), on obtient un tableau plein d'`undefined`.",
+      "exemples": [
+        { "code": ["const numbers = Object.freeze([3, 14, 15]);", "const doubles = numbers.map((n) => n * 2);", "console.log(doubles);", "console.log(numbers);"] },
+        { "titre": "D'autres données", "code": ["const prix = [10, 25, 4];", "console.log(prix.map((p) => p * 1.1));", "const mots = [\"Sator\", \"Arepo\"];", "console.log(mots.map((mot) => mot.length));"] }
+      ],
+      "pieges": ["`map` avec un `console.log` dedans : on obtient `[undefined, undefined…]`.", "`map` avec une condition (`n % 2 !== 0`) : on obtient des true / false, pas les éléments gardés. C'est `filter`."]
+    },
+    {
+      "id": "filter",
+      "titre": "filter : garder certains éléments",
+      "icone": "filt",
+      "resume": "`tab.filter((x) => condition)` retourne un nouveau tableau avec **seulement** les éléments pour lesquels la condition vaut `true`. Les éléments ne sont pas transformés.",
+      "analogie": "Un **tamis** : tu poses chaque œuf dessus et tu poses une question (« es-tu impair ? »). Oui (`true`) : l'œuf passe dans la nouvelle boîte, **intact**. Non (`false`) : il reste dehors.",
+      "texte": "`const impairs = numbers.filter((n) => n % 2 !== 0);`\n\n- La fonction doit retourner un **booléen** : la réponse à « je garde ? ».\n- Une comparaison donne **déjà** un booléen : pas besoin de `if`, ni de `? true : false`.\n- Le nouveau tableau est **plus court ou égal** : il peut même être vide.\n- Les éléments gardés sont les **mêmes** qu'avant (pas transformés).",
+      "exemples": [
+        { "code": ["const numbers = Object.freeze([3, 14, 15, 92, 65]);", "console.log(numbers.filter((n) => n % 2 !== 0));", "console.log(numbers.filter((n) => n > 50));", "console.log(numbers.filter((n) => n > 1000));"] }
+      ],
+      "pieges": ["Écrire `(n) => { if (n % 2 !== 0) return true; }` : marche, mais `(n) => n % 2 !== 0` dit la même chose.", "Retourner l'élément au lieu d'un booléen : `(n) => n` garde tout ce qui n'est pas 0."]
+    },
+    {
+      "id": "foreach-vs-map",
+      "titre": "forEach ou map ?",
+      "icone": "?",
+      "resume": "**Afficher** chaque élément → `forEach`. **Fabriquer** un nouveau tableau → `map`. Afficher n'est pas retourner.",
+      "texte": "- **afficher** ou **faire** quelque chose pour chaque élément → `forEach` → `undefined`\n- **obtenir un nouveau tableau** transformé → `map` → un tableau de même longueur\n\nRepère dans l'énoncé : « Afficher… » → forEach + console.log. « Retourner un tableau… » → map (ou filter).",
+      "exemples": [
+        { "code": ["const numbers = [3, 14];", "const a = numbers.forEach((n) => n * 2);", "const b = numbers.map((n) => n * 2);", "console.log(a, b);"] }
+      ]
+    },
+    {
+      "id": "map-vs-filter",
+      "titre": "map ou filter ?",
+      "icone": "≡",
+      "resume": "`map` **garde toujours la même longueur** et transforme. `filter` **ne transforme pas** et peut raccourcir.",
+      "texte": "Pose-toi deux questions :\n1. Le résultat a-t-il **autant d'éléments** que l'original ? Oui → `map`.\n2. Les éléments du résultat sont-ils **les mêmes**, simplement moins nombreux ? Oui → `filter`.\n\nRetourner « les valeurs doublées » : même longueur, éléments transformés → `map`.\nRetourner « les valeurs impaires » : moins d'éléments, inchangés → `filter`.\n\nEt si on veut les deux ? On **enchaîne** : `numbers.filter(…).map(…)`.",
+      "exemples": [
+        { "code": ["const numbers = [3, 14, 15, 92];", "console.log(numbers.map((n) => n % 2 !== 0));", "console.log(numbers.filter((n) => n % 2 !== 0));", "console.log(numbers.filter((n) => n % 2 !== 0).map((n) => n * 10));"] }
+      ]
+    },
+    {
+      "id": "enchainement",
+      "titre": "Enchaîner les méthodes",
+      "icone": ".a.b",
+      "resume": "`tab.filter(…).map(…).length` : chaque méthode s'applique au **résultat** de la précédente. Garde en tête le type à chaque étape.",
+      "texte": "On lit un enchaînement de gauche à droite, étape par étape :\n\n`numbers.filter((n) => n > 10).map((n) => n * 2).length`\n- `numbers` : un **tableau**\n- `.filter(…)` : un **tableau** (plus court)\n- `.map(…)` : un **tableau** (même longueur que le précédent)\n- `.length` : un **nombre**\n\nSi une étape donne un nombre ou `undefined`, la suite ne peut plus utiliser de méthode de tableau : `x.map is not a function`.",
+      "exemples": [
+        { "code": ["const numbers = [3, 14, 15, 92, 65];", "const resultat = numbers.filter((n) => n > 10).map((n) => n * 2);", "console.log(resultat, resultat.length);"] }
+      ],
+      "pieges": ["Enchaîner après `forEach` : il retourne `undefined`."]
+    }
+  ],
+  "lecons": [
+    {
+      "id": "u05-l1",
+      "titre": "forEach : visiter chaque œuf",
+      "duree": 5,
+      "notions": ["foreach", "callback-param"],
+      "cartes": [
+        {
+          "titre": "Un œuf à la fois",
+          "illu": "boite",
+          "tableau": ["pomme", "kiwi", "mangue"],
+          "nom": "fruits",
+          "texte": "`forEach` prend les éléments **un par un** et, pour chacun, appelle la fonction que tu lui donnes.",
+          "code": ["const fruits = [\"pomme\", \"kiwi\", \"mangue\"];", "fruits.forEach((fruit) => console.log(fruit));"],
+          "fiche": "foreach"
+        },
+        {
+          "titre": "Le paramètre, c'est ta main",
+          "texte": "`(fruit) => console.log(fruit)` est une fonction fléchée (unité 3). `forEach` l'appelle trois fois : avec `\"pomme\"`, puis `\"kiwi\"`, puis `\"mangue\"`. À chaque appel, `fruit` contient **un** élément.",
+          "analogie": "La méthode te tend les œufs un par un. Le paramètre est ta **main** : à chaque tour, elle tient un seul œuf. Tu l'appelles `fruit` (un œuf), pas `fruits` (la boîte).",
+          "fiche": "callback-param"
+        },
+        {
+          "titre": "Le nom est à toi",
+          "texte": "JavaScript se moque du nom du paramètre : c'est **toi** qui le choisis. Ces trois lignes font exactement la même chose. Seule la première se relit facilement.",
+          "code": ["const fruits = [\"pomme\", \"kiwi\"];", "fruits.forEach((fruit) => console.log(fruit));", "fruits.forEach((x) => console.log(x));", "fruits.forEach((numbers) => console.log(numbers));"],
+          "piege": "`(numbers)` pour des fruits, ou `(fruits)` pour un fruit : le code marche, mais tu ne sais plus si tu manipules la boîte ou un œuf. C'est la source des bugs de l'unité suivante."
+        },
+        {
+          "titre": "L'indice en bonus",
+          "texte": "La fonction reçoit aussi l'indice de l'élément, en **deuxième** paramètre.",
+          "code": ["const podium = [\"Léa\", \"Sami\", \"Noé\"];", "podium.forEach((eleve, i) => console.log(i + 1, eleve));"]
+        },
+        {
+          "titre": "forEach ne fabrique rien",
+          "texte": "`forEach` sert à **faire** quelque chose (afficher). Il ne retourne rien : `undefined`.",
+          "code": ["const numbers = [1, 2, 3];", "const r = numbers.forEach((n) => n * 2);", "console.log(r);"]
+        }
+      ],
+      "exercices": [
+        { "id": "u05-l1-e1", "type": "predire", "notions": ["foreach"], "question": "Que va afficher ce code ?", "code": ["const notes = [5, 4, 6];", "notes.forEach((note) => console.log(note));"], "explication": "Un `console.log` par élément, dans l'ordre." },
+        { "id": "u05-l1-e2", "type": "pointer-code", "notions": ["callback-param"], "question": "Touche le **paramètre** de la fonction fléchée (l'œuf).", "code": ["const fruits = [\"pomme\", \"kiwi\"];", "fruits.forEach((⟦fruit⟧) => console.log(fruit));"], "explication": "`fruits` est la boîte ; `fruit`, entre les parenthèses avant `=>`, est l'œuf de chaque tour." },
+        { "id": "u05-l1-e3", "type": "qcm", "notions": ["callback-param"], "question": "Quel est le meilleur nom pour le paramètre ?", "code": ["const prix = [12, 8, 25];", "prix.forEach((___) => console.log(___ * 2));"], "choix": ["p (un prix)", "prix", "numbers", "tableau"], "bonne": 0, "mono": true, "explication": "Un œuf : `p`. `prix` serait le nom de la boîte ; `numbers` viendrait d'un autre exercice." },
+        { "id": "u05-l1-e4", "type": "predire", "notions": ["foreach", "callback-param"], "question": "Que va afficher ce code ?", "code": ["const mots = [\"Sator\", \"Arepo\"];", "mots.forEach((mot, i) => console.log(i + \" : \" + mot));"], "explication": "Le deuxième paramètre est l'indice : 0, puis 1." },
+        { "id": "u05-l1-e5", "type": "bug", "notions": ["callback-param"], "question": "Ce code affiche `NaN` deux fois. Pourquoi ?", "code": ["const prix = [10, 20];", "prix.forEach((p) => console.log(prix * 2));"], "ligne": 2, "choix": ["On multiplie la boîte `prix` au lieu de l'œuf `p`", "`forEach` ne marche pas avec des nombres", "Il faut `map` au lieu de `forEach`", "Il manque `return`"], "bonne": 0, "explication": "Dans la fonction, on travaille avec l'élément `p`. `prix * 2` essaie de multiplier un tableau entier : NaN." },
+        {
+          "id": "u05-l1-e6", "type": "trous", "notions": ["foreach", "callback-param"],
+          "question": "Complète pour afficher chaque élève, un par ligne.",
+          "code": ["const eleves = [\"Léa\", \"Sami\", \"Noé\"];", "eleves.___((___) => console.log(eleve));"],
+          "tests": { "cas": [ { "sortie": ["Léa", "Sami", "Noé"] } ] },
+          "indices": ["Quelle méthode visite chaque élément ?", "Le paramètre doit s'appeler comme ce qu'on affiche dans console.log."],
+          "solution": ["forEach", "eleve"],
+          "erreursTypiques": [ { "trous": ["forEach", "eleves"], "attendu": "erreur" }, { "trous": ["foreach", "eleve"], "attendu": "erreur" } ],
+          "explication": "`forEach` visite, `eleve` est l'œuf du tour."
+        },
+        {
+          "id": "u05-l1-e7", "type": "ecrire", "notions": ["foreach", "callback-param"],
+          "question": "Le tableau `tshirts` (des tailles) est déjà créé. Affiche chaque taille sur sa ligne, précédée de `Taille ` (exemple : `Taille S`).",
+          "donnees": { "tshirts": ["S", "M", "L"] },
+          "depart": [""],
+          "tests": { "cas": [
+            { "sortie": ["Taille S", "Taille M", "Taille L"] },
+            { "titre": "Autres données", "donnees": { "tshirts": ["XS", "XL"] }, "sortie": ["Taille XS", "Taille XL"] },
+            { "titre": "Tableau vide", "donnees": { "tshirts": [] }, "sortie": [] }
+          ], "obligatoire": ["forEach"] },
+          "indices": ["Un affichage par élément : `forEach`.", "Choisis un nom au singulier pour le paramètre : `taille`.", { "code": "tshirts.forEach((taille) => console.log(___));" }],
+          "solution": ["tshirts.forEach((taille) => console.log(\"Taille \" + taille));"],
+          "erreursTypiques": [
+            { "code": "console.log(\"Taille \" + tshirts);", "attendu": "echec" },
+            { "code": "tshirts.forEach((tshirts) => console.log(\"Taille \" + tshirts));", "attendu": "conseil", "diagnostic": "param-nom-tableau" },
+            { "code": "tshirts.forEach((taille) => console.log(\"Taille\" + taille));", "attendu": "echec" }
+          ],
+          "explication": "`forEach` + `console.log` : un affichage par élément."
+        }
+      ]
+    },
+    {
+      "id": "u05-l2",
+      "titre": "map : transformer chaque œuf",
+      "duree": 6,
+      "notions": ["map", "callback-param"],
+      "cartes": [
+        {
+          "titre": "La machine à transformer",
+          "texte": "`map` applique ta fonction à chaque élément et **range ce qu'elle retourne** dans un **nouveau** tableau.",
+          "code": ["const numbers = [3, 14, 15];", "const doubles = numbers.map((n) => n * 2);", "console.log(doubles);"],
+          "analogie": "Une machine : chaque œuf qui entre ressort transformé, dans une nouvelle boîte. Autant d'œufs sortent que d'œufs entrent.",
+          "fiche": "map"
+        },
+        {
+          "titre": "Toujours la même longueur",
+          "texte": "3 éléments entrent, 3 éléments sortent. Toujours. Ce n'est pas un détail : c'est **la** règle de `map`.",
+          "code": ["const prix = [10, 25, 4];", "const ttc = prix.map((p) => p * 1.1);", "console.log(prix.length, ttc.length);"]
+        },
+        {
+          "titre": "L'original ne bouge pas",
+          "texte": "`map` fabrique une nouvelle boîte : il fonctionne même sur un tableau gelé.",
+          "code": ["const numbers = Object.freeze([3, 14, 15]);", "const doubles = numbers.map((n) => n * 2);", "console.log(numbers);", "console.log(doubles);"]
+        },
+        {
+          "titre": "Transformer en autre chose",
+          "texte": "L'élément transformé peut changer de type : des mots en longueurs (nombres), des nombres en textes…",
+          "code": ["const mots = [\"Sator\", \"Arepo\", \"Opera\"];", "console.log(mots.map((mot) => mot.length));", "const notes = [5, 3.5];", "console.log(notes.map((note) => \"Note : \" + note));"]
+        },
+        {
+          "titre": "Ce qui compte : ce qui est retourné",
+          "texte": "L'élément du nouveau tableau, c'est ce que **retourne** la fonction. Avec des accolades sans `return`, la fonction ne retourne rien : on obtient des `undefined`.",
+          "code": ["const numbers = [1, 2];", "console.log(numbers.map((n) => n * 2));", "console.log(numbers.map((n) => { n * 2 }));"],
+          "piege": "Accolades → `return` obligatoire."
+        }
+      ],
+      "exercices": [
+        { "id": "u05-l2-e1", "type": "map-visuel", "notions": ["map"], "question": "Que contient le nouveau tableau ?", "tableau": [3, 14, 15, 92], "nom": "numbers", "fonction": "(n) => n * 2", "explication": "Chaque nombre est doublé ; la longueur ne change pas." },
+        { "id": "u05-l2-e2", "type": "map-visuel", "notions": ["map"], "question": "Que contient le nouveau tableau ?", "tableau": ["Sator", "Arepo", "Tenet"], "nom": "strings", "fonction": "(word) => word.length", "explication": "Chaque mot devient sa longueur : 5, 5, 5." },
+        { "id": "u05-l2-e3", "type": "map-visuel", "notions": ["map"], "question": "Que contient le nouveau tableau ?", "tableau": [10, 25, 4], "nom": "prix", "fonction": "(p) => p - 1", "explication": "On enlève 1 franc à chaque prix." },
+        { "id": "u05-l2-e4", "type": "predire", "notions": ["map"], "question": "Que va afficher ce code ?", "code": ["const numbers = [1, 2, 3];", "const r = numbers.map((n) => n * n);", "console.log(r);"], "explication": "Chaque nombre au carré." },
+        { "id": "u05-l2-e5", "type": "predire", "notions": ["map", "return"], "question": "Que va afficher ce code ?", "code": ["const numbers = [1, 2, 3];", "console.log(numbers.map((n) => { n + 1 }));"], "explication": "Accolades sans `return` : chaque élément devient `undefined`." },
+        { "id": "u05-l2-e6", "type": "pointer-code", "notions": ["map"], "question": "Touche ce qui devient chaque élément du nouveau tableau.", "code": ["const ttc = prix.map((p) => ⟦p * 1.081⟧);"], "explication": "Ce que retourne la fonction (après `=>`) devient l'élément du nouveau tableau." },
+        {
+          "id": "u05-l2-e7", "type": "ecrire", "notions": ["map", "callback-param", "return"],
+          "question": "Écris `getPrixSoldes(prix)` qui **retourne** un nouveau tableau où chaque prix est divisé par 2.",
+          "depart": ["function getPrixSoldes(prix) {", "  ", "}", "", "console.log(getPrixSoldes([10, 25, 4]));"],
+          "tests": { "fonction": "getPrixSoldes", "cas": [ { "args": [[10, 25, 4]], "attendu": [5, 12.5, 2] }, { "args": [[100]], "attendu": [50] }, { "titre": "tableau vide", "args": [[]], "attendu": [] } ], "obligatoire": ["map"] },
+          "indices": ["Même longueur, éléments transformés : `map`.", "Le paramètre de la fléchée est un prix : `p`.", { "code": "return prix.map((___) => ___);" }],
+          "solution": ["function getPrixSoldes(prix) {", "  return prix.map((p) => p / 2);", "}", "", "console.log(getPrixSoldes([10, 25, 4]));"],
+          "erreursTypiques": [
+            { "code": "function getPrixSoldes(prix) {\n  prix.map((p) => p / 2);\n}", "attendu": "echec", "diagnostic": "sans-return" },
+            { "code": "function getPrixSoldes(prix) {\n  return prix.map((p) => prix / 2);\n}", "attendu": "echec" },
+            { "code": "function getPrixSoldes(prix) {\n  return prix.map((p) => { p / 2 });\n}", "attendu": "echec", "diagnostic": "fleche-sans-return" },
+            { "code": "function getPrixSoldes(prix) {\n  return prix.map((prix) => prix / 2);\n}", "attendu": "conseil", "diagnostic": "param-nom-tableau" }
+          ],
+          "explication": "Deux `return` différents : celui de la fonction `getPrixSoldes` (qui tend le nouveau tableau) et celui, implicite, de la fléchée (qui donne chaque nouveau prix)."
+        }
+      ]
+    },
+    {
+      "id": "u05-l3",
+      "titre": "forEach ou map ?",
+      "duree": 5,
+      "notions": ["foreach-vs-map", "foreach", "map", "return"],
+      "cartes": [
+        {
+          "titre": "Afficher ≠ retourner, encore",
+          "texte": "C'est la même histoire que `console.log` et `return` (unité 3) :\n- `forEach` + `console.log` : on **montre** chaque élément ;\n- `map` : on **fabrique** un nouveau tableau, qu'on peut ensuite garder, retourner, afficher.",
+          "code": ["const numbers = [3, 14];", "const a = numbers.forEach((n) => n * 2);", "const b = numbers.map((n) => n * 2);", "console.log(a);", "console.log(b);"],
+          "fiche": "foreach-vs-map"
+        },
+        {
+          "titre": "Lis l'énoncé",
+          "texte": "- « **Afficher** tous les nombres » → `forEach` + `console.log`\n- « **Retourner** un tableau avec les valeurs doublées » → `return` + `map`",
+          "analogie": "Le cuisinier encore : `forEach` montre chaque plat par la fenêtre ; `map` remplit un nouveau plateau qu'il te tend."
+        },
+        {
+          "titre": "Le piège : console.log dans map",
+          "texte": "`console.log` retourne `undefined`. Si c'est ce que retourne ta fonction dans `map`, le nouveau tableau est plein d'`undefined`.",
+          "code": ["const numbers = [3, 14];", "const r = numbers.map((n) => console.log(n * 2));", "console.log(r);"]
+        }
+      ],
+      "exercices": [
+        { "id": "u05-l3-e1", "type": "methode", "notions": ["foreach-vs-map"], "question": "« Afficher tous les prix dans la console » : quelle méthode ?", "choix": ["forEach", "map", "filter"], "bonne": 0, "explication": "Afficher : forEach + console.log." },
+        { "id": "u05-l3-e2", "type": "methode", "notions": ["foreach-vs-map"], "question": "« Retourner un tableau avec tous les prix augmentés de 10 % » : quelle méthode ?", "choix": ["map", "forEach", "filter"], "bonne": 0, "explication": "Un nouveau tableau de même longueur : map." },
+        { "id": "u05-l3-e3", "type": "predire", "notions": ["foreach-vs-map"], "question": "Que va afficher la **dernière** ligne ?", "code": ["const numbers = [1, 2];", "const r = numbers.forEach((n) => n + 1);", "console.log(r);"], "explication": "forEach retourne toujours undefined." },
+        { "id": "u05-l3-e4", "type": "tri", "notions": ["foreach-vs-map", "foreach", "map"], "question": "Que retourne chaque appel ?", "mono": true, "categories": ["un tableau", "undefined"], "items": [["numbers.map((n) => n)", 0], ["numbers.forEach((n) => n)", 1], ["numbers.map((n) => console.log(n))", 0], ["numbers.forEach((n) => console.log(n))", 1], ["numbers.filter((n) => n > 0)", 0]], "explication": "map et filter retournent toujours un tableau (parfois plein d'undefined !). forEach retourne toujours undefined." },
+        {
+          "id": "u05-l3-e5", "type": "corriger", "notions": ["foreach-vs-map", "return"],
+          "question": "`getNotesSur10(notes)` doit **retourner** les notes multipliées par 2 (notes sur 5 → sur 10). Elle affiche au lieu de retourner. Corrige-la.",
+          "depart": ["function getNotesSur10(notes) {", "  notes.forEach((note) => console.log(note * 2));", "}", "", "console.log(getNotesSur10([4, 5, 3.5]));"],
+          "tests": { "fonction": "getNotesSur10", "cas": [ { "args": [[4, 5, 3.5]], "attendu": [8, 10, 7] }, { "titre": "tableau vide", "args": [[]], "attendu": [] } ] },
+          "indices": ["Exécute : que vaut `getNotesSur10([4, 5, 3.5])` ?", "Il faut fabriquer un nouveau tableau et le tendre : `return` + `map`."],
+          "solution": ["function getNotesSur10(notes) {", "  return notes.map((note) => note * 2);", "}", "", "console.log(getNotesSur10([4, 5, 3.5]));"],
+          "erreursTypiques": [
+            { "code": "function getNotesSur10(notes) {\n  return notes.forEach((note) => note * 2);\n}", "attendu": "echec", "diagnostic": "foreach-rien" },
+            { "code": "function getNotesSur10(notes) {\n  return notes.map((note) => console.log(note * 2));\n}", "attendu": "echec", "diagnostic": "fleche-sans-return" }
+          ],
+          "explication": "`return notes.map(…)` : on fabrique le nouveau tableau, et on le tend."
+        }
+      ]
+    },
+    {
+      "id": "u05-l4",
+      "titre": "filter : le tamis",
+      "duree": 6,
+      "notions": ["filter", "callback-param", "comparaisons"],
+      "cartes": [
+        {
+          "titre": "Garder ou jeter",
+          "texte": "`filter` pose une question à chaque élément. Si ta fonction répond `true`, l'élément est **gardé** dans le nouveau tableau ; sinon il est laissé de côté.",
+          "code": ["const numbers = [3, 14, 15, 92, 65];", "const grands = numbers.filter((n) => n > 50);", "console.log(grands);"],
+          "analogie": "Un **tamis** : chaque œuf passe le test, ou reste dehors. Les œufs qui passent ne sont pas transformés.",
+          "fiche": "filter"
+        },
+        {
+          "titre": "La condition EST la réponse",
+          "texte": "Une comparaison donne déjà `true` ou `false` (unité 2). Pas besoin de `if` dans la fonction :",
+          "code": ["const numbers = [3, 14, 15];", "const a = numbers.filter((n) => {", "  if (n % 2 !== 0) {", "    return true;", "  } else {", "    return false;", "  }", "});", "const b = numbers.filter((n) => n % 2 !== 0);", "console.log(a, b);"],
+          "astuce": "Les deux marchent. La seconde dit la même chose en une ligne : « garde n si n est impair »."
+        },
+        {
+          "titre": "Les impairs du TP",
+          "texte": "« Retourner un tableau ne contenant que les valeurs impaires » : un tamis avec la question « es-tu impair ? ». Rappel : `n % 2 !== 0` marche aussi pour les négatifs.",
+          "code": ["const numbers = Object.freeze([3, 14, 15, 92, 65, 35, 89, 79, 32, 38]);", "console.log(numbers.filter((n) => n % 2 !== 0));"]
+        },
+        {
+          "titre": "Un tamis peut tout garder… ou rien",
+          "texte": "Le résultat est toujours un tableau : parfois aussi long que l'original, parfois vide.",
+          "code": ["const notes = [4, 5, 6];", "console.log(notes.filter((note) => note >= 4));", "console.log(notes.filter((note) => note > 6));"]
+        }
+      ],
+      "exercices": [
+        { "id": "u05-l4-e1", "type": "filtre-visuel", "notions": ["filter", "modulo"], "question": "Quelles cases `filter` garde-t-il ?", "tableau": [3, 14, 15, 92, 65, 35], "nom": "numbers", "condition": "(n) => n % 2 !== 0", "explication": "Les impairs : 3, 15, 65, 35." },
+        { "id": "u05-l4-e2", "type": "filtre-visuel", "notions": ["filter"], "question": "Quelles cases `filter` garde-t-il ?", "tableau": [12, 8, 25, 40, 5], "nom": "prix", "condition": "(p) => p >= 10", "explication": "Les prix d'au moins 10 : 12, 25, 40." },
+        { "id": "u05-l4-e3", "type": "filtre-visuel", "notions": ["filter"], "question": "Quelles cases `filter` garde-t-il ?", "tableau": ["Sator", "Arepo", "Tenet", "Opera", "Rotas"], "nom": "strings", "condition": "(word) => word.length === 5", "explication": "Tous les mots font 5 lettres : tout est gardé." },
+        { "id": "u05-l4-e4", "type": "filtre-visuel", "notions": ["filter"], "question": "Quelles cases `filter` garde-t-il ?", "tableau": ["Léa", "Sami", "Noé", "Ana"], "nom": "eleves", "condition": "(eleve) => eleve === \"Zoé\"", "explication": "Personne ne s'appelle Zoé : le résultat est un tableau vide `[]`. (Ne touche aucune case, puis vérifie.)" },
+        { "id": "u05-l4-e5", "type": "qcm", "notions": ["filter", "comparaisons"], "question": "Quelle fonction garde les nombres **négatifs** ?", "choix": ["(n) => n < 0", "(n) => { if (n < 0) n }", "(n) => n", "(n) => n < 0 ? n : false"], "bonne": 0, "mono": true, "explication": "La comparaison donne directement le booléen. La 2e ne retourne rien, la 3e garde tout sauf 0, la 4e garderait n (un nombre non nul est « vrai »)… sauf le cas 0, et elle est inutilement compliquée." },
+        { "id": "u05-l4-e6", "type": "predire", "notions": ["filter"], "question": "Que va afficher ce code ?", "code": ["const ages = [12, 19, 15, 30];", "console.log(ages.filter((age) => age >= 18));"], "explication": "Seuls 19 et 30 passent le tamis." },
+        {
+          "id": "u05-l4-e7", "type": "ecrire", "notions": ["filter", "callback-param", "comparaisons"],
+          "question": "Écris `getReussies(notes)` qui **retourne** seulement les notes d'au moins 4.",
+          "depart": ["function getReussies(notes) {", "  ", "}", "", "console.log(getReussies([3.5, 4, 5.5, 2]));"],
+          "tests": { "fonction": "getReussies", "cas": [ { "args": [[3.5, 4, 5.5, 2]], "attendu": [4, 5.5] }, { "args": [[6, 6]], "attendu": [6, 6] }, { "titre": "aucune réussie", "args": [[1, 2]], "attendu": [] }, { "titre": "tableau vide", "args": [[]], "attendu": [] } ], "obligatoire": ["filter"] },
+          "indices": ["Garder certains éléments sans les transformer : `filter`.", { "code": "return notes.filter((note) => ___);" }],
+          "solution": ["function getReussies(notes) {", "  return notes.filter((note) => note >= 4);", "}", "", "console.log(getReussies([3.5, 4, 5.5, 2]));"],
+          "erreursTypiques": [
+            { "code": "function getReussies(notes) {\n  return notes.map((note) => note >= 4);\n}", "attendu": "echec", "diagnostic": "map-condition" },
+            { "code": "function getReussies(notes) {\n  return notes.filter((note) => note > 4);\n}", "attendu": "echec" },
+            { "code": "function getReussies(notes) {\n  return notes.filter((note) => { note >= 4 });\n}", "attendu": "echec" }
+          ],
+          "explication": "`filter` + une comparaison : la fonction répond « je garde » ou « je jette »."
+        }
+      ]
+    },
+    {
+      "id": "u05-l5",
+      "titre": "map ou filter ? Et les deux",
+      "duree": 6,
+      "notions": ["map-vs-filter", "enchainement", "map", "filter"],
+      "cartes": [
+        {
+          "titre": "La règle de la longueur",
+          "texte": "Avant d'écrire, demande-toi : le résultat a-t-il **autant d'éléments** que l'original ?\n- Oui, et ils sont transformés → `map`\n- Non, ce sont les mêmes éléments mais moins nombreux → `filter`",
+          "code": ["const numbers = [3, 14, 15, 92];", "console.log(numbers.map((n) => n * 2));", "console.log(numbers.filter((n) => n > 10));"],
+          "fiche": "map-vs-filter"
+        },
+        {
+          "titre": "Le piège : map avec une condition",
+          "texte": "Mettre une condition dans `map` ne trie rien : chaque élément est **transformé en réponse** (true / false). La longueur reste la même.",
+          "code": ["const numbers = [3, 14, 15, 92];", "console.log(numbers.map((n) => n % 2 !== 0));"],
+          "piege": "Si ton résultat est plein de `true` et `false`, tu voulais sûrement `filter`."
+        },
+        {
+          "titre": "Enchaîner",
+          "texte": "« Les impairs, multipliés par 10 » : on filtre **puis** on transforme. Chaque méthode travaille sur le **résultat** de la précédente.",
+          "code": ["const numbers = [3, 14, 15, 92];", "const r = numbers.filter((n) => n % 2 !== 0).map((n) => n * 10);", "console.log(r);"],
+          "fiche": "enchainement"
+        },
+        {
+          "titre": "Suivre le type à chaque étape",
+          "texte": "Pour ne pas se perdre dans un enchaînement, on note le type après chaque maillon :\n- `numbers` → tableau\n- `.filter(…)` → tableau\n- `.map(…)` → tableau\n- `.length` → **nombre** (fin des méthodes de tableau !)",
+          "code": ["const numbers = [3, 14, 15, 92];", "console.log(numbers.filter((n) => n > 10).map((n) => n * 2).length);"]
+        }
+      ],
+      "exercices": [
+        { "id": "u05-l5-e1", "type": "methode", "notions": ["map-vs-filter"], "question": "« Retourner les mots de plus de 4 lettres » :", "choix": ["filter", "map", "forEach"], "bonne": 0, "explication": "Moins d'éléments, inchangés : filter." },
+        { "id": "u05-l5-e2", "type": "methode", "notions": ["map-vs-filter"], "question": "« Retourner la longueur de chaque mot » :", "choix": ["map", "filter", "forEach"], "bonne": 0, "explication": "Autant d'éléments, transformés en longueurs : map." },
+        { "id": "u05-l5-e3", "type": "predire", "notions": ["map-vs-filter"], "question": "Que va afficher ce code ?", "code": ["const numbers = [5, 8, 9];", "console.log(numbers.map((n) => n > 6));"], "explication": "map transforme chaque nombre en réponse : false, true, true." },
+        { "id": "u05-l5-e4", "type": "types-chaine", "notions": ["enchainement"], "question": "Quel est le type après chaque maillon ?", "depart": "[3, 14, 15, 92]", "maillons": [".filter((n) => n > 10)", ".map((n) => n * 2)", ".length"], "explication": "filter et map retournent des tableaux ; length est un nombre." },
+        { "id": "u05-l5-e5", "type": "types-chaine", "notions": ["enchainement", "map-vs-filter"], "question": "Et ici ?", "depart": "[\"Sator\", \"Arepo\", \"Tenet\"]", "maillons": [".map((word) => word.length)", ".filter((len) => len === 5)", ".length", " > 2"], "explication": "map : tableau de nombres ; filter : tableau ; length : nombre ; une comparaison : booléen." },
+        { "id": "u05-l5-e6", "type": "predire", "notions": ["enchainement"], "question": "Que va afficher ce code ?", "code": ["const prix = [12, 5, 30];", "console.log(prix.filter((p) => p > 10).map((p) => p - 2));"], "explication": "On garde 12 et 30, puis on enlève 2 à chacun." },
+        {
+          "id": "u05-l5-e7", "type": "parsons", "notions": ["enchainement", "map", "filter"],
+          "question": "Reconstitue `getGrandsDoubles(numbers)` : les nombres de plus de 10, doublés.",
+          "lignes": ["function getGrandsDoubles(numbers) {", "  return numbers", "    .filter((n) => n > 10)", "    .map((n) => n * 2);", "}"],
+          "distracteurs": ["    .forEach((n) => n * 2);"],
+          "explication": "On filtre d'abord, puis on transforme. `forEach` ne retournerait rien."
+        },
+        {
+          "id": "u05-l5-e8", "type": "ecrire", "notions": ["enchainement", "map", "filter"],
+          "question": "Écris `getLongueursLongues(mots)` qui retourne les **longueurs** des mots de **plus de 3 lettres**.",
+          "depart": ["function getLongueursLongues(mots) {", "  ", "}", "", "console.log(getLongueursLongues([\"kiwi\", \"noix\", \"ail\", \"mangue\"]));"],
+          "tests": { "fonction": "getLongueursLongues", "cas": [ { "args": [["kiwi", "noix", "ail", "mangue"]], "attendu": [4, 4, 6] }, { "args": [["a", "bb"]], "attendu": [] }, { "titre": "tableau vide", "args": [[]], "attendu": [] } ] },
+          "indices": ["Deux étapes : garder (lesquels ?) puis transformer (en quoi ?).", { "code": "return mots.filter((mot) => ___).map((mot) => ___);" }],
+          "solution": ["function getLongueursLongues(mots) {", "  return mots.filter((mot) => mot.length > 3).map((mot) => mot.length);", "}", "", "console.log(getLongueursLongues([\"kiwi\", \"noix\", \"ail\", \"mangue\"]));"],
+          "erreursTypiques": [
+            { "code": "function getLongueursLongues(mots) {\n  return mots.map((mot) => mot.length > 3);\n}", "attendu": "echec", "diagnostic": "map-condition" },
+            { "code": "function getLongueursLongues(mots) {\n  return mots.filter((mot) => mot.length > 3);\n}", "attendu": "echec" }
+          ],
+          "explication": "`filter` puis `map` : chaque méthode travaille sur le tableau retourné par la précédente."
+        }
+      ]
+    }
+  ],
+  "jeux": [
+    {
+      "id": "u05-aiguillage",
+      "titre": "map, filter ou forEach ?",
+      "description": "Une consigne, trois méthodes. Choisis vite et bien.",
+      "tours": 10,
+      "badge": "aiguilleur",
+      "seuilBadge": 8,
+      "questions": [
+        { "id": "u05-j1-1", "type": "methode", "notions": ["foreach"], "question": "Afficher chaque élève dans la console.", "choix": ["forEach", "map", "filter"], "bonne": 0, "explication": "Afficher : forEach." },
+        { "id": "u05-j1-2", "type": "methode", "notions": ["map"], "question": "Retourner les prix en euros (× 0.95).", "choix": ["map", "filter", "forEach"], "bonne": 0, "explication": "Tous les prix, transformés : map." },
+        { "id": "u05-j1-3", "type": "methode", "notions": ["filter"], "question": "Retourner les t-shirts disponibles en taille M.", "choix": ["filter", "map", "forEach"], "bonne": 0, "explication": "Une partie des éléments : filter." },
+        { "id": "u05-j1-4", "type": "methode", "notions": ["map"], "question": "Retourner chaque nombre au carré.", "choix": ["map", "filter", "forEach"], "bonne": 0, "explication": "Même longueur, transformés : map." },
+        { "id": "u05-j1-5", "type": "methode", "notions": ["filter"], "question": "Retourner les nombres pairs.", "choix": ["filter", "map", "forEach"], "bonne": 0, "explication": "On garde certains nombres : filter." },
+        { "id": "u05-j1-6", "type": "methode", "notions": ["map"], "question": "Retourner la première lettre de chaque mot.", "choix": ["map", "filter", "forEach"], "bonne": 0, "explication": "Chaque mot devient une lettre : map." },
+        { "id": "u05-j1-7", "type": "methode", "notions": ["foreach"], "question": "Afficher « Bonjour » suivi du nom de chaque élève.", "choix": ["forEach", "map", "filter"], "bonne": 0, "explication": "On affiche : forEach." },
+        { "id": "u05-j1-8", "type": "methode", "notions": ["filter"], "question": "Retourner les mots qui contiennent exactement 5 lettres.", "choix": ["filter", "map", "forEach"], "bonne": 0, "explication": "Un tamis sur la longueur : filter." },
+        { "id": "u05-j1-9", "type": "methode", "notions": ["map"], "question": "Retourner un tableau de booléens : chaque note est-elle suffisante ?", "choix": ["map", "filter", "forEach"], "bonne": 0, "explication": "Ici on VEUT des true/false, un par note : c'est bien map." },
+        { "id": "u05-j1-10", "type": "methode", "notions": ["filter"], "question": "Retourner les notes suffisantes (≥ 4).", "choix": ["filter", "map", "forEach"], "bonne": 0, "explication": "On garde les notes elles-mêmes : filter." },
+        { "id": "u05-j1-11", "type": "filtre-visuel", "notions": ["filter"], "question": "Quelles cases `filter` garde-t-il ?", "tableau": [-3, 0, 7, -1, 4], "nom": "numbers", "condition": "(n) => n >= 0", "explication": "Les positifs (0 compris) : 0, 7, 4." },
+        { "id": "u05-j1-12", "type": "map-visuel", "notions": ["map"], "question": "Que contient le nouveau tableau ?", "tableau": [1, 2, 3], "nom": "numbers", "fonction": "(n) => n * 10", "explication": "Chaque nombre × 10." }
+      ]
+    }
+  ],
+  "quiz": {
+    "titre": "Quiz : forEach, map, filter",
+    "questions": [
+      { "id": "u05-q1", "type": "predire", "notions": ["foreach"], "question": "Que va afficher ce code ?", "code": ["[\"a\", \"b\"].forEach((lettre) => console.log(lettre + lettre));"], "explication": "Chaque lettre doublée, une par ligne." },
+      { "id": "u05-q2", "type": "map-visuel", "notions": ["map"], "question": "Que contient le nouveau tableau ?", "tableau": [3, 14, 15], "nom": "numbers", "fonction": "(n) => n + 1", "explication": "Chaque nombre + 1." },
+      { "id": "u05-q3", "type": "filtre-visuel", "notions": ["filter"], "question": "Quelles cases `filter` garde-t-il ?", "tableau": [3, 14, 15, 92, 65, 35, 89, 79, 32, 38], "nom": "numbers", "condition": "(n) => n % 2 === 0", "explication": "Les pairs : 14, 92, 32, 38." },
+      { "id": "u05-q4", "type": "qcm", "notions": ["map-vs-filter"], "question": "Un tableau de 8 éléments passe dans `map`. Combien d'éléments dans le résultat ?", "choix": ["8, toujours", "Ça dépend de la fonction", "Moins de 8", "0"], "bonne": 0, "explication": "map garde toujours la même longueur." },
+      { "id": "u05-q5", "type": "predire", "notions": ["foreach-vs-map"], "question": "Que va afficher ce code ?", "code": ["const r = [1, 2].forEach((n) => n * 3);", "console.log(r);"], "explication": "forEach retourne undefined." },
+      { "id": "u05-q6", "type": "pointer-code", "notions": ["callback-param"], "question": "Touche **l'élément** (l'œuf) dans ce code.", "code": ["numbers.filter((⟦n⟧) => n % 2 !== 0);"], "explication": "`n` est l'œuf de chaque tour ; `numbers` est la boîte." },
+      { "id": "u05-q7", "type": "bug", "notions": ["callback-param"], "question": "Trouve le bug.", "code": ["const notes = [4, 6];", "const r = notes.map((note) => notes * 2);", "console.log(r);"], "ligne": 2, "choix": ["On utilise la boîte `notes` au lieu de l'œuf `note`", "Il faut forEach", "Il manque return", "Il faut filter"], "bonne": 0, "explication": "`notes * 2` → NaN. Il fallait `note * 2`." },
+      { "id": "u05-q8", "type": "predire", "notions": ["map-vs-filter"], "question": "Que va afficher ce code ?", "code": ["console.log([4, 7].map((n) => n % 2 === 0));"], "explication": "map avec une condition : des booléens." },
+      { "id": "u05-q9", "type": "qcm", "notions": ["filter"], "question": "Quelle écriture est la plus simple pour garder les nombres > 10 ?", "choix": ["tab.filter((n) => n > 10)", "tab.filter((n) => { if (n > 10) { return true; } else { return false; } })", "tab.filter((n) => n > 10 ? true : false)", "tab.map((n) => n > 10)"], "bonne": 0, "mono": true, "explication": "Les trois premières donnent le même résultat, mais la comparaison est déjà le booléen : inutile d'ajouter un if ou un ternaire. La dernière donne des booléens." },
+      { "id": "u05-q10", "type": "types-chaine", "notions": ["enchainement"], "question": "Type après chaque maillon ?", "depart": "[2, 9, 4]", "maillons": [".map((n) => n * 3)", ".filter((n) => n > 10)", ".length"], "explication": "Tableau, tableau, nombre." },
+      { "id": "u05-q11", "type": "predire", "notions": ["filter"], "question": "Que va afficher ce code ?", "code": ["console.log([\"Sator\", \"Tenet\"].filter((w) => w === \"tenet\"));"], "explication": "Les majuscules comptent : aucun mot n'est égal à \"tenet\"." },
+      { "id": "u05-q12", "type": "methode", "notions": ["map-vs-filter"], "question": "« Retourner un tableau avec les valeurs doublées » (TP, nombres, ex. 2) :", "choix": ["map", "filter", "forEach"], "bonne": 0, "explication": "Même longueur, transformées." },
+      { "id": "u05-q13", "type": "methode", "notions": ["map-vs-filter"], "question": "« Retourner un tableau ne contenant que les valeurs impaires » (TP, nombres, ex. 3) :", "choix": ["filter", "map", "forEach"], "bonne": 0, "explication": "On garde une partie, sans transformer." },
+      { "id": "u05-q14", "type": "predire", "notions": ["map", "return"], "question": "Que va afficher ce code ?", "code": ["console.log([1, 2].map((n) => console.log(n)));"], "aide": "Attention : il y a des affichages pendant le map, puis le résultat.", "explication": "map affiche 1 puis 2 (les console.log internes), puis le tableau des valeurs retournées par console.log : undefined, undefined." },
+      { "id": "u05-q15", "type": "vf", "notions": ["map", "immutabilite"], "question": "`map` modifie le tableau d'origine.", "bonne": false, "explication": "map fabrique un nouveau tableau : il marche même sur un tableau gelé." }
+    ]
+  },
+  "boss": [
+    {
+      "id": "u05-b1",
+      "titre": "Afficher tous les nombres",
+      "source": "TP Tableaux · nombres, exercice 1",
+      "notions": ["foreach", "callback-param"],
+      "enonce": "À partir du tableau `numbers` : **afficher tous les nombres dans la console**, un par ligne.\n\nÉcris une fonction `printAll(numbers)` qui affiche chaque nombre du tableau reçu.",
+      "regles": ["La structure de données initiale ne doit pas être modifiée.", "Vos solutions se doivent de rester fonctionnelles même si le tableau initial diffère (tableau vide compris)."],
+      "donnees": { "numbers": [3, 14, 15, 92, 65, 35, 89, 79, 32, 38] },
+      "depart": ["function printAll(numbers) {", "  ", "}", "", "printAll(numbers);"],
+      "tests": {
+        "fonction": "printAll",
+        "cas": [
+          { "titre": "Données du cours", "args": [[3, 14, 15, 92, 65, 35, 89, 79, 32, 38]], "sortie": ["3", "14", "15", "92", "65", "35", "89", "79", "32", "38"] },
+          { "titre": "Autres données", "args": [[7, -1, 0]], "sortie": ["7", "-1", "0"] },
+          { "titre": "Tableau vide", "args": [[]], "sortie": [] }
+        ]
+      },
+      "indices": [
+        "« Afficher » chaque élément : quelle méthode visite chaque œuf ?",
+        "Le paramètre de la fléchée est UN nombre : appelle-le `n` (pas `numbers`).",
+        { "code": "numbers.___((n) => ___);" }
+      ],
+      "solution": ["function printAll(numbers) {", "  numbers.forEach((n) => console.log(n));", "}", "", "printAll(numbers);"],
+      "erreursTypiques": [
+        { "code": "function printAll(numbers) {\n  console.log(numbers);\n}", "attendu": "echec", "diagnostic": "boite-entiere" },
+        { "code": "function printAll(numbers) {\n  numbers.map((n) => n);\n}", "attendu": "echec", "diagnostic": "rien-affiche" },
+        { "code": "function printAll(arr) {\n  numbers.forEach((n) => console.log(n));\n}", "attendu": "echec" }
+      ],
+      "explication": "Premier exercice du TP : réussi ! (La solution du prof affiche le tableau d'un coup ; ici, on affiche chaque nombre sur sa ligne, comme le demande « tous les nombres ».)"
+    },
+    {
+      "id": "u05-b2",
+      "titre": "Les valeurs doublées",
+      "source": "TP Tableaux · nombres, exercice 2",
+      "notions": ["map", "callback-param", "return"],
+      "enonce": "À partir du tableau `numbers` : **retourner un tableau avec les valeurs doublées**.\n\nÉcris une fonction `getDoubled(numbers)`.",
+      "regles": ["La structure de données initiale ne doit pas être modifiée.", "Vos solutions se doivent de rester fonctionnelles même si le tableau initial diffère.", "Entraîne-toi avec `map` : c'est la méthode de cet exercice."],
+      "donnees": { "numbers": [3, 14, 15, 92, 65, 35, 89, 79, 32, 38] },
+      "depart": ["function getDoubled(numbers) {", "  ", "}", "", "console.log(getDoubled(numbers));"],
+      "tests": {
+        "fonction": "getDoubled",
+        "cas": [
+          { "titre": "Données du cours", "args": [[3, 14, 15, 92, 65, 35, 89, 79, 32, 38]], "attendu": [6, 28, 30, 184, 130, 70, 178, 158, 64, 76] },
+          { "titre": "Autres données", "args": [[-1, 0.5, 100]], "attendu": [-2, 1, 200] },
+          { "titre": "Tableau vide", "args": [[]], "attendu": [] }
+        ],
+        "obligatoire": ["map"],
+        "interdit": ["push", "sort", "reverse", "splice"]
+      },
+      "indices": [
+        "« Retourner un tableau » de même longueur, avec chaque valeur transformée : `map`. Et la fonction doit **retourner**.",
+        "Deux étages de « retour » : `return numbers.map(…)` pour la fonction, et `(n) => n * 2` qui donne chaque nouvel élément.",
+        { "code": "return numbers.map((___) => ___);" }
+      ],
+      "solution": ["function getDoubled(numbers) {", "  return numbers.map((n) => n * 2);", "}", "", "console.log(getDoubled(numbers));"],
+      "erreursTypiques": [
+        { "code": "function getDoubled(numbers) {\n  numbers.forEach((n) => console.log(n * 2));\n}", "attendu": "echec", "diagnostic": "foreach-rien" },
+        { "code": "function getDoubled(numbers) {\n  console.log(numbers.map((n) => n * 2));\n}", "attendu": "echec", "diagnostic": "return-vs-log" },
+        { "code": "function getDoubled(numbers) {\n  return numbers.map((numbers) => numbers * 2);\n}", "attendu": "conseil", "diagnostic": "param-nom-tableau" },
+        { "code": "function getDoubled(numbers) {\n  return numbers.map((n) => { n * 2 });\n}", "attendu": "echec", "diagnostic": "fleche-sans-return" },
+        { "code": "function getDoubled(numbers) {\n  for (let i = 0; i < numbers.length; i++) {\n    numbers[i] = numbers[i] * 2;\n  }\n  return numbers;\n}", "attendu": "erreur" },
+        { "code": "function getDoubled(arr) {\n  return numbers.map((n) => n * 2);\n}", "attendu": "echec", "diagnostic": "donnees-en-dur" }
+      ],
+      "explication": "C'est exactement l'exercice 2 du TP. Tes erreurs typiques (afficher au lieu de retourner, forEach au lieu de map, nom du paramètre) sont maintenant derrière toi."
+    },
+    {
+      "id": "u05-b3",
+      "titre": "Les valeurs impaires",
+      "source": "TP Tableaux · nombres, exercice 3",
+      "notions": ["filter", "modulo", "callback-param", "return"],
+      "enonce": "À partir du tableau `numbers` : **retourner un tableau ne contenant que les valeurs impaires**.\n\nÉcris une fonction `getOdds(numbers)`.",
+      "regles": ["La structure de données initiale ne doit pas être modifiée.", "Vos solutions se doivent de rester fonctionnelles même si le tableau initial diffère (nombres négatifs compris)."],
+      "donnees": { "numbers": [3, 14, 15, 92, 65, 35, 89, 79, 32, 38] },
+      "depart": ["function getOdds(numbers) {", "  ", "}", "", "console.log(getOdds(numbers));"],
+      "tests": {
+        "fonction": "getOdds",
+        "cas": [
+          { "titre": "Données du cours", "args": [[3, 14, 15, 92, 65, 35, 89, 79, 32, 38]], "attendu": [3, 15, 65, 35, 89, 79] },
+          { "titre": "Autres données", "args": [[2, 4, 7]], "attendu": [7] },
+          { "titre": "Nombres négatifs", "args": [[-3, -2, 5]], "attendu": [-3, 5], "siEchec": "Avec -3, ta condition rate : `-3 % 2` vaut `-1`, pas 1. Teste « impair » avec `n % 2 !== 0`." },
+          { "titre": "Aucun impair", "args": [[8, 10]], "attendu": [] },
+          { "titre": "Tableau vide", "args": [[]], "attendu": [] }
+        ],
+        "obligatoire": ["filter"],
+        "interdit": ["push", "sort", "reverse", "splice"]
+      },
+      "indices": [
+        "On garde **certains** nombres, sans les transformer : quelle méthode ?",
+        "La fonction donnée à cette méthode répond à « est-il impair ? » par true ou false. Relis la fiche [[modulo]] pour les négatifs.",
+        { "code": "return numbers.filter((n) => n % 2 ___ 0);" }
+      ],
+      "solution": ["function getOdds(numbers) {", "  return numbers.filter((n) => n % 2 !== 0);", "}", "", "console.log(getOdds(numbers));"],
+      "erreursTypiques": [
+        { "code": "function getOdds(numbers) {\n  return numbers.map((n) => n % 2 !== 0);\n}", "attendu": "echec", "diagnostic": "map-condition" },
+        { "code": "function getOdds(numbers) {\n  return numbers.filter((n) => n % 2 === 1);\n}", "attendu": "echec", "diagnostic": "contenu" },
+        { "code": "function getOdds(numbers) {\n  return numbers.filter((n) => n % 2 == 1);\n}", "attendu": "echec" },
+        { "code": "function getOdds(numbers) {\n  return numbers.filter((n) => { if (n % 2 !== 0) n });\n}", "attendu": "echec" }
+      ],
+      "explication": "Exercice 3 du TP réussi, y compris avec des nombres négatifs (ce que la solution « officielle » `nb % 2` gère aussi, car -1 est « vrai »)."
+    }
+  ]
+}

@@ -89,7 +89,7 @@ async function testerTout(filtreUnite){
     }
     // liens [[fiche]] dans les textes
     const texte = JSON.stringify(u);
-    for (const m of texte.matchAll(/\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g)) if (!FICHES[m[1]]) erreurs.push(`${u.id} : lien vers une fiche inconnue [[${m[1]}]]`);
+    for (const m of texte.matchAll(/\[\[([a-z][a-z0-9-]*)(?:\|[^\]]+)?\]\]/g)) if (!FICHES[m[1]]) erreurs.push(`${u.id} : lien vers une fiche inconnue [[${m[1]}]]`);
     for (const l of u.lecons) for (const c of l.cartes) if (c.fiche && !FICHES[c.fiche]) erreurs.push(`${u.id} · ${l.id} : fiche inconnue ${c.fiche}`);
   }
   return { erreurs, avertissements:avert, stats };

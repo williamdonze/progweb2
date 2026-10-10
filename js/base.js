@@ -259,7 +259,7 @@ function richInline(txt){
   return esc(txt)
     .replace(/`([^`]+)`/g, (m, c) => `<code>${c}</code>`)
     .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-    .replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (m, id, t) => `<button type="button" class="fl" data-fiche="${id}">${t || (FICHES[id]?.titre ?? id)}</button>`);
+    .replace(/\[\[([a-z][a-z0-9-]*)(?:\|([^\]]+))?\]\]/g, (m, id, t) => `<button type="button" class="fl" data-fiche="${id}">${t || (FICHES[id]?.titre ?? id)}</button>`);
 }
 function rich(txt){
   return String(txt ?? "").split(/\n\n/).map(p => {

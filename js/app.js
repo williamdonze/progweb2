@@ -6,6 +6,7 @@
 /* ---------------- runner de session ---------------- */
 /* steps : [{kind:"carte", carte}, {kind:"q", q}] ; opts : {title, requeue, onEnd(result)} */
 let nettoyerSession = null;
+const MODE_TEST = /[?&]test\b/.test(location.search);
 const BRAVO = ["Bien joué !", "Excellent !", "Parfait !", "Bravo !", "Ça compile dans ta tête !", "Impeccable !"];
 function runSession(steps, opts){
   closeSession();
@@ -59,6 +60,7 @@ function runSession(steps, opts){
     foot.innerHTML = `<button class="btn ok" data-check disabled>Vérifier</button>`;
     const btn = foot.querySelector("[data-check]");
     current = Q[q.type](q, () => { btn.disabled = occupe || !current?.ready(); });
+    if (MODE_TEST) window.__q = current;   // tests automatiques : accès à la question affichée
     box.appendChild(current.el);
     btn.disabled = !current.ready();
     btn.onclick = garde(() => verify(q, st));
