@@ -502,6 +502,7 @@ function exerciceCode(q, onChange){
       verrou = true; ed?.lectureSeule(true); champs.forEach(c => c.readOnly = true);
       essais++;
       const r = await executer({ code: codeActuel(), donnees: q.donnees || null, tests: q.tests, contexte:{ tableaux } });
+      if (r.timeout && q.tests?.siTropLong) r.erreur.message += " " + q.tests.siTropLong;
       sortie.innerHTML = "";
       sortie.appendChild(h(consoleHTML(r.console, { vide:"Rien n'a été affiché." })));
       sortie.appendChild(resultatHTML(r));

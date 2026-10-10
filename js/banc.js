@@ -396,8 +396,10 @@ function executerTout({ code, donnees, tests, contexte = {} }){
       const logsAppel = []; run.rediriger(logsAppel);
       if (cas.repetitions) {   // fonction au hasard : propriétés sur de nombreux tirages
         const vus = new Set(); let faute = null;
+        const verif = cas.verifie ? new Function("r", "args", `"use strict"; return (${cas.verifie});`) : null;
         for (let k = 0; k < cas.repetitions && !faute; k++) {
           let v; try { v = fn(...args); } catch(e) { r.erreur = decrireErreur(e, code, don); r.ok = false; break; }
+          if (verif) { let bon = false; try { bon = verif(v, args); } catch(e) {} if (!bon) faute = `${cas.messageVerifie || "Résultat inattendu"} (obtenu : ${formater(v, 1)}).`; continue; }
           if (typeof v !== "number" || Number.isNaN(v)) faute = `Un tirage a donné ${formater(v, 1)} au lieu d'un nombre.`;
           else if (cas.entier && !Number.isInteger(v)) faute = `Un tirage a donné ${v}, qui n'est pas un nombre entier : pense à Math.floor.`;
           else if (v < cas.min || v > cas.max) faute = `Un tirage a donné ${v}, hors des bornes ${cas.min} à ${cas.max} (comprises). Vérifie le calcul : Math.floor(Math.random() * (max - min + 1)) + min.`;
@@ -416,6 +418,11 @@ function executerTout({ code, donnees, tests, contexte = {} }){
         const att = cas.attenduUndefined ? undefined : cas.attendu;
         r.attendu = enCode(att); r.obtenu = enCode(obtenu);
         if (!egal(obtenu, att)) { r.ok = false; const dg = diagnostiquer({ ...cas, attendu: att, index }, obtenu, logsAppel, code, { reussiCours, ...(casListe[0] && "attendu" in casListe[0] && (casListe[0].fonction || tests.fonction) === nomFn ? { attenduCours: casListe[0].attendu } : {}) }); if (dg) r.diagnostic = dg; }
+      }
+      if (cas.verifie) {   // propriété du résultat (fonctions au hasard) : expression JavaScript sur r et args
+        let bon = false; try { bon = new Function("r", "args", `"use strict"; return (${cas.verifie});`)(obtenu, args); } catch(e) {}
+        r.obtenu = enCode(obtenu);
+        if (!bon) { r.ok = false; r.details.push(`${cas.messageVerifie || "Le résultat ne respecte pas ce qui est demandé"} (obtenu : ${enCode(obtenu)}).`); if (obtenu === undefined) { const dg = diagnostiquer({ ...cas, attendu: 0, index }, obtenu, logsAppel, code, {}); if (dg) r.diagnostic = dg; } }
       }
       if (cas.sortie) {
         r.sortieAttendue = cas.sortie; r.sortieObtenue = logsAppel.slice();
@@ -469,12 +476,18 @@ function executerTout({ code, donnees, tests, contexte = {} }){
   });
   if (st.bloquants.length) res.diagnostics.push(...st.bloquants);
   // premier diagnostic utile : celui du premier cas raté
-  const rate = res.cas.find(c => !c.ok && c.diagnostic) || res.cas.find(c => !c.ok);
-  if (rate && rate.diagnostic) res.diagnostics.push(rate.diagnostic);
-  if (rate && !rate.diagnostic && !rate.erreur && casListe[res.cas.indexOf(rate)]?.siEchec) res.diagnostics.push({ id:"contenu", message: casListe[res.cas.indexOf(rate)].siEchec });
+  // le message le plus précis : un diagnostic automatique spécifique, sinon le « siEchec » du contenu, sinon un diagnostic générique
+  const GENERIQUES = ["rien-affiche", "tableau-vide", "donnees-en-dur", "espaces"];
+  const rates = res.cas.filter(c => !c.ok);
+  const specifique = rates.find(c => c.diagnostic && !GENERIQUES.includes(c.diagnostic.id));
+  const iSiEchec = res.cas.findIndex((c, i) => !c.ok && !c.erreur && casListe[i]?.siEchec);
+  const rate = specifique || rates.find(c => c.diagnostic) || rates[0];
+  if (specifique) res.diagnostics.push(specifique.diagnostic);
+  else if (iSiEchec >= 0) res.diagnostics.push({ id:"contenu", message: casListe[iSiEchec].siEchec });
+  else if (rate && rate.diagnostic) res.diagnostics.push(rate.diagnostic);
   // pas de diagnostic précis : un conseil de l'analyse statique explique peut-être l'échec
-  if (rate && !rate.diagnostic && !rate.erreur) { const c = res.conseils.find(x => ["accolades-sans-return","objet-sans-parentheses","param-nom-tableau","reduce-un-param","tosorted-imbrique","egalite-tableaux"].includes(x.id)); if (c) res.diagnostics.push(c); }
-  if (rate && !rate.diagnostic && rate.titre && /vide/i.test(rate.titre)) res.diagnostics.push({ id:"tableau-vide", message: `Ta solution ne marche pas avec un tableau vide []. Pense à ce cas : que doit-on obtenir s'il n'y a aucun élément ?` });
+  if (rate && !res.diagnostics.length && !rate.erreur) { const c = res.conseils.find(x => ["accolades-sans-return","objet-sans-parentheses","param-nom-tableau","reduce-un-param","tosorted-imbrique","egalite-tableaux"].includes(x.id)); if (c) res.diagnostics.push(c); }
+  if (rate && !res.diagnostics.length && rate.titre && /vide/i.test(rate.titre)) res.diagnostics.push({ id:"tableau-vide", message: `Ta solution ne marche pas avec un tableau vide []. Pense à ce cas : que doit-on obtenir s'il n'y a aucun élément ?` });
   res.ok = res.cas.every(c => c.ok) && !st.bloquants.length;
   res.duree = Date.now() - t0;
   return res;

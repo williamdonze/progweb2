@@ -6,7 +6,7 @@ Apprendre le JavaScript en jouant, de zéro jusqu'aux exercices du cours *Prog. 
 - **Les boss** sont les exercices du cours, testés avec d'autres données (tableau vide, nombres négatifs…), avec 3 indices progressifs et **jamais la solution**.
 - Ton code tourne dans un bac à sable isolé (Web Worker), avec une console, un délai maximum contre les boucles infinies, et des messages qui expliquent l'erreur : « Ta fonction montre le plat par la fenêtre (console.log) au lieu de le tendre (return) ».
 
-Programme et correspondance avec les TP : [docs/programme.md](docs/programme.md).
+Programme et correspondance avec les TP (Fonctions, Tableaux, DOM) : [docs/programme.md](docs/programme.md).
 
 ## Lancer sur ton ordinateur
 

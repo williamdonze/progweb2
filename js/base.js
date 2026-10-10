@@ -233,7 +233,7 @@ function executer(payload){
     const vide = { ok:false, console:[], cas:[], diagnostics:[], conseils:[] };
     try { w = new Worker("js/worker.js"); }
     catch(e) { return resolve({ ...vide, erreur:{ titre:"Bac à sable indisponible", message:"Ton navigateur n'a pas pu lancer le bac à sable. Recharge la page (le site doit être ouvert en http://, pas en double-cliquant le fichier)." } }); }
-    const t = setTimeout(() => { w.terminate(); resolve({ ...vide, timeout:true, erreur:{ titre:"Trop long", message:`Ton code tourne depuis plus de ${DELAI_MAX / 1000} secondes : sans doute une boucle infinie. Vérifie que la condition de ta boucle finit par devenir fausse (et que le compteur avance dans le bon sens).` } }); }, DELAI_MAX);
+    const t = setTimeout(() => { w.terminate(); resolve({ ...vide, timeout:true, erreur:{ titre:"Trop long", message:`Ton code tourne depuis plus de ${DELAI_MAX / 1000} secondes : sans doute une boucle infinie (vérifie que la condition finit par devenir fausse et que le compteur avance dans le bon sens), ou une boucle beaucoup trop longue (des milliards de tours).` } }); }, DELAI_MAX);
     w.onmessage = e => { clearTimeout(t); w.terminate(); resolve(e.data); };
     w.onerror = e => { clearTimeout(t); w.terminate(); e.preventDefault?.(); resolve({ ...vide, erreur:{ titre:"Erreur", message: traduireErreur({ message: String(e.message || "").replace(/^Uncaught \w+: /, "") }) } }); };
     w.postMessage(payload);
@@ -262,6 +262,13 @@ function richInline(txt){
     .replace(/\[\[([a-z][a-z0-9-]*)(?:\|([^\]]+))?\]\]/g, (m, id, t) => `<button type="button" class="fl" data-fiche="${id}">${t || (FICHES[id]?.titre ?? id)}</button>`);
 }
 function rich(txt){
+  // blocs de code entre ``` : affichés colorés, en lecture seule
+  const morceaux = String(txt ?? "").split(/```\w*\n?([\s\S]*?)```/);
+  if (morceaux.length > 1) return morceaux.map((m, i) => i % 2 ? codeHTML(m.replace(/\n$/, ""), { numeros:false }) : richParas(m.trim())).join("");
+  return richParas(txt);
+}
+function richParas(txt){
+  if (!String(txt ?? "").trim()) return "";
   return String(txt ?? "").split(/\n\n/).map(p => {
     const ls = p.split("\n");
     if (ls.every(l => /^- /.test(l))) return `<ul>${ls.map(l => `<li>${richInline(l.slice(2))}</li>`).join("")}</ul>`;

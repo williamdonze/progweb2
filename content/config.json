@@ -4,19 +4,20 @@
     "content/unites/u01-bases.json",
     "content/unites/u02-operateurs.json",
     "content/unites/u03-fonctions.json",
-    "content/unites/u04-tableaux.json",
-    "content/unites/u05-parcourir.json",
-    "content/unites/u06-reduire.json"
+    "content/unites/u04-boucles.json",
+    "content/unites/u05-tableaux.json",
+    "content/unites/u06-parcourir.json",
+    "content/unites/u07-reduire.json"
   ],
   "aVenir": [
     {
       "titre": "Tester : some, every",
-      "resume": "TP Tableaux : multiple de 9, que des positifs, tous les mots font 5 lettres",
+      "resume": "TP Tableaux : au moins un multiple de 9, que des positifs, tous les mots font 5 lettres",
       "icone": "?"
     },
     {
       "titre": "Extraire et assembler : slice, spread, with",
-      "resume": "TP Tableaux : sans le premier, sans le dernier, pairs puis impairs, le mot du milieu",
+      "resume": "TP Tableaux : sans le premier, sans le dernier, pairs puis impairs, Lorem au début, Ipsum à la fin, radar au milieu",
       "icone": "..."
     },
     {
@@ -25,19 +26,29 @@
       "icone": "a-z"
     },
     {
-      "titre": "Chaînes : split, join, toReversed",
+      "titre": "Chaînes : includes, toLowerCase, split, join",
       "resume": "TP Tableaux : les mots avec un r, le palindrome",
       "icone": "\"\""
     },
     {
-      "titre": "Objets",
-      "resume": "TP Tableaux : les cercles (aires, rouges, centres, translation)",
-      "icone": "{:}"
+      "titre": "Objets : le jeu de cartes",
+      "resume": "TP Tableaux : carte, paquet, buildBaseDeck, compareRank, getHighestCard, displayRank, showCard",
+      "icone": "♠"
     },
     {
-      "titre": "Combiner, boucles et hasard",
-      "resume": "map imbriqués, flatMap, for, Math.random, Fisher–Yates : le jeu de cartes",
-      "icone": "♠"
+      "titre": "Mélanger et tirer",
+      "resume": "TP Tableaux : shuffleInPlace (Fisher–Yates), drawCards",
+      "icone": "🔀"
+    },
+    {
+      "titre": "DOM : sélectionner",
+      "resume": "TP DOM : querySelector, querySelectorAll, sélecteurs CSS (id, classe, OU, attribut, :not), classList",
+      "icone": "<>"
+    },
+    {
+      "titre": "DOM : événements et clones",
+      "resume": "TP DOM : addEventListener, cloneNode, removeAttribute, replaceChildren, tirer une main",
+      "icone": "⚡"
     }
   ],
   "rangs": [

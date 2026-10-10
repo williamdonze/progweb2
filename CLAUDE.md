@@ -2,9 +2,10 @@
 
 Site pédagogique façon **Duolingo** pour apprendre le JavaScript **de zéro** jusqu'à pouvoir faire **seul** les exercices du cours *Prog. Web* (HEIG-VD, Nicolas Chabloz, https://chabloz.eu/progweb/). Construit sur le modèle de **Pampre** (https://github.com/williamdonze/pampre, le « Duolingo du vin ») : même architecture, même moteur de questions, même gamification. Public : l'élève, débutant complet, francophone. Langue du site, du contenu et des commentaires : **français**, tutoiement.
 
-## État actuel (v1)
+## État actuel
 
-- Unités 1 à 6 complètes : 6 unités, 30 leçons, 37 fiches de théorie, 6 jeux, 6 quiz, 14 boss (exercices du cours). 360 questions. Détail et correspondance avec les TP : `docs/programme.md`.
+- Unités 1 à 7 complètes : 36 leçons, 44 fiches de théorie, 7 jeux, 7 quiz, 19 boss (exercices du cours), 421 questions. **TP Fonctions complet** ; TP Tableaux : nombres 1, 2, 3, 6, 7 et chaînes 6. Détail, unités à venir (8 à 15, dont le jeu de cartes et le DOM) et correspondance avec les TP : `docs/programme.md`.
+- Source des énoncés : pages du cours enregistrées le 10 octobre 2026, copiées dans `docs/cours/` (tp1-fonctions, tp2-tableaux, tp3-dom). Les boss reprennent les énoncés tels quels.
 - 22 types d'exercices (dont 4 avec du code exécuté et testé), éditeur de code mobile, bac à sable (Web Worker), tests automatiques, diagnostics et erreurs JavaScript traduits en français.
 - Gamification de Pampre : XP, 7 rangs, badges, série de jours, défi du jour, graphique 7 jours. **Pas de vies**, volontairement (choix de l'élève).
 - Répétition espacée **par notion** (boîtes de Leitner), fiches de théorie consultables partout, console libre.
@@ -73,7 +74,8 @@ manifest.webmanifest, sw.js, icones/   Appli installable, hors connexion (change
 
 Quand l'élève donne le lien (ou le contenu) d'une nouvelle page de TP :
 
-1. **Lire la page et lister les exercices.** Le domaine `chabloz.eu` est souvent bloqué dans les environnements cloud : demander alors à l'élève d'autoriser `chabloz.eu` dans les réglages réseau de l'environnement, ou de coller le texte de la page / d'enregistrer la page complète (Ctrl+S) et de l'envoyer. Repli : les énoncés sont aussi sur GitHub, `Chabloz/im` (`progweb/*.md`, version 2024), et le code fait en classe dans `Chabloz/IM54_1_ProgWeb_Live` et `Chabloz/IM54_2_ProgWeb_Live` (dépôts publics, clonables). **Ne jamais inventer un énoncé** : signaler ce qui manque.
+1. **Lire la page et lister les exercices.** Le domaine `chabloz.eu` est souvent bloqué dans les environnements cloud : demander alors à l'élève d'autoriser `chabloz.eu` dans les réglages réseau de l'environnement, ou d'enregistrer **la page du TP elle-même** (pas seulement la liste des TP) et de l'envoyer (zip). Attention : les énoncés de `Chabloz/im` sur GitHub (version 2024) **diffèrent** de la version actuelle (exercices 8 à 10 des fonctions, jeu de cartes au lieu des cercles) : ne pas s'y fier. **Ne jamais inventer un énoncé** : signaler ce qui manque.
+   Si de nouveaux exercices s'insèrent au milieu du programme, on peut insérer une unité : la progression est indexée par identifiant (une unité déjà ouverte le reste).
 2. **Repérer les nouvelles notions** par rapport aux fiches existantes (`grep '"id"' content/unites/*.json`, `docs/programme.md`).
 3. **Créer les leçons et les fiches** de ces notions (une unité `content/unites/uNN-nom.json`, ou plusieurs), avec plusieurs types d'exercices par leçon, des analogies, d'autres données que celles du cours, et des révisions des notions précédentes (questions de leçon, quiz : 2 à 3 révisions).
 4. **Créer les boss** à partir des exercices du prof : énoncé tel quel (`enonce`), `source`, `regles` du cours, `donnees` du cours, tests avec d'autres données et cas limites, 3 indices, `solution` (jamais affichée), `erreursTypiques` avec diagnostics.
@@ -108,4 +110,4 @@ GitHub Actions (`.github/workflows/tests.yml`) lance les trois tests à chaque p
 
 - Une seule exécution à la fois par exercice ; timeout fixe de 2 s.
 - Les erreurs de syntaxe n'ont pas de numéro de ligne dans Chromium : il est déduit d'une analyse des parenthèses et des mots sans guillemets (`verifierParentheses`, `texteSansGuillemets`).
-- `aVenir` et `docs/programme.md` décrivent les unités 7 à 14 : à écrire avec la procédure ci-dessus.
+- `aVenir` et `docs/programme.md` décrivent les unités 8 à 15 : à écrire avec la procédure ci-dessus. Les unités DOM demandent un second bac à sable (iframe), et `showCard` des couleurs ANSI dans la console : voir « À prévoir dans le moteur » dans `docs/programme.md`.

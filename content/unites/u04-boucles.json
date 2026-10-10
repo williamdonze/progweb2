@@ -1,0 +1,615 @@
+{
+  "id": "u04",
+  "titre": "Les boucles",
+  "sousTitre": "TP 1 : Fonctions · exercices 4, 5, 6, 7, 9",
+  "objectif": "Répéter avec for, compter de 2 en 2 ou à l'envers, filtrer avec un if, compter, sortir plus tôt, recevoir autant d'arguments qu'on veut.",
+  "icone": "for",
+  "fiches": [
+    {
+      "id": "boucle-for",
+      "titre": "La boucle for : répéter",
+      "icone": "for",
+      "resume": "`for (let i = 0; i <= n; i++) { … }` répète le bloc pour i = 0, 1, 2… tant que la condition est vraie.",
+      "analogie": "Un coureur qui fait des **tours de piste** avec un compteur à la main. Avant chaque tour, il regarde son compteur : « encore un tour ? » (la condition). Après chaque tour, il avance son compteur (le pas). Quand la réponse est non, il s'arrête.",
+      "texte": "Trois morceaux entre les parenthèses, séparés par des `;` :\n1. **départ** : `let i = 0` (le compteur, créé une fois) ;\n2. **condition** : `i <= n` (vérifiée **avant** chaque tour : si elle est fausse, la boucle s'arrête) ;\n3. **pas** : `i++` (exécuté **après** chaque tour ; `i++` veut dire `i = i + 1`).\n\nLe compteur se déclare avec `let` (il change), jamais `const`.\n\n**Boucle infinie** : si la condition ne devient jamais fausse (compteur qui ne bouge pas, ou qui part dans le mauvais sens), la page tourne sans fin. Ici, le bac à sable l'arrête au bout de 2 secondes.",
+      "exemples": [
+        { "code": ["for (let i = 0; i < 3; i++) {", "  console.log(\"tour\", i);", "}", "console.log(\"fini\");"] }
+      ],
+      "pieges": ["`const i = 0` dans un for : le compteur ne peut pas avancer.", "`;` et non `,` entre les trois morceaux.", "`<` ou `<=` : la borne est-elle comprise ? « entre 0 et n » compris → `<= n`."]
+    },
+    {
+      "id": "boucle-pas",
+      "titre": "Le pas : de 2 en 2, à l'envers",
+      "icone": "i--",
+      "resume": "`i += 2` avance de 2 en 2 ; `i--` recule. À l'envers : `for (let i = n; i >= 1; i--)`.",
+      "texte": "- `i++` : +1 ; `i += 2` : +2 ; `i--` : -1 ; `i -= 3` : -3.\n- **À l'envers**, tout s'inverse : on part de la fin, la condition regarde vers le bas (`i >= 1`), le pas recule (`i--`). C'est la forme de la boucle de Fisher–Yates (mélange du jeu de cartes).\n- Pour parcourir un tableau à l'envers : `for (let i = tab.length - 1; i >= 0; i--)` (le dernier indice est `length - 1`).",
+      "exemples": [
+        { "code": ["for (let i = 0; i <= 10; i += 2) console.log(i);"] },
+        { "titre": "À l'envers", "code": ["for (let i = 3; i >= 1; i--) console.log(i);", "console.log(\"Partez !\");"] }
+      ],
+      "pieges": ["À l'envers avec `i++` : le compteur s'éloigne de la fin, boucle infinie.", "À l'envers avec `i <= 1` au lieu de `i >= 1` : la boucle ne fait aucun tour."]
+    },
+    {
+      "id": "boucle-condition",
+      "titre": "Un if dans la boucle",
+      "icone": "if",
+      "resume": "La boucle visite chaque nombre ; un `if` décide lesquels on garde (affiche, compte…).",
+      "texte": "Pour « les nombres pairs et multiples de 7 entre 0 et n » : on visite **tous** les nombres de 0 à n, et on n'affiche que ceux qui passent le test.\n\n```\nfor (let i = 0; i <= n; i++) {\n  if (i % 2 === 0 && i % 7 === 0) console.log(i);\n}\n```\n\nLa condition se construit avec les outils de l'unité 2 : `%` (multiple), `&&` (et), `||` (ou), `!==` (non multiple : `i % 7 !== 0`).\n\nAttention aux phrases : « pairs **et** multiples de 3, **ainsi que** les multiples de 7 » = `(pair && multiple de 3) || multiple de 7`. Les parenthèses rendent l'intention claire.",
+      "exemples": [
+        { "code": ["const n = 30;", "for (let i = 0; i <= n; i++) {", "  if (i % 5 === 0 && i % 2 !== 0) console.log(i);", "}"] }
+      ]
+    },
+    {
+      "id": "compteur",
+      "titre": "Compter et accumuler",
+      "icone": "+1",
+      "resume": "On crée le compteur **avant** la boucle (`let compte = 0;`), on l'augmente **dans** la boucle, on le retourne **après** la boucle.",
+      "analogie": "Un **boulier** posé à côté de la piste : on le met à zéro avant la course, on pousse une bille à chaque tour qui compte, on lit le total à l'arrivée. Lire le total au milieu de la course (un `return` dans la boucle) donne un mauvais résultat.",
+      "texte": "```\nfunction compterPairs(n) {\n  let compte = 0;           // avant : remise à zéro\n  for (let i = 0; i <= n; i++) {\n    if (i % 2 === 0) compte++;   // pendant : +1\n  }\n  return compte;            // après : le total\n}\n```\n\n- Le compteur se déclare **en dehors** de la boucle : sinon il est recréé (et remis à 0) à chaque tour, et il n'existe plus après.\n- On peut avoir plusieurs compteurs, et les retourner ensemble dans un **objet** : `return { tails: nbPiles, heads: nbFaces };`\n- Pile ou face au hasard : `Math.random() < 0.5` est vrai une fois sur deux environ.",
+      "exemples": [
+        { "code": ["let total = 0;", "for (let i = 1; i <= 4; i++) {", "  total = total + i;", "}", "console.log(total);"] },
+        { "titre": "Deux compteurs dans un objet", "code": ["let petits = 0;", "let grands = 0;", "for (let k = 0; k < 1000; k++) {", "  if (Math.random() < 0.5) petits++;", "  else grands++;", "}", "console.log({ petits: petits, grands: grands });"] }
+      ],
+      "pieges": ["`return` dans la boucle : la fonction s'arrête au premier tour.", "`let compte = 0;` dans la boucle : remis à zéro à chaque tour."]
+    },
+    {
+      "id": "return-boucle",
+      "titre": "Sortir plus tôt : return dans une boucle",
+      "icone": "↩",
+      "resume": "Un `return` dans une boucle arrête **tout de suite** la boucle et la fonction. Pratique dès qu'on a trouvé la réponse.",
+      "texte": "« Ce nombre a-t-il un diviseur ? » : dès qu'on en trouve **un**, la réponse est oui, inutile de continuer. Mais pour répondre **non**, il faut avoir tout essayé : ce `return` se met **après** la boucle.\n\n```\nfor (let d = 2; d < n; d++) {\n  if (n % d === 0) return true;   // trouvé : on sort\n}\nreturn false;                      // rien trouvé après tous les essais\n```\n\n**Aller moins loin** : si n a un diviseur, il en a un qui ne dépasse pas sa racine carrée. On peut donc s'arrêter quand `d * d > n` (condition `d * d <= n`). Pour 87 178 291 199, ça fait environ 295 000 tours au lieu de 87 milliards.",
+      "exemples": [
+        { "code": ["function premierDiviseur(n) {", "  for (let d = 2; d * d <= n; d++) {", "    if (n % d === 0) return d;", "  }", "  return n;", "}", "console.log(premierDiviseur(91), premierDiviseur(13));"] }
+      ],
+      "pieges": ["`return false` dans un `else` dans la boucle : la fonction répond dès le premier essai, sans tester les autres.", "`d * d < n` au lieu de `<=` : on rate les carrés (25, 49…)."]
+    },
+    {
+      "id": "for-of",
+      "titre": "for…of : chaque élément",
+      "icone": "of",
+      "resume": "`for (const fruit of fruits) { … }` visite chaque élément d'un tableau, sans indice.",
+      "texte": "Quand on n'a pas besoin de l'indice, `for…of` est plus simple que le `for` classique :\n\n- `for (const fruit of fruits) console.log(fruit);`\n- équivaut à `fruits.forEach((fruit) => console.log(fruit));`\n\nComme pour forEach, la variable de boucle est **un élément** : nom au singulier. Ici `const` est permis : une nouvelle variable est créée à chaque tour.",
+      "exemples": [
+        { "code": ["const fruits = [\"pomme\", \"kiwi\"];", "for (const fruit of fruits) {", "  console.log(fruit);", "}"] }
+      ]
+    },
+    {
+      "id": "parametre-reste",
+      "titre": "...params : autant d'arguments qu'on veut",
+      "icone": "...",
+      "resume": "`function f(...valeurs)` range **tous** les arguments reçus dans un tableau nommé `valeurs`.",
+      "analogie": "Les `...` devant le paramètre, c'est une **boîte d'œufs vide** posée à l'entrée : tous les arguments donnés à l'appel y sont rangés, quel que soit leur nombre.",
+      "texte": "`console.log` accepte 1, 2 ou 10 valeurs. Pour écrire une fonction pareille, on met `...` devant le dernier paramètre (on l'appelle le **paramètre du reste**) :\n\n```\nfunction compter(...valeurs) {\n  return valeurs.length;\n}\ncompter(4, \"a\", true); // 3\n```\n\n`valeurs` est un **vrai tableau** : length, for…of, forEach, map… fonctionnent.\n\nOn retrouvera les mêmes trois points dans l'autre sens (le *spread*, « sortir les œufs de la boîte ») avec les tableaux.",
+      "exemples": [
+        { "code": ["function infos(...valeurs) {", "  console.log(valeurs);", "  console.log(valeurs.length);", "}", "infos(1, \"a\", true);", "infos();"] }
+      ],
+      "pieges": ["Oublier les `...` : le paramètre ne reçoit que le premier argument."]
+    }
+  ],
+  "lecons": [
+    {
+      "id": "u04-l1",
+      "titre": "La boucle for",
+      "duree": 6,
+      "notions": ["boucle-for"],
+      "cartes": [
+        {
+          "titre": "Répéter sans recopier",
+          "texte": "Afficher les nombres de 0 à 4 avec cinq `console.log`, c'est long. Avec 1000 nombres, impossible. Une **boucle** répète un bloc de code autant de fois qu'il faut.",
+          "code": ["for (let i = 0; i <= 4; i++) {", "  console.log(i);", "}"],
+          "analogie": "Un coureur qui fait des **tours de piste**, un compteur à la main : avant chaque tour, « encore un ? » ; après chaque tour, il avance le compteur.",
+          "fiche": "boucle-for"
+        },
+        {
+          "titre": "Les trois morceaux",
+          "texte": "`for (let i = 0; i <= 4; i++)`\n- `let i = 0` : le **départ** du compteur (une seule fois) ;\n- `i <= 4` : la **condition**, vérifiée **avant chaque tour** ;\n- `i++` : le **pas**, après chaque tour (`i = i + 1`).\n\nQuand la condition devient fausse (i vaut 5), la boucle s'arrête et le programme continue après l'accolade.",
+          "astuce": "Lis-la à voix haute : « en partant de 0, tant que i est inférieur ou égal à 4, en ajoutant 1 à chaque fois »."
+        },
+        {
+          "titre": "Le compteur sert dans le bloc",
+          "texte": "À chaque tour, `i` a une valeur différente : on peut calculer avec.",
+          "code": ["for (let i = 1; i <= 3; i++) {", "  console.log(i, \"x 7 =\", i * 7);", "}"]
+        },
+        {
+          "titre": "< ou <= ?",
+          "texte": "« De 0 à n **compris** » : `i <= n`. « Moins de n » : `i < n`. Une erreur d'un seul caractère, et on a un tour de trop ou de moins.",
+          "code": ["for (let i = 0; i < 3; i++) console.log(\"<\", i);", "for (let i = 0; i <= 3; i++) console.log(\"<=\", i);"]
+        },
+        {
+          "titre": "La boucle infinie",
+          "texte": "Si la condition ne devient **jamais** fausse, la boucle tourne pour toujours (et la page se fige). Ici, le bac à sable arrête ton code au bout de 2 secondes et te prévient.",
+          "code": ["for (let i = 0; i <= 4; i--) {", "  // i recule : 0, -1, -2… toujours <= 4 !", "}"],
+          "executable": false,
+          "piege": "Vérifie toujours que le pas rapproche le compteur de la fin."
+        }
+      ],
+      "exercices": [
+        { "id": "u04-l1-e1", "type": "predire", "notions": ["boucle-for"], "question": "Que va afficher ce code ?", "code": ["for (let i = 0; i < 3; i++) {", "  console.log(i);", "}"], "explication": "i vaut 0, 1, 2. Quand i vaut 3, `i < 3` est faux : on s'arrête." },
+        { "id": "u04-l1-e2", "type": "pointer-code", "notions": ["boucle-for"], "question": "Touche la **condition** (vérifiée avant chaque tour).", "code": ["for (let i = 0; ⟦i <= 10⟧; i++) {", "  console.log(i);", "}"], "explication": "Le deuxième morceau, entre les deux `;`." },
+        { "id": "u04-l1-e3", "type": "pointer-code", "notions": ["boucle-for"], "question": "Touche le **pas** (ce qui fait avancer le compteur).", "code": ["for (let i = 0; i <= 10; ⟦i++⟧) {", "  console.log(i);", "}"], "explication": "Le troisième morceau, exécuté après chaque tour." },
+        { "id": "u04-l1-e4", "type": "qcm", "notions": ["boucle-for"], "question": "Combien de tours fait cette boucle ?", "code": ["for (let i = 1; i <= 5; i++) {", "  console.log(\"bip\");", "}"], "choix": ["5", "4", "6", "Une infinité"], "bonne": 0, "explication": "i vaut 1, 2, 3, 4, 5 : cinq tours." },
+        { "id": "u04-l1-e5", "type": "bug", "notions": ["boucle-for"], "question": "Cette boucle ne s'arrête jamais. Pourquoi ?", "code": ["for (let i = 10; i >= 0; i++) {", "  console.log(i);", "}"], "ligne": 1, "choix": ["i augmente alors qu'il devrait descendre vers 0 : il faut `i--`", "Il faut `const i`", "La condition doit être `i == 0`", "Il manque un `return`"], "bonne": 0, "explication": "i vaut 10, 11, 12… toujours `>= 0`. Le pas doit rapprocher i de la fin : `i--`." },
+        {
+          "id": "u04-l1-e6", "type": "trous", "notions": ["boucle-for"],
+          "question": "Complète pour afficher les nombres de 1 à 10, un par ligne.",
+          "code": ["for (let i = ___; i ___ 10; i++) {", "  console.log(i);", "}"],
+          "tests": { "cas": [ { "sortie": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"] } ] },
+          "indices": ["Où commence-t-on ? 10 est-il compris ?"],
+          "solution": ["1", "<="],
+          "erreursTypiques": [ { "trous": ["1", "<"], "attendu": "echec" }, { "trous": ["0", "<="], "attendu": "echec" } ],
+          "explication": "De 1 à 10 compris : départ 1, condition `<= 10`."
+        },
+        {
+          "id": "u04-l1-e7", "type": "ecrire", "notions": ["boucle-for", "parametres"],
+          "question": "Écris `printUpTo(n)` qui affiche les nombres de 1 à n, un par ligne.",
+          "depart": ["function printUpTo(n) {", "  ", "}", "", "printUpTo(5);"],
+          "tests": { "fonction": "printUpTo", "cas": [ { "args": [5], "sortie": ["1", "2", "3", "4", "5"] }, { "args": [1], "sortie": ["1"] }, { "titre": "n = 0 : rien à afficher", "args": [0], "sortie": [] } ] },
+          "indices": ["Une boucle for, dont la fin dépend du paramètre n.", { "code": "for (let i = ___; i <= ___; i++) {\n  console.log(___);\n}" }],
+          "solution": ["function printUpTo(n) {", "  for (let i = 1; i <= n; i++) {", "    console.log(i);", "  }", "}", "", "printUpTo(5);"],
+          "erreursTypiques": [
+            { "code": "function printUpTo(n) {\n  for (let i = 1; i <= 5; i++) {\n    console.log(i);\n  }\n}", "attendu": "echec" },
+            { "code": "function printUpTo(n) {\n  for (const i = 1; i <= n; i++) {\n    console.log(i);\n  }\n}", "attendu": "erreur" },
+            { "code": "function printUpTo(n) {\n  for (let i = 1; i <= n; i++) {\n    console.log(n);\n  }\n}", "attendu": "echec" }
+          ],
+          "explication": "La borne est le paramètre `n` : la fonction marche pour n'importe quel n."
+        }
+      ]
+    },
+    {
+      "id": "u04-l2",
+      "titre": "De 2 en 2, à l'envers",
+      "duree": 5,
+      "notions": ["boucle-pas", "boucle-for"],
+      "cartes": [
+        {
+          "titre": "Changer le pas",
+          "texte": "Le pas n'est pas forcément `i++`. `i += 2` avance de 2 en 2 : en partant de 0, on ne visite que les nombres pairs.",
+          "code": ["for (let i = 0; i <= 10; i += 2) {", "  console.log(i);", "}"],
+          "fiche": "boucle-pas"
+        },
+        {
+          "titre": "À l'envers",
+          "texte": "Pour compter à rebours, tout s'inverse : départ à la fin, condition vers le bas, pas qui recule.",
+          "code": ["for (let i = 3; i >= 1; i--) {", "  console.log(i);", "}", "console.log(\"Partez !\");"],
+          "astuce": "C'est exactement la boucle du mélange de Fisher–Yates du TP Tableaux : `for (let i = tab.length - 1; i >= 1; i--)`."
+        },
+        {
+          "titre": "Parcourir un tableau à l'envers",
+          "texte": "Le dernier indice est `length - 1` (unité Tableaux) : on part de là, et on descend jusqu'à 0.",
+          "code": ["const mots = [\"Sator\", \"Arepo\", \"Tenet\"];", "for (let i = mots.length - 1; i >= 0; i--) {", "  console.log(i, mots[i]);", "}"]
+        }
+      ],
+      "exercices": [
+        { "id": "u04-l2-e1", "type": "predire", "notions": ["boucle-pas"], "question": "Que va afficher ce code ?", "code": ["for (let i = 1; i <= 9; i += 3) {", "  console.log(i);", "}"], "explication": "1, puis 4, puis 7. Le suivant serait 10 : plus grand que 9, on s'arrête." },
+        { "id": "u04-l2-e2", "type": "predire", "notions": ["boucle-pas"], "question": "Que va afficher ce code ?", "code": ["for (let i = 4; i >= 2; i--) {", "  console.log(i);", "}"], "explication": "4, 3, 2 : à l'envers jusqu'à 2 compris." },
+        { "id": "u04-l2-e3", "type": "qcm", "notions": ["boucle-pas"], "question": "Quelle boucle affiche 10, 8, 6, 4, 2, 0 ?", "choix": ["for (let i = 10; i >= 0; i -= 2)", "for (let i = 10; i <= 0; i -= 2)", "for (let i = 0; i <= 10; i += 2)", "for (let i = 10; i > 0; i -= 2)"], "bonne": 0, "mono": true, "explication": "Départ 10, on descend de 2, et 0 doit être compris : `>= 0`." },
+        {
+          "id": "u04-l2-e4", "type": "parsons", "notions": ["boucle-pas"],
+          "question": "Reconstitue un compte à rebours de 5 à 1, suivi de « Décollage ! ».",
+          "lignes": ["for (let i = 5; i >= 1; i--) {", "  console.log(i);", "}", "console.log(\"Décollage !\");"],
+          "distracteurs": ["for (let i = 5; i >= 1; i++) {"],
+          "explication": "À l'envers, le pas recule : `i--`. Avec `i++`, la boucle ne s'arrêterait jamais."
+        },
+        {
+          "id": "u04-l2-e5", "type": "ecrire", "notions": ["boucle-pas", "boucle-for"],
+          "question": "Écris `printCountdown(n)` qui affiche n, n-1, …, jusqu'à 0, un par ligne.",
+          "depart": ["function printCountdown(n) {", "  ", "}", "", "printCountdown(3);"],
+          "tests": { "fonction": "printCountdown", "cas": [ { "args": [3], "sortie": ["3", "2", "1", "0"] }, { "args": [0], "sortie": ["0"] }, { "args": [5], "sortie": ["5", "4", "3", "2", "1", "0"] } ], "siTropLong": "Ta boucle à l'envers tourne sans fin : le pas doit être `i--`, et la condition `i >= 0`." },
+          "indices": ["Départ à n, on descend.", { "code": "for (let i = ___; i ___ 0; i___) {\n  console.log(i);\n}" }],
+          "solution": ["function printCountdown(n) {", "  for (let i = n; i >= 0; i--) {", "    console.log(i);", "  }", "}", "", "printCountdown(3);"],
+          "erreursTypiques": [
+            { "code": "function printCountdown(n) {\n  for (let i = n; i >= 0; i++) {\n    console.log(i);\n  }\n}", "attendu": "erreur" },
+            { "code": "function printCountdown(n) {\n  for (let i = n; i > 0; i--) {\n    console.log(i);\n  }\n}", "attendu": "echec" },
+            { "code": "function printCountdown(n) {\n  for (let i = 0; i <= n; i++) {\n    console.log(i);\n  }\n}", "attendu": "echec" }
+          ],
+          "explication": "Départ n, condition `>= 0` (0 compris), pas `i--`."
+        }
+      ]
+    },
+    {
+      "id": "u04-l3",
+      "titre": "Un if dans la boucle",
+      "duree": 6,
+      "notions": ["boucle-condition", "modulo", "logique"],
+      "cartes": [
+        {
+          "titre": "Visiter tout, garder certains",
+          "texte": "La boucle visite **tous** les nombres ; un `if` décide lesquels on affiche. C'est l'idée de l'exercice 4 du TP Fonctions.",
+          "code": ["for (let i = 0; i <= 20; i++) {", "  if (i % 7 === 0) console.log(i);", "}"],
+          "fiche": "boucle-condition"
+        },
+        {
+          "titre": "Deux façons d'avoir les pairs",
+          "texte": "Pas de 2, ou pas de 1 avec un `if`. Les deux marchent. La seconde se combine plus facilement avec d'autres conditions.",
+          "code": ["for (let i = 0; i <= 6; i += 2) console.log(\"pas de 2 :\", i);", "for (let i = 0; i <= 6; i++) {", "  if (i % 2 === 0) console.log(\"if :\", i);", "}"]
+        },
+        {
+          "titre": "Traduire la phrase en condition",
+          "texte": "- « pairs **et** multiples de 7 » → `i % 2 === 0 && i % 7 === 0`\n- « multiples de 3 **ou** de 5 » → `i % 3 === 0 || i % 5 === 0`\n- « **non** multiples de 7 » → `i % 7 !== 0`\n- « (pairs et multiples de 3) **ainsi que** les multiples de 7 » → `(i % 2 === 0 && i % 3 === 0) || i % 7 === 0`",
+          "astuce": "Mets des parenthèses autour de chaque groupe : tu relis ta condition comme la phrase."
+        },
+        {
+          "titre": "Et le zéro ?",
+          "texte": "0 est pair (0 % 2 vaut 0) et multiple de tout nombre (0 % 7 vaut 0). « Entre 0 et n » : 0 fait partie de la liste, et il passe la plupart des tests… sauf « non multiple de 7 ».",
+          "code": ["console.log(0 % 2 === 0, 0 % 7 === 0);"]
+        }
+      ],
+      "exercices": [
+        { "id": "u04-l3-e1", "type": "predire", "notions": ["boucle-condition"], "question": "Que va afficher ce code ?", "code": ["for (let i = 1; i <= 10; i++) {", "  if (i % 4 === 0) console.log(i);", "}"], "explication": "Les multiples de 4 entre 1 et 10." },
+        { "id": "u04-l3-e2", "type": "assoc", "notions": ["boucle-condition", "logique"], "mono": true, "question": "Associe chaque phrase à sa condition.", "paires": [["pairs et multiples de 7", "i % 2 === 0 && i % 7 === 0"], ["multiples de 3 ou de 7", "i % 3 === 0 || i % 7 === 0"], ["multiples de 3 mais pas de 7", "i % 3 === 0 && i % 7 !== 0"], ["impairs", "i % 2 !== 0"]], "explication": "« et » → `&&`, « ou » → `||`, « pas » → `!==`." },
+        { "id": "u04-l3-e3", "type": "predire", "notions": ["boucle-condition", "logique"], "question": "Que va afficher ce code ?", "code": ["for (let i = 0; i <= 15; i++) {", "  if (i % 3 === 0 && i % 5 !== 0) console.log(i);", "}"], "explication": "Multiples de 3 (0, 3, 6, 9, 12, 15) qui ne sont pas multiples de 5 (on retire 0 et 15)." },
+        {
+          "id": "u04-l3-e4", "type": "trous", "notions": ["boucle-condition", "modulo"],
+          "question": "Complète pour afficher les multiples de 5 **impairs** entre 0 et 30.",
+          "code": ["for (let i = 0; i <= 30; i++) {", "  if (i % 5 === 0 ___ i % 2 ___ 0) console.log(i);", "}"],
+          "tests": { "cas": [ { "sortie": ["5", "15", "25"] } ] },
+          "indices": ["Les deux conditions doivent être vraies. « Impair » : le reste par 2 n'est pas 0."],
+          "solution": ["&&", "!=="],
+          "erreursTypiques": [ { "trous": ["||", "!=="], "attendu": "echec" }, { "trous": ["&&", "==="], "attendu": "echec" } ],
+          "explication": "`&&` (les deux), `!== 0` (impair)."
+        },
+        {
+          "id": "u04-l3-e5", "type": "ecrire", "notions": ["boucle-condition", "boucle-for", "logique"],
+          "question": "Écris `printMultiplesOf3Or5(n)` qui affiche, entre 1 et n compris, les nombres multiples de 3 **ou** de 5.",
+          "depart": ["function printMultiplesOf3Or5(n) {", "  ", "}", "", "printMultiplesOf3Or5(15);"],
+          "tests": { "fonction": "printMultiplesOf3Or5", "cas": [ { "args": [15], "sortie": ["3", "5", "6", "9", "10", "12", "15"] }, { "args": [4], "sortie": ["3"] }, { "args": [2], "sortie": [] } ] },
+          "indices": ["Une boucle de 1 à n, un if dedans.", { "code": "if (i % 3 === 0 ___ i % 5 === 0) console.log(i);" }],
+          "solution": ["function printMultiplesOf3Or5(n) {", "  for (let i = 1; i <= n; i++) {", "    if (i % 3 === 0 || i % 5 === 0) console.log(i);", "  }", "}", "", "printMultiplesOf3Or5(15);"],
+          "erreursTypiques": [
+            { "code": "function printMultiplesOf3Or5(n) {\n  for (let i = 1; i <= n; i++) {\n    if (i % 3 === 0 && i % 5 === 0) console.log(i);\n  }\n}", "attendu": "echec" },
+            { "code": "function printMultiplesOf3Or5(n) {\n  for (let i = 1; i < n; i++) {\n    if (i % 3 === 0 || i % 5 === 0) console.log(i);\n  }\n}", "attendu": "echec" }
+          ],
+          "explication": "« ou » → `||` ; « compris » → `<= n`."
+        }
+      ]
+    },
+    {
+      "id": "u04-l4",
+      "titre": "Compter et accumuler",
+      "duree": 6,
+      "notions": ["compteur", "boucle-for", "math-random"],
+      "cartes": [
+        {
+          "titre": "Avant, pendant, après",
+          "texte": "Pour **compter** avec une boucle :\n1. **avant** la boucle : `let compte = 0;`\n2. **pendant** : `compte++` quand l'élément nous intéresse ;\n3. **après** la boucle : `return compte;`",
+          "code": ["function compterPairs(n) {", "  let compte = 0;", "  for (let i = 0; i <= n; i++) {", "    if (i % 2 === 0) compte++;", "  }", "  return compte;", "}", "console.log(compterPairs(10));"],
+          "analogie": "Un **boulier** : remis à zéro avant la course, une bille poussée à chaque tour qui compte, le total lu à l'arrivée.",
+          "fiche": "compteur"
+        },
+        {
+          "titre": "Le return au mauvais endroit",
+          "texte": "Un `return` **dans** la boucle arrête la fonction au premier tour. Le total se lit **après** l'accolade de la boucle.",
+          "code": ["function compterPairs(n) {", "  let compte = 0;", "  for (let i = 0; i <= n; i++) {", "    if (i % 2 === 0) compte++;", "    return compte;", "  }", "}", "console.log(compterPairs(10));"],
+          "piege": "Aligne ton `return` avec le `for`, pas avec ce qu'il y a dedans."
+        },
+        {
+          "titre": "Pile ou face",
+          "texte": "`Math.random() < 0.5` est vrai environ une fois sur deux : c'est une pièce de monnaie. Sur beaucoup de lancers, on obtient à peu près moitié-moitié.",
+          "code": ["let piles = 0;", "for (let k = 0; k < 1000; k++) {", "  if (Math.random() < 0.5) piles++;", "}", "console.log(piles);"]
+        },
+        {
+          "titre": "Retourner deux résultats",
+          "texte": "Une fonction ne retourne qu'**une** valeur. Pour en rendre deux, on les range dans un **objet** (unité 3) : `{ nom: valeur, nom: valeur }`.",
+          "code": ["function compterPetitsGrands(nombres) {", "  let petits = 0;", "  let grands = 0;", "  for (const n of nombres) {", "    if (n < 10) petits++;", "    else grands++;", "  }", "  return { petits: petits, grands: grands };", "}", "console.log(compterPetitsGrands([3, 14, 15, 9]));"]
+        }
+      ],
+      "exercices": [
+        { "id": "u04-l4-e1", "type": "predire", "notions": ["compteur"], "question": "Que va afficher ce code ?", "code": ["let total = 0;", "for (let i = 1; i <= 4; i++) {", "  total = total + i;", "}", "console.log(total);"], "explication": "1 + 2 + 3 + 4." },
+        { "id": "u04-l4-e2", "type": "bug", "notions": ["compteur"], "question": "`compterMultiplesDe3(9)` devrait valoir 4 (0, 3, 6, 9) mais vaut 1. Quelle ligne déplacer ?", "code": ["function compterMultiplesDe3(n) {", "  let compte = 0;", "  for (let i = 0; i <= n; i++) {", "    if (i % 3 === 0) compte++;", "    return compte;", "  }", "}"], "ligne": 5, "choix": ["Le `return` est dans la boucle : il faut le mettre après l'accolade du for", "Il faut `const compte`", "Il faut `i < n`", "Il faut `compte--`"], "bonne": 0, "explication": "Au premier tour (i = 0, compte = 1), le return arrête tout." },
+        { "id": "u04-l4-e3", "type": "bug", "notions": ["compteur", "portee"], "question": "Ce code plante. Pourquoi ?", "code": ["for (let i = 0; i < 5; i++) {", "  let compte = 0;", "  compte++;", "}", "console.log(compte);"], "ligne": 2, "choix": ["Le compteur est créé dans la boucle : remis à 0 à chaque tour, et introuvable après", "Il faut `i <= 5`", "`compte++` est interdit", "Il manque un return"], "bonne": 0, "explication": "Le compteur se déclare **avant** la boucle." },
+        { "id": "u04-l4-e4", "type": "objet", "notions": ["compteur", "fleche-objet"], "question": "On a compté `nbPiles` et `nbFaces`. Construis l'objet à retourner.", "code": ["let nbPiles = 0;", "let nbFaces = 0;", "// … la boucle compte …", "return {", "  tails: …,", "  heads: …,", "};"], "cles": ["tails", "heads"], "etiquettes": ["nbPiles", "nbFaces", "\"nbPiles\"", "0", "n / 2"], "bonnes": { "tails": ["nbPiles"], "heads": ["nbFaces"] }, "explication": "Les valeurs sont les **variables** compteurs, sans guillemets." },
+        {
+          "id": "u04-l4-e5", "type": "ecrire", "notions": ["compteur", "boucle-condition"],
+          "question": "Écris `countMultiplesOf7(n)` qui **retourne** combien de nombres entre 1 et n (compris) sont des multiples de 7.",
+          "depart": ["function countMultiplesOf7(n) {", "  ", "}", "", "console.log(countMultiplesOf7(30));"],
+          "tests": { "fonction": "countMultiplesOf7", "cas": [ { "args": [30], "attendu": 4 }, { "args": [7], "attendu": 1 }, { "args": [6], "attendu": 0 }, { "args": [70], "attendu": 10 } ] },
+          "indices": ["Avant, pendant, après : remise à zéro, +1, return.", { "code": "let compte = 0;\nfor (let i = 1; i <= n; i++) {\n  if (___) compte++;\n}\nreturn ___;" }],
+          "solution": ["function countMultiplesOf7(n) {", "  let compte = 0;", "  for (let i = 1; i <= n; i++) {", "    if (i % 7 === 0) compte++;", "  }", "  return compte;", "}", "", "console.log(countMultiplesOf7(30));"],
+          "erreursTypiques": [
+            { "code": "function countMultiplesOf7(n) {\n  let compte = 0;\n  for (let i = 1; i <= n; i++) {\n    if (i % 7 === 0) compte++;\n    return compte;\n  }\n}", "attendu": "echec" },
+            { "code": "function countMultiplesOf7(n) {\n  let compte = 0;\n  for (let i = 1; i <= n; i++) {\n    if (i % 7 === 0) compte++;\n  }\n  console.log(compte);\n}", "attendu": "echec", "diagnostic": "return-vs-log" },
+            { "code": "function countMultiplesOf7(n) {\n  let compte = 0;\n  for (let i = 0; i <= n; i++) {\n    if (i % 7 === 0) compte++;\n  }\n  return compte;\n}", "attendu": "echec" }
+          ],
+          "explication": "Remise à zéro avant, +1 pendant, return après. (En partant de 0, on compterait 0 en trop : il est multiple de 7.)"
+        }
+      ]
+    },
+    {
+      "id": "u04-l5",
+      "titre": "Sortir plus tôt",
+      "duree": 6,
+      "notions": ["return-boucle", "boucle-for", "modulo"],
+      "cartes": [
+        {
+          "titre": "Dès qu'on a trouvé",
+          "texte": "Parfois, on n'a pas besoin d'aller jusqu'au bout : « y a-t-il un multiple de 9 ? » Dès qu'on en trouve un, la réponse est oui. Un `return` dans la boucle arrête tout **immédiatement**.",
+          "code": ["function aUnMultipleDe9(debut, fin) {", "  for (let i = debut; i <= fin; i++) {", "    if (i % 9 === 0) return true;", "  }", "  return false;", "}", "console.log(aUnMultipleDe9(10, 20), aUnMultipleDe9(10, 15));"],
+          "fiche": "return-boucle"
+        },
+        {
+          "titre": "Le « non » se donne à la fin",
+          "texte": "Pour répondre **oui**, un seul exemple suffit. Pour répondre **non**, il faut avoir **tout** essayé : ce `return false` se met **après** la boucle.",
+          "piege": "`if (…) return true; else return false;` dans la boucle : la fonction répond après le premier essai, sans regarder les autres."
+        },
+        {
+          "titre": "Un diviseur ?",
+          "texte": "n est divisible par d si `n % d === 0`. Pour chercher un diviseur, on essaie d = 2, 3, 4…",
+          "code": ["function premierDiviseur(n) {", "  for (let d = 2; d < n; d++) {", "    if (n % d === 0) return d;", "  }", "  return n;", "}", "console.log(premierDiviseur(91), premierDiviseur(13));"]
+        },
+        {
+          "titre": "S'arrêter à la racine",
+          "texte": "Si n = a × b, l'un des deux est forcément ≤ √n. Donc s'il n'y a aucun diviseur jusqu'à √n, il n'y en a aucun du tout. Au lieu de `d < n`, on écrit `d * d <= n` : pour un nombre à 11 chiffres, ça fait 295 000 tours au lieu de 87 milliards.",
+          "code": ["const n = 87178291199;", "let tours = 0;", "for (let d = 2; d * d <= n; d++) tours++;", "console.log(tours);"],
+          "astuce": "`<=` et pas `<` : pour 49, il faut tester 7 (7 × 7 = 49)."
+        }
+      ],
+      "exercices": [
+        { "id": "u04-l5-e1", "type": "predire", "notions": ["return-boucle"], "question": "Que va afficher ce code ?", "code": ["function premierPair(debut) {", "  for (let i = debut; i < 100; i++) {", "    if (i % 2 === 0) return i;", "  }", "}", "console.log(premierPair(7));"], "explication": "7 est impair, 8 est pair : on sort tout de suite avec 8." },
+        { "id": "u04-l5-e2", "type": "bug", "notions": ["return-boucle"], "question": "`contientUnSept(1, 10)` devrait être true, mais elle répond false. Quelle ligne ?", "code": ["function contientUnSept(debut, fin) {", "  for (let i = debut; i <= fin; i++) {", "    if (i === 7) return true;", "    else return false;", "  }", "}"], "ligne": 4, "choix": ["Le `return false` répond dès le premier essai : il faut le mettre après la boucle", "Il faut `i == 7`", "Il faut `i < fin`", "Il manque `const`"], "bonne": 0, "explication": "Au premier tour (i = 1), le else répond false. Le « non » ne se donne qu'après avoir tout essayé." },
+        { "id": "u04-l5-e3", "type": "qcm", "notions": ["return-boucle"], "question": "Pour tester si 49 a un diviseur, jusqu'où faut-il essayer d ?", "choix": ["Jusqu'à 7 compris (d * d <= 49)", "Jusqu'à 6 (d * d < 49)", "Jusqu'à 48", "Jusqu'à 24"], "bonne": 0, "explication": "7 × 7 = 49 : il faut tester 7. `d * d <= n` inclut ce cas." },
+        {
+          "id": "u04-l5-e4", "type": "ecrire", "notions": ["return-boucle", "modulo"],
+          "question": "Écris `getPremierDiviseur(n)` (n ≥ 2) qui **retourne** le plus petit diviseur de n plus grand que 1 (n lui-même s'il n'y en a pas d'autre). Va au plus jusqu'à la racine carrée.",
+          "depart": ["function getPremierDiviseur(n) {", "  ", "}", "", "console.log(getPremierDiviseur(91));"],
+          "tests": { "fonction": "getPremierDiviseur", "cas": [ { "args": [91], "attendu": 7 }, { "args": [15], "attendu": 3 }, { "args": [49], "attendu": 7 }, { "args": [13], "attendu": 13 }, { "args": [2], "attendu": 2 }, { "titre": "un grand nombre premier", "args": [87178291199], "attendu": 87178291199 } ], "siTropLong": "Pour un très grand nombre, essayer tous les diviseurs jusqu'à n prend des milliards de tours : arrête-toi quand `d * d` dépasse n." },
+          "indices": ["Essaie d = 2, 3, 4… et sors dès que `n % d === 0`.", "Si la boucle se termine sans rien trouver, n n'a pas d'autre diviseur que lui-même.", { "code": "for (let d = 2; d * d ___ n; d++) {\n  if (___) return d;\n}\nreturn ___;" }],
+          "solution": ["function getPremierDiviseur(n) {", "  for (let d = 2; d * d <= n; d++) {", "    if (n % d === 0) return d;", "  }", "  return n;", "}", "", "console.log(getPremierDiviseur(91));"],
+          "erreursTypiques": [
+            { "code": "function getPremierDiviseur(n) {\n  for (let d = 2; d * d < n; d++) {\n    if (n % d === 0) return d;\n  }\n  return n;\n}", "attendu": "echec" },
+            { "code": "function getPremierDiviseur(n) {\n  for (let d = 2; d < n; d++) {\n    if (n % d === 0) return d;\n  }\n  return n;\n}", "attendu": "erreur" }
+          ],
+          "explication": "Sortie dès qu'un diviseur est trouvé, et `d * d <= n` pour ne pas aller trop loin."
+        }
+      ]
+    },
+    {
+      "id": "u04-l6",
+      "titre": "for…of et ...params",
+      "duree": 5,
+      "notions": ["for-of", "parametre-reste"],
+      "cartes": [
+        {
+          "titre": "for…of : chaque élément",
+          "texte": "Quand on n'a pas besoin de l'indice, `for…of` visite directement chaque élément d'un tableau.",
+          "code": ["const notes = [4, 5.5, 6];", "for (const note of notes) {", "  console.log(note);", "}"],
+          "astuce": "Même idée que `forEach` (unité 6) : la variable de boucle est **un** élément, au singulier.",
+          "fiche": "for-of"
+        },
+        {
+          "titre": "Autant d'arguments qu'on veut",
+          "texte": "`console.log(1, 2, 3)` accepte n'importe quel nombre d'arguments. Pour faire pareil, on met `...` devant le paramètre : tous les arguments sont rangés dans un **tableau**.",
+          "code": ["function compter(...valeurs) {", "  return valeurs.length;", "}", "console.log(compter(4, \"a\", true));", "console.log(compter());"],
+          "analogie": "Les `...` posent une **boîte d'œufs vide** à l'entrée de la fonction : tous les arguments y sont rangés.",
+          "fiche": "parametre-reste"
+        },
+        {
+          "titre": "Les deux ensemble",
+          "texte": "Le paramètre du reste est un vrai tableau : on peut le parcourir avec `for…of`.",
+          "code": ["function somme(...nombres) {", "  let total = 0;", "  for (const n of nombres) total += n;", "  return total;", "}", "console.log(somme(1, 2, 3), somme(10));"]
+        }
+      ],
+      "exercices": [
+        { "id": "u04-l6-e1", "type": "predire", "notions": ["for-of"], "question": "Que va afficher ce code ?", "code": ["for (const lettre of [\"a\", \"b\", \"c\"]) {", "  console.log(lettre + \"!\");", "}"], "explication": "Un tour par élément." },
+        { "id": "u04-l6-e2", "type": "pointer-code", "notions": ["parametre-reste"], "question": "Touche le **paramètre du reste** (celui qui reçoit tous les arguments).", "code": ["function lister(⟦...prenoms⟧) {", "  return prenoms.length;", "}"], "explication": "Les trois points devant le nom : tous les arguments sont rangés dans le tableau `prenoms`." },
+        { "id": "u04-l6-e3", "type": "predire", "notions": ["parametre-reste"], "question": "Que va afficher ce code ?", "code": ["function f(...valeurs) {", "  console.log(valeurs);", "}", "f(1, \"a\");"], "explication": "Les arguments, rangés dans un tableau." },
+        { "id": "u04-l6-e4", "type": "predire", "notions": ["parametre-reste"], "question": "Et sans les trois points ?", "code": ["function f(valeurs) {", "  console.log(valeurs);", "}", "f(1, \"a\");"], "explication": "Sans `...`, le paramètre ne reçoit que le premier argument." },
+        {
+          "id": "u04-l6-e5", "type": "ecrire", "notions": ["parametre-reste", "for-of", "compteur"],
+          "question": "Écris `maxOf(...nombres)` qui **retourne** le plus grand des nombres reçus (au moins un), avec une boucle `for…of`.",
+          "depart": ["function maxOf(...nombres) {", "  ", "}", "", "console.log(maxOf(3, 92, 14));"],
+          "tests": { "fonction": "maxOf", "cas": [ { "args": [3, 92, 14], "attendu": 92 }, { "args": [-5, -2, -9], "attendu": -2 }, { "args": [7], "attendu": 7 } ], "interdit": ["Math.max"] },
+          "indices": ["Comme getMax (unité 3), mais avec autant de nombres qu'on veut : garde le plus grand vu jusqu'ici.", "Commence avec le premier nombre, pas avec 0 (pense aux négatifs).", { "code": "let max = nombres[0];\nfor (const n of nombres) {\n  if (___) max = n;\n}\nreturn max;" }],
+          "solution": ["function maxOf(...nombres) {", "  let max = nombres[0];", "  for (const n of nombres) {", "    if (n > max) max = n;", "  }", "  return max;", "}", "", "console.log(maxOf(3, 92, 14));"],
+          "erreursTypiques": [
+            { "code": "function maxOf(...nombres) {\n  let max = 0;\n  for (const n of nombres) {\n    if (n > max) max = n;\n  }\n  return max;\n}", "attendu": "echec" },
+            { "code": "function maxOf(nombres) {\n  let max = nombres;\n  return max;\n}", "attendu": "echec" }
+          ],
+          "explication": "`...nombres` range tous les arguments dans un tableau ; la boucle garde le plus grand."
+        }
+      ]
+    }
+  ],
+  "jeux": [
+    {
+      "id": "u04-tours",
+      "titre": "Combien de tours ?",
+      "description": "Lis la boucle et prédis ce qu'elle affiche, sans l'exécuter.",
+      "tours": 8,
+      "questions": [
+        { "id": "u04-j1-1", "type": "qcm", "notions": ["boucle-for"], "question": "Combien de tours ?", "code": ["for (let i = 0; i < 10; i++) {}"], "choix": ["10", "9", "11", "0"], "bonne": 0, "explication": "i de 0 à 9." },
+        { "id": "u04-j1-2", "type": "qcm", "notions": ["boucle-for"], "question": "Combien de tours ?", "code": ["for (let i = 0; i <= 10; i++) {}"], "choix": ["11", "10", "9", "0"], "bonne": 0, "explication": "i de 0 à 10 compris." },
+        { "id": "u04-j1-3", "type": "qcm", "notions": ["boucle-pas"], "question": "Combien de tours ?", "code": ["for (let i = 0; i <= 10; i += 5) {}"], "choix": ["3", "2", "10", "5"], "bonne": 0, "explication": "0, 5, 10." },
+        { "id": "u04-j1-4", "type": "qcm", "notions": ["boucle-pas"], "question": "Combien de tours ?", "code": ["for (let i = 5; i >= 1; i--) {}"], "choix": ["5", "4", "6", "Une infinité"], "bonne": 0, "explication": "5, 4, 3, 2, 1." },
+        { "id": "u04-j1-5", "type": "qcm", "notions": ["boucle-pas"], "question": "Combien de tours ?", "code": ["for (let i = 5; i <= 1; i--) {}"], "choix": ["0", "5", "4", "Une infinité"], "bonne": 0, "explication": "Au départ, `5 <= 1` est déjà faux : aucun tour." },
+        { "id": "u04-j1-6", "type": "predire", "notions": ["boucle-condition"], "question": "Que va afficher ce code ?", "code": ["for (let i = 0; i <= 14; i++) {", "  if (i % 2 === 0 && i % 7 === 0) console.log(i);", "}"], "explication": "Pairs et multiples de 7 : 0 et 14." },
+        { "id": "u04-j1-7", "type": "predire", "notions": ["compteur"], "question": "Que va afficher ce code ?", "code": ["let n = 0;", "for (let i = 0; i < 5; i++) n += 2;", "console.log(n);"], "explication": "Cinq tours, +2 à chaque fois." },
+        { "id": "u04-j1-8", "type": "predire", "notions": ["return-boucle"], "question": "Que va afficher ce code ?", "code": ["function f() {", "  for (let i = 1; i <= 10; i++) {", "    if (i * i > 20) return i;", "  }", "}", "console.log(f());"], "explication": "4 × 4 = 16, 5 × 5 = 25 > 20 : on sort avec 5." },
+        { "id": "u04-j1-9", "type": "predire", "notions": ["for-of", "compteur"], "question": "Que va afficher ce code ?", "code": ["let mots = 0;", "for (const m of [\"Sator\", \"Tenet\"]) mots++;", "console.log(mots);"], "explication": "Un tour par élément." },
+        { "id": "u04-j1-10", "type": "qcm", "notions": ["boucle-for"], "question": "Que se passe-t-il ?", "code": ["for (let i = 0; i < 5; i--) {}"], "choix": ["Une boucle infinie", "5 tours", "Aucun tour", "Une erreur de syntaxe"], "bonne": 0, "explication": "i recule : toujours `< 5`." }
+      ]
+    }
+  ],
+  "quiz": {
+    "titre": "Quiz : les boucles",
+    "questions": [
+      { "id": "u04-q1", "type": "predire", "notions": ["boucle-for"], "question": "Que va afficher ce code ?", "code": ["for (let i = 2; i <= 4; i++) console.log(i * 10);"], "explication": "20, 30, 40." },
+      { "id": "u04-q2", "type": "pointer-code", "notions": ["boucle-for"], "question": "Touche le **départ** du compteur.", "code": ["for (⟦let i = 1⟧; i <= 100; i++) {}"], "explication": "Le premier morceau, exécuté une seule fois." },
+      { "id": "u04-q3", "type": "qcm", "notions": ["boucle-for"], "question": "« Les entiers entre 0 et n compris » : quelle condition ?", "choix": ["i <= n", "i < n", "i == n", "i >= n"], "bonne": 0, "mono": true, "explication": "Compris → `<=`." },
+      { "id": "u04-q4", "type": "predire", "notions": ["boucle-pas"], "question": "Que va afficher ce code ?", "code": ["for (let i = 6; i >= 0; i -= 3) console.log(i);"], "explication": "6, 3, 0." },
+      { "id": "u04-q5", "type": "predire", "notions": ["boucle-condition"], "question": "Que va afficher ce code ?", "code": ["for (let i = 1; i <= 12; i++) {", "  if (i % 2 === 0 && i % 3 === 0) console.log(i);", "}"], "explication": "Pairs et multiples de 3 : 6 et 12." },
+      { "id": "u04-q6", "type": "bug", "notions": ["compteur"], "question": "Trouve la ligne fautive.", "code": ["function compterImpairs(n) {", "  let compte = 0;", "  for (let i = 0; i <= n; i++) {", "    if (i % 2 !== 0) compte++;", "  }", "  console.log(compte);", "}"], "ligne": 6, "choix": ["La fonction doit **retourner** le compte, pas l'afficher", "Il faut `i % 2 === 0`", "Il faut `const compte`", "Il faut `i < n`"], "bonne": 0, "explication": "Toujours la même histoire : afficher n'est pas retourner." },
+      { "id": "u04-q7", "type": "vf", "notions": ["compteur"], "question": "Le compteur d'une boucle doit être créé à l'intérieur de la boucle.", "bonne": false, "explication": "Avant la boucle : sinon il repart à 0 à chaque tour." },
+      { "id": "u04-q8", "type": "predire", "notions": ["return-boucle"], "question": "Que va afficher ce code ?", "code": ["function aUnDiviseur(n) {", "  for (let d = 2; d * d <= n; d++) {", "    if (n % d === 0) return true;", "  }", "  return false;", "}", "console.log(aUnDiviseur(25), aUnDiviseur(23));"], "explication": "25 = 5 × 5 ; 23 n'a pas de diviseur." },
+      { "id": "u04-q9", "type": "qcm", "notions": ["return-boucle"], "question": "Où mettre le `return false` d'une fonction « contient au moins un… » ?", "choix": ["Après la boucle", "Dans un else, dans la boucle", "Avant la boucle", "Nulle part"], "bonne": 0, "explication": "Le « non » ne se donne qu'après avoir tout essayé." },
+      { "id": "u04-q10", "type": "predire", "notions": ["parametre-reste"], "question": "Que va afficher ce code ?", "code": ["const f = (...xs) => xs.length;", "console.log(f(1, 2, 3, 4));"], "explication": "Quatre arguments rangés dans `xs`." },
+      { "id": "u04-q11", "type": "predire", "notions": ["for-of"], "question": "Que va afficher ce code ?", "code": ["let s = \"\";", "for (const mot of [\"Ro\", \"tas\"]) s += mot;", "console.log(s);"], "explication": "On colle chaque mot." },
+      { "id": "u04-q12", "type": "assoc", "notions": ["boucle-pas"], "mono": true, "question": "Associe chaque boucle à ce qu'elle visite.", "paires": [["for (let i = 0; i <= 6; i += 2)", "0, 2, 4, 6"], ["for (let i = 3; i >= 1; i--)", "3, 2, 1"], ["for (let i = 1; i < 4; i++)", "1, 2, 3"], ["for (let i = 0; i < 0; i++)", "aucun tour"]], "explication": "Départ, condition, pas : lis-les dans l'ordre." },
+      { "id": "u04-q13", "type": "predire", "notions": ["compteur", "boucle-condition"], "question": "Que va afficher ce code ?", "code": ["let c = 0;", "for (let i = 0; i <= 21; i++) if (i % 7 === 0) c++;", "console.log(c);"], "explication": "0, 7, 14, 21 : quatre multiples de 7 (0 compris)." },
+      { "id": "u04-q14", "type": "qcm", "notions": ["math-random", "compteur"], "question": "Sur 10 000 lancers de `Math.random() < 0.5`, combien de `true` environ ?", "choix": ["Environ 5 000", "Exactement 5 000", "10 000", "Entre 0 et 1"], "bonne": 0, "explication": "À peu près la moitié, mais jamais exactement à chaque fois : c'est du hasard." },
+      { "id": "u04-q15", "type": "bug", "notions": ["boucle-pas"], "question": "Ce compte à rebours ne fait aucun tour. Pourquoi ?", "code": ["for (let i = 10; i <= 0; i--) {", "  console.log(i);", "}"], "ligne": 1, "choix": ["La condition doit être `i >= 0`", "Il faut `i++`", "Il faut partir de 0", "Il manque un return"], "bonne": 0, "explication": "Au départ, `10 <= 0` est faux. À l'envers, la condition regarde vers le bas." }
+    ]
+  },
+  "boss": [
+    {
+      "id": "u04-b1",
+      "titre": "Pairs, multiples et compagnie",
+      "source": "TP Fonctions · exercice 4",
+      "notions": ["boucle-for", "boucle-condition", "modulo", "logique"],
+      "enonce": "En fonction d'un nombre n (n > 0) donné en paramètre, écrire une fonction qui affiche dans la console (un nombre par ligne, dans l'ordre croissant) :\n\n1. `printEven(n)` : les nombres entiers **pairs** compris entre 0 et n ;\n2. `printEvenMul7(n)` : les nombres entiers **pairs et multiples de 7** compris entre 0 et n ;\n3. `printEvenMul3OrMul7(n)` : les nombres entiers **pairs et multiples de 3, ainsi que** les nombres entiers **multiples de 7** compris entre 0 et n ;\n4. `printEvenMul3NotMul7(n)` : les nombres entiers **pairs et multiples de 3, mais non multiples de 7** compris entre 0 et n.",
+      "regles": ["« Compris entre 0 et n » : 0 et n font partie de l'intervalle.", "Tes fonctions seront testées avec plusieurs valeurs de n."],
+      "depart": ["function printEven(n) {", "  ", "}", "", "function printEvenMul7(n) {", "  ", "}", "", "function printEvenMul3OrMul7(n) {", "  ", "}", "", "function printEvenMul3NotMul7(n) {", "  ", "}", "", "printEven(10);"],
+      "tests": {
+        "cas": [
+          { "fonction": "printEven", "args": [30], "sortie": ["0", "2", "4", "6", "8", "10", "12", "14", "16", "18", "20", "22", "24", "26", "28", "30"] },
+          { "fonction": "printEven", "args": [21], "sortie": ["0", "2", "4", "6", "8", "10", "12", "14", "16", "18", "20"] },
+          { "fonction": "printEvenMul7", "args": [30], "sortie": ["0", "14", "28"] },
+          { "fonction": "printEvenMul7", "args": [21], "sortie": ["0", "14"] },
+          { "fonction": "printEvenMul3OrMul7", "args": [30], "sortie": ["0", "6", "7", "12", "14", "18", "21", "24", "28", "30"], "siEchec": "« pairs et multiples de 3, AINSI QUE les multiples de 7 » : `(pair && multiple de 3) || multiple de 7`. Les multiples de 7 impairs (7, 21) en font partie." },
+          { "fonction": "printEvenMul3OrMul7", "args": [21], "sortie": ["0", "6", "7", "12", "14", "18", "21"] },
+          { "fonction": "printEvenMul3NotMul7", "args": [30], "sortie": ["6", "12", "18", "24", "30"], "siEchec": "« non multiples de 7 » : `i % 7 !== 0`. Et 0 est un multiple de 7 (0 % 7 vaut 0) : il ne doit pas s'afficher." },
+          { "fonction": "printEvenMul3NotMul7", "args": [21], "sortie": ["6", "12", "18"] },
+          { "fonction": "printEven", "titre": "n = 1", "args": [1], "sortie": ["0"] }
+        ]
+      },
+      "indices": [
+        "Les quatre fonctions ont la même boucle (de 0 à n compris) ; seule la condition du `if` change.",
+        "Traduis chaque phrase : « et » → `&&`, « ainsi que » → `||`, « non multiple de 7 » → `i % 7 !== 0`. Mets des parenthèses autour des groupes.",
+        { "texte": "La forme commune :", "code": "for (let i = 0; i ___ n; i++) {\n  if (___) console.log(i);\n}" }
+      ],
+      "solution": ["function printEven(n) {", "  for (let i = 0; i <= n; i++) {", "    if (i % 2 === 0) console.log(i);", "  }", "}", "", "function printEvenMul7(n) {", "  for (let i = 0; i <= n; i++) {", "    if (i % 2 === 0 && i % 7 === 0) console.log(i);", "  }", "}", "", "function printEvenMul3OrMul7(n) {", "  for (let i = 0; i <= n; i++) {", "    if ((i % 2 === 0 && i % 3 === 0) || i % 7 === 0) console.log(i);", "  }", "}", "", "function printEvenMul3NotMul7(n) {", "  for (let i = 0; i <= n; i++) {", "    if (i % 2 === 0 && i % 3 === 0 && i % 7 !== 0) console.log(i);", "  }", "}", "", "printEven(10);"],
+      "erreursTypiques": [
+        { "code": "function printEven(n) {\n  for (let i = 0; i < n; i++) {\n    if (i % 2 === 0) console.log(i);\n  }\n}\nfunction printEvenMul7(n) {\n  for (let i = 0; i <= n; i++) {\n    if (i % 2 === 0 && i % 7 === 0) console.log(i);\n  }\n}\nfunction printEvenMul3OrMul7(n) {\n  for (let i = 0; i <= n; i++) {\n    if ((i % 2 === 0 && i % 3 === 0) || i % 7 === 0) console.log(i);\n  }\n}\nfunction printEvenMul3NotMul7(n) {\n  for (let i = 0; i <= n; i++) {\n    if (i % 2 === 0 && i % 3 === 0 && i % 7 !== 0) console.log(i);\n  }\n}", "attendu": "echec" },
+        { "code": "function printEven(n) {\n  for (let i = 0; i <= n; i++) {\n    if (i % 2 === 0) console.log(i);\n  }\n}\nfunction printEvenMul7(n) {\n  for (let i = 0; i <= n; i++) {\n    if (i % 2 === 0 && i % 7 === 0) console.log(i);\n  }\n}\nfunction printEvenMul3OrMul7(n) {\n  for (let i = 0; i <= n; i++) {\n    if (i % 2 === 0 && i % 3 === 0 && i % 7 === 0) console.log(i);\n  }\n}\nfunction printEvenMul3NotMul7(n) {\n  for (let i = 0; i <= n; i++) {\n    if (i % 2 === 0 && i % 3 === 0 && i % 7 !== 0) console.log(i);\n  }\n}", "attendu": "echec", "diagnostic": "contenu" },
+        { "code": "function printEven(n) {\n  for (let i = 0; i <= n; i++) {\n    if (i % 2 === 0) console.log(i);\n  }\n}\nfunction printEvenMul7(n) {\n  for (let i = 0; i <= n; i++) {\n    if (i % 2 === 0 && i % 7 === 0) console.log(i);\n  }\n}\nfunction printEvenMul3OrMul7(n) {\n  for (let i = 0; i <= n; i++) {\n    if ((i % 2 === 0 && i % 3 === 0) || i % 7 === 0) console.log(i);\n  }\n}\nfunction printEvenMul3NotMul7(n) {\n  for (let i = 1; i <= n; i++) {\n    if (i % 2 === 0 && i % 3 === 0 && i % 7 === 0) console.log(i);\n  }\n}", "attendu": "echec", "diagnostic": "contenu" }
+      ],
+      "explication": "Exercice 4 du TP Fonctions : quatre boucles identiques, quatre conditions traduites de la phrase."
+    },
+    {
+      "id": "u04-b2",
+      "titre": "Pile ou face",
+      "source": "TP Fonctions · exercice 5",
+      "notions": ["compteur", "math-random", "boucle-for", "fleche-objet"],
+      "enonce": "Écrire deux fonctions retournant respectivement :\n\n1. `countTails(n)` : le **nombre de piles** obtenus sur un lancer de n pièces de monnaie, simulé avec le générateur de nombres aléatoires ;\n2. `countTailsAndHeads(n)` : le **nombre de piles et de faces** obtenus sur un lancer de n pièces, sous forme d'un objet `{ tails: …, heads: … }`.",
+      "regles": ["Chaque pièce a une chance sur deux de tomber sur pile.", "Les fonctions retournent leurs résultats (pas de console.log obligatoire).", "Elles seront appelées de nombreuses fois : les résultats doivent varier comme un vrai hasard."],
+      "depart": ["function countTails(n) {", "  ", "}", "", "function countTailsAndHeads(n) {", "  ", "}", "", "console.log(countTails(10));", "console.log(countTailsAndHeads(10));"],
+      "tests": {
+        "cas": [
+          { "fonction": "countTails", "titre": "countTails(0)", "args": [0], "attendu": 0 },
+          { "fonction": "countTails", "titre": "countTails(1), 300 fois : tantôt 0, tantôt 1", "args": [1], "repetitions": 300, "entier": true, "min": 0, "max": 1, "tous": true },
+          { "fonction": "countTails", "titre": "countTails(10000) ≈ 5000", "args": [10000], "repetitions": 5, "verifie": "Number.isInteger(r) && r >= 4700 && r <= 5300", "messageVerifie": "Sur 10 000 lancers, on attend un nombre entier de piles proche de 5 000" },
+          { "fonction": "countTailsAndHeads", "titre": "countTailsAndHeads(1000)", "args": [1000], "repetitions": 5, "verifie": "r !== null && typeof r === 'object' && r.tails + r.heads === 1000 && r.tails >= 400 && r.tails <= 600", "messageVerifie": "On attend un objet { tails, heads } dont la somme vaut 1000, avec environ 500 piles" },
+          { "fonction": "countTailsAndHeads", "titre": "countTailsAndHeads(0)", "args": [0], "attendu": { "tails": 0, "heads": 0 } },
+          { "fonction": "countTailsAndHeads", "titre": "countTailsAndHeads(1), 300 fois", "args": [1], "repetitions": 300, "verifie": "r.tails + r.heads === 1 && (r.tails === 0 || r.tails === 1)", "messageVerifie": "Une seule pièce : soit { tails: 1, heads: 0 }, soit { tails: 0, heads: 1 }" }
+        ]
+      },
+      "indices": [
+        "Une pièce : `Math.random() < 0.5` est vrai une fois sur deux. n pièces : une boucle de n tours.",
+        "Compteurs **avant** la boucle, +1 **dans** la boucle, `return` **après**. Pour deux résultats : un objet.",
+        { "code": "let tails = 0;\nfor (let i = 0; i < n; i++) {\n  if (___) tails++;\n}\nreturn ___;" }
+      ],
+      "solution": ["function countTails(n) {", "  let tails = 0;", "  for (let i = 0; i < n; i++) {", "    if (Math.random() < 0.5) tails++;", "  }", "  return tails;", "}", "", "function countTailsAndHeads(n) {", "  const tails = countTails(n);", "  return { tails: tails, heads: n - tails };", "}", "", "console.log(countTails(10));", "console.log(countTailsAndHeads(10));"],
+      "erreursTypiques": [
+        { "code": "function countTails(n) {\n  return n / 2;\n}\nfunction countTailsAndHeads(n) {\n  return { tails: n / 2, heads: n / 2 };\n}", "attendu": "echec" },
+        { "code": "function countTails(n) {\n  let tails = 0;\n  for (let i = 0; i < n; i++) {\n    if (Math.random() < 0.5) tails++;\n    return tails;\n  }\n}\nfunction countTailsAndHeads(n) {\n  const tails = countTails(n);\n  return { tails: tails, heads: n - tails };\n}", "attendu": "echec" },
+        { "code": "function countTails(n) {\n  let tails = 0;\n  for (let i = 0; i < n; i++) {\n    if (Math.random() < 0.5) tails++;\n  }\n  console.log(tails);\n}\nfunction countTailsAndHeads(n) {\n  return { tails: 0, heads: 0 };\n}", "attendu": "echec" },
+        { "code": "function countTails(n) {\n  let tails = 0;\n  for (let i = 0; i < n; i++) {\n    if (Math.random() < 0.5) tails++;\n  }\n  return tails;\n}\nfunction countTailsAndHeads(n) {\n  return { tails: countTails(n), heads: countTails(n) };\n}", "attendu": "echec" }
+      ],
+      "explication": "Exercice 5 du TP. Astuce : les faces se déduisent des piles (`n - tails`), pas besoin de relancer les pièces."
+    },
+    {
+      "id": "u04-b3",
+      "titre": "Nombre premier",
+      "source": "TP Fonctions · exercice 6",
+      "notions": ["return-boucle", "modulo", "boucle-for"],
+      "enonce": "Écrire une fonction `isPrime(n)` qui indique (retourne `true` ou `false`) si un nombre entier est un **nombre premier** ou non.\n\nTester la fonction avec les valeurs suivantes : 0, 1, 2, 3, 4, 9, 11, 26, 87178291197, 87178291199.",
+      "regles": ["Un nombre premier a exactement deux diviseurs : 1 et lui-même. 0 et 1 ne sont pas premiers ; 2 l'est.", "87 178 291 199 doit répondre en moins de 2 secondes."],
+      "depart": ["function isPrime(n) {", "  ", "}", "", "for (const n of [0, 1, 2, 3, 4, 9, 11, 26, 87178291197, 87178291199]) {", "  console.log(n, isPrime(n));", "}"],
+      "tests": {
+        "fonction": "isPrime",
+        "cas": [
+          { "args": [0], "attendu": false }, { "args": [1], "attendu": false, "siEchec": "1 n'est pas premier : il n'a qu'un seul diviseur." },
+          { "args": [2], "attendu": true }, { "args": [3], "attendu": true }, { "args": [4], "attendu": false },
+          { "args": [9], "attendu": false, "siEchec": "9 = 3 × 3 : avec `d * d < n`, tu ne testes jamais 3. Il faut `d * d <= n`." },
+          { "args": [11], "attendu": true }, { "args": [26], "attendu": false },
+          { "args": [49], "attendu": false },
+          { "args": [87178291197], "attendu": false }, { "args": [87178291199], "attendu": true }
+        ],
+        "siTropLong": "Pour 87 178 291 199, essayer tous les diviseurs jusqu'à n demande 87 milliards de tours. Arrête-toi à la racine carrée : condition `d * d <= n`."
+      },
+      "indices": [
+        "Cherche un diviseur entre 2 et n - 1. Dès que tu en trouves un, `return false`. Si tu n'en trouves aucun, c'est un nombre premier.",
+        "Deux pièges : les petits nombres (0 et 1 ne sont pas premiers) et le temps (arrête-toi quand `d * d` dépasse n). Relis la fiche [[return-boucle]].",
+        { "code": "function isPrime(n) {\n  if (n < 2) return ___;\n  for (let d = 2; d * d ___ n; d++) {\n    if (___) return false;\n  }\n  return ___;\n}" }
+      ],
+      "solution": ["function isPrime(n) {", "  if (n < 2) return false;", "  for (let d = 2; d * d <= n; d++) {", "    if (n % d === 0) return false;", "  }", "  return true;", "}", "", "for (const n of [0, 1, 2, 3, 4, 9, 11, 26, 87178291197, 87178291199]) {", "  console.log(n, isPrime(n));", "}"],
+      "erreursTypiques": [
+        { "code": "function isPrime(n) {\n  for (let d = 2; d * d <= n; d++) {\n    if (n % d === 0) return false;\n  }\n  return true;\n}", "attendu": "echec", "diagnostic": "contenu" },
+        { "code": "function isPrime(n) {\n  if (n < 2) return false;\n  for (let d = 2; d * d < n; d++) {\n    if (n % d === 0) return false;\n  }\n  return true;\n}", "attendu": "echec", "diagnostic": "contenu" },
+        { "code": "function isPrime(n) {\n  if (n < 2) return false;\n  for (let d = 2; d < n; d++) {\n    if (n % d === 0) return false;\n  }\n  return true;\n}", "attendu": "erreur" },
+        { "code": "function isPrime(n) {\n  if (n < 2) return false;\n  for (let d = 2; d * d <= n; d++) {\n    if (n % d === 0) return false;\n    else return true;\n  }\n  return true;\n}", "attendu": "echec" }
+      ],
+      "explication": "Exercice 6 du TP. On peut aller encore plus vite en sautant les multiples de 2 et de 3, mais ta version suffit largement."
+    },
+    {
+      "id": "u04-b4",
+      "titre": "La fonction cl",
+      "source": "TP Fonctions · exercice 7",
+      "notions": ["parametre-reste", "for-of", "console-log"],
+      "enonce": "Écrire une fonction nommée `cl` qui affiche dans la console, **ligne après ligne**, toutes les données fournies en paramètre. Exemple d'appel :\n\n```\ncl(1, 2, \"a\", [3.1, 4, 159]);\n```",
+      "regles": ["`cl` doit accepter n'importe quel nombre d'arguments (même aucun)."],
+      "depart": ["function cl() {", "  ", "}", "", "cl(1, 2, \"a\", [3.1, 4, 159]);"],
+      "tests": {
+        "fonction": "cl",
+        "cas": [
+          { "args": [1, 2, "a", [3.1, 4, 159]], "sortie": ["1", "2", "a", "[3.1, 4, 159]"] },
+          { "titre": "un seul argument", "args": ["seul"], "sortie": ["seul"] },
+          { "titre": "aucun argument", "args": [], "sortie": [] },
+          { "titre": "beaucoup d'arguments", "args": [true, null, 0, "x", -1], "sortie": ["true", "null", "0", "x", "-1"] }
+        ]
+      },
+      "indices": [
+        "Comment une fonction peut-elle recevoir un nombre d'arguments inconnu à l'avance ? Relis la fiche [[parametre-reste]].",
+        "Une fois tous les arguments rangés dans un tableau, il suffit de le parcourir et d'afficher chaque élément.",
+        { "code": "function cl(...___) {\n  for (const ___ of ___) console.log(___);\n}" }
+      ],
+      "solution": ["function cl(...args) {", "  for (const v of args) {", "    console.log(v);", "  }", "}", "", "cl(1, 2, \"a\", [3.1, 4, 159]);"],
+      "erreursTypiques": [
+        { "code": "function cl(args) {\n  console.log(args);\n}", "attendu": "echec" },
+        { "code": "function cl(...args) {\n  console.log(args);\n}", "attendu": "echec" },
+        { "code": "function cl(...args) {\n  console.log(...args);\n}", "attendu": "echec" }
+      ],
+      "explication": "Exercice 7 du TP : les `...` rangent tous les arguments dans un tableau. On reverra ces trois points dans l'autre sens (le spread) avec les tableaux."
+    },
+    {
+      "id": "u04-b5",
+      "titre": "repeatTransform",
+      "source": "TP Fonctions · exercice 9",
+      "notions": ["boucle-for", "fonction-en-parametre", "compteur"],
+      "enonce": "Écrire une fonction `repeatTransform` qui reçoit un nombre, une fonction et un nombre de répétitions en paramètres. Elle doit appliquer la fonction au nombre, puis appliquer à nouveau cette même fonction au résultat obtenu, autant de fois que demandé. Elle retourne le résultat final.\n\n```\nrepeatTransform(2, double, 3); // Returns 16: 2 → 4 → 8 → 16\nrepeatTransform(2, square, 2); // Returns 16: 2 → 4 → 16\n```\n\nLes fonctions `double` et `square` de l'exercice 8 sont déjà écrites.",
+      "regles": ["`repeatTransform` doit marcher avec n'importe quelle fonction et n'importe quel nombre de répétitions (0 compris : on retourne alors le nombre tel quel)."],
+      "depart": ["function double(n) {", "  return n * 2;", "}", "", "function square(n) {", "  return n * n;", "}", "", "function repeatTransform(n, fct, times) {", "  ", "}", "", "console.log(repeatTransform(2, double, 3));"],
+      "tests": {
+        "fonction": "repeatTransform",
+        "cas": [
+          { "titre": "repeatTransform(2, double, 3)", "argsCode": "[2, double, 3]", "attendu": 16 },
+          { "titre": "repeatTransform(2, square, 2)", "argsCode": "[2, square, 2]", "attendu": 16, "siEchec": "À chaque tour, la fonction s'applique au **résultat du tour précédent**, pas au nombre de départ." },
+          { "titre": "repeatTransform(1, (x) => x * 10, 4)", "argsCode": "[1, (x) => x * 10, 4]", "attendu": 10000 },
+          { "titre": "0 répétition", "argsCode": "[5, double, 0]", "attendu": 5 },
+          { "titre": "avec une chaîne", "argsCode": "[\"a\", (s) => s + \"b\", 3]", "attendu": "abbb" }
+        ]
+      },
+      "indices": [
+        "Garde le résultat courant dans une variable `let`, qui commence avec le nombre de départ.",
+        "Une boucle de `times` tours : à chaque tour, le résultat devient `fct(résultat)`. Retourne-le après la boucle.",
+        { "code": "let result = ___;\nfor (let i = 0; i < ___; i++) {\n  result = ___;\n}\nreturn result;" }
+      ],
+      "solution": ["function double(n) {", "  return n * 2;", "}", "", "function square(n) {", "  return n * n;", "}", "", "function repeatTransform(n, fct, times) {", "  let result = n;", "  for (let i = 0; i < times; i++) {", "    result = fct(result);", "  }", "  return result;", "}", "", "console.log(repeatTransform(2, double, 3));"],
+      "erreursTypiques": [
+        { "code": "function double(n) {\n  return n * 2;\n}\nfunction square(n) {\n  return n * n;\n}\nfunction repeatTransform(n, fct, times) {\n  let result = n;\n  for (let i = 0; i < times; i++) {\n    result = fct(n);\n  }\n  return result;\n}", "attendu": "echec", "diagnostic": "contenu" },
+        { "code": "function double(n) {\n  return n * 2;\n}\nfunction square(n) {\n  return n * n;\n}\nfunction repeatTransform(n, fct, times) {\n  let result = n;\n  for (let i = 0; i <= times; i++) {\n    result = fct(result);\n  }\n  return result;\n}", "attendu": "echec" },
+        { "code": "function double(n) {\n  return n * 2;\n}\nfunction square(n) {\n  return n * n;\n}\nfunction repeatTransform(n, fct, times) {\n  let result = n;\n  for (let i = 0; i < times; i++) {\n    result = fct(result);\n    return result;\n  }\n}", "attendu": "echec" }
+      ],
+      "explication": "Exercice 9 du TP : avec les exercices 1 à 10, tout le TP Fonctions est fait."
+    }
+  ]
+}

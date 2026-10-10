@@ -1,5 +1,5 @@
 {
-  "id": "u06",
+  "id": "u07",
   "titre": "Réduire : reduce",
   "sousTitre": "TP 2 : Tableaux · somme, maximum, concaténation",
   "objectif": "Comprendre l'accumulateur (le porte-monnaie), choisir la valeur de départ, calculer une somme, un maximum, une concaténation.",
@@ -53,7 +53,7 @@
   ],
   "lecons": [
     {
-      "id": "u06-l1",
+      "id": "u07-l1",
       "titre": "Le porte-monnaie",
       "duree": 6,
       "notions": ["reduce"],
@@ -83,15 +83,15 @@
         }
       ],
       "exercices": [
-        { "id": "u06-l1-e1", "type": "reduce-pas", "notions": ["reduce"], "question": "Remplis le porte-monnaie, tour par tour.", "tableau": [3, 14, 15], "nom": "numbers", "fonction": "(acc, n) => acc + n", "depart": 0, "explication": "0 + 3 = 3, puis 3 + 14 = 17, puis 17 + 15 = 32." },
-        { "id": "u06-l1-e2", "type": "reduce-pas", "notions": ["reduce"], "question": "Et avec des prix ?", "tableau": [10, 2.5, 4], "nom": "prix", "fonction": "(acc, p) => acc + p", "depart": 0, "explication": "Le total du panier : 16.5." },
-        { "id": "u06-l1-e3", "type": "pointer-code", "notions": ["reduce"], "question": "Touche l'**accumulateur** (le porte-monnaie).", "code": ["const total = prix.reduce((⟦acc⟧, p) => acc + p, 0);"], "explication": "Le premier paramètre est toujours l'accumulateur." },
-        { "id": "u06-l1-e4", "type": "pointer-code", "notions": ["reduce", "valeur-depart"], "question": "Touche la **valeur de départ** du porte-monnaie.", "code": ["const total = prix.reduce((acc, p) => acc + p, ⟦0⟧);"], "explication": "Le deuxième argument de reduce, après la fonction." },
-        { "id": "u06-l1-e5", "type": "pointer-code", "notions": ["reduce"], "question": "Touche ce qui devient le **acc du tour suivant**.", "code": ["const total = prix.reduce((acc, p) => ⟦acc + p⟧, 0);"], "explication": "Ce que retourne la fonction (après `=>`) devient le nouvel accumulateur." },
-        { "id": "u06-l1-e6", "type": "predire", "notions": ["reduce"], "question": "Que va afficher ce code ?", "code": ["const notes = [4, 5, 6];", "console.log(notes.reduce((acc, note) => acc + note, 0));"], "explication": "4 + 5 + 6." },
-        { "id": "u06-l1-e7", "type": "qcm", "notions": ["reduce"], "question": "Que retourne `reduce` ?", "choix": ["Une seule valeur : le dernier contenu du porte-monnaie", "Un tableau de même longueur", "Un tableau plus court", "Toujours undefined"], "bonne": 0, "explication": "C'est la grande différence avec map et filter." },
+        { "id": "u07-l1-e1", "type": "reduce-pas", "notions": ["reduce"], "question": "Remplis le porte-monnaie, tour par tour.", "tableau": [3, 14, 15], "nom": "numbers", "fonction": "(acc, n) => acc + n", "depart": 0, "explication": "0 + 3 = 3, puis 3 + 14 = 17, puis 17 + 15 = 32." },
+        { "id": "u07-l1-e2", "type": "reduce-pas", "notions": ["reduce"], "question": "Et avec des prix ?", "tableau": [10, 2.5, 4], "nom": "prix", "fonction": "(acc, p) => acc + p", "depart": 0, "explication": "Le total du panier : 16.5." },
+        { "id": "u07-l1-e3", "type": "pointer-code", "notions": ["reduce"], "question": "Touche l'**accumulateur** (le porte-monnaie).", "code": ["const total = prix.reduce((⟦acc⟧, p) => acc + p, 0);"], "explication": "Le premier paramètre est toujours l'accumulateur." },
+        { "id": "u07-l1-e4", "type": "pointer-code", "notions": ["reduce", "valeur-depart"], "question": "Touche la **valeur de départ** du porte-monnaie.", "code": ["const total = prix.reduce((acc, p) => acc + p, ⟦0⟧);"], "explication": "Le deuxième argument de reduce, après la fonction." },
+        { "id": "u07-l1-e5", "type": "pointer-code", "notions": ["reduce"], "question": "Touche ce qui devient le **acc du tour suivant**.", "code": ["const total = prix.reduce((acc, p) => ⟦acc + p⟧, 0);"], "explication": "Ce que retourne la fonction (après `=>`) devient le nouvel accumulateur." },
+        { "id": "u07-l1-e6", "type": "predire", "notions": ["reduce"], "question": "Que va afficher ce code ?", "code": ["const notes = [4, 5, 6];", "console.log(notes.reduce((acc, note) => acc + note, 0));"], "explication": "4 + 5 + 6." },
+        { "id": "u07-l1-e7", "type": "qcm", "notions": ["reduce"], "question": "Que retourne `reduce` ?", "choix": ["Une seule valeur : le dernier contenu du porte-monnaie", "Un tableau de même longueur", "Un tableau plus court", "Toujours undefined"], "bonne": 0, "explication": "C'est la grande différence avec map et filter." },
         {
-          "id": "u06-l1-e8", "type": "trous", "notions": ["reduce", "valeur-depart"],
+          "id": "u07-l1-e8", "type": "trous", "notions": ["reduce", "valeur-depart"],
           "question": "Complète pour calculer le nombre total d'articles dans le panier.",
           "code": ["const quantites = [2, 1, 4];", "const total = quantites.reduce((___, q) => acc + q, ___);", "console.log(total);"],
           "tests": { "cas": [ { "sortie": ["7"], "variables": { "total": 7 } } ] },
@@ -103,7 +103,7 @@
       ]
     },
     {
-      "id": "u06-l2",
+      "id": "u07-l2",
       "titre": "La valeur de départ",
       "duree": 6,
       "notions": ["valeur-depart", "reduce"],
@@ -133,13 +133,13 @@
         }
       ],
       "exercices": [
-        { "id": "u06-l2-e1", "type": "assoc", "notions": ["valeur-depart"], "question": "Associe chaque calcul à sa valeur de départ.", "mono": true, "paires": [["somme", "0"], ["produit", "1"], ["coller des mots", "\"\""], ["maximum", "(aucune : le 1er élément)"]], "explication": "Le départ doit être « neutre » : il ne doit pas changer le résultat." },
-        { "id": "u06-l2-e2", "type": "predire", "notions": ["valeur-depart"], "question": "Que va afficher ce code ?", "code": ["console.log([5, 5].reduce((acc, n) => acc + n, 100));"], "explication": "Le porte-monnaie commence avec 100 : 100 + 5 + 5." },
-        { "id": "u06-l2-e3", "type": "reduce-pas", "notions": ["valeur-depart", "reduce"], "question": "Sans valeur de départ : remplis les tours.", "tableau": [3, 14, 15], "nom": "numbers", "fonction": "(acc, n) => acc + n", "explication": "acc commence avec 3 (le premier élément) et on part de 14 : seulement deux tours." },
-        { "id": "u06-l2-e4", "type": "reduce-pas", "notions": ["valeur-depart"], "question": "Un produit :", "tableau": [2, 3, 4], "nom": "numbers", "fonction": "(acc, n) => acc * n", "depart": 1, "explication": "1 × 2 = 2, 2 × 3 = 6, 6 × 4 = 24." },
-        { "id": "u06-l2-e5", "type": "bug", "notions": ["valeur-depart"], "question": "Ce code plante quand `achats` est vide. Quelle ligne corriger ?", "code": ["const achats = [];", "const total = achats.reduce((acc, a) => acc + a);", "console.log(total);"], "ligne": 2, "choix": ["Il manque la valeur de départ 0", "Il faut `map` au lieu de `reduce`", "Il faut `let total`", "`acc` doit s'appeler `total`"], "bonne": 0, "explication": "Sans départ, un tableau vide n'a rien pour remplir le porte-monnaie. Avec `, 0`, le résultat est 0." },
+        { "id": "u07-l2-e1", "type": "assoc", "notions": ["valeur-depart"], "question": "Associe chaque calcul à sa valeur de départ.", "mono": true, "paires": [["somme", "0"], ["produit", "1"], ["coller des mots", "\"\""], ["maximum", "(aucune : le 1er élément)"]], "explication": "Le départ doit être « neutre » : il ne doit pas changer le résultat." },
+        { "id": "u07-l2-e2", "type": "predire", "notions": ["valeur-depart"], "question": "Que va afficher ce code ?", "code": ["console.log([5, 5].reduce((acc, n) => acc + n, 100));"], "explication": "Le porte-monnaie commence avec 100 : 100 + 5 + 5." },
+        { "id": "u07-l2-e3", "type": "reduce-pas", "notions": ["valeur-depart", "reduce"], "question": "Sans valeur de départ : remplis les tours.", "tableau": [3, 14, 15], "nom": "numbers", "fonction": "(acc, n) => acc + n", "explication": "acc commence avec 3 (le premier élément) et on part de 14 : seulement deux tours." },
+        { "id": "u07-l2-e4", "type": "reduce-pas", "notions": ["valeur-depart"], "question": "Un produit :", "tableau": [2, 3, 4], "nom": "numbers", "fonction": "(acc, n) => acc * n", "depart": 1, "explication": "1 × 2 = 2, 2 × 3 = 6, 6 × 4 = 24." },
+        { "id": "u07-l2-e5", "type": "bug", "notions": ["valeur-depart"], "question": "Ce code plante quand `achats` est vide. Quelle ligne corriger ?", "code": ["const achats = [];", "const total = achats.reduce((acc, a) => acc + a);", "console.log(total);"], "ligne": 2, "choix": ["Il manque la valeur de départ 0", "Il faut `map` au lieu de `reduce`", "Il faut `let total`", "`acc` doit s'appeler `total`"], "bonne": 0, "explication": "Sans départ, un tableau vide n'a rien pour remplir le porte-monnaie. Avec `, 0`, le résultat est 0." },
         {
-          "id": "u06-l2-e6", "type": "ecrire", "notions": ["valeur-depart", "reduce"],
+          "id": "u07-l2-e6", "type": "ecrire", "notions": ["valeur-depart", "reduce"],
           "question": "Écris `getProduit(numbers)` qui **retourne** le produit de tous les nombres (1 pour un tableau vide).",
           "depart": ["function getProduit(numbers) {", "  ", "}", "", "console.log(getProduit([2, 3, 4]));"],
           "tests": { "fonction": "getProduit", "cas": [ { "args": [[2, 3, 4]], "attendu": 24 }, { "args": [[5]], "attendu": 5 }, { "titre": "avec zéro", "args": [[7, 0, 3]], "attendu": 0 }, { "titre": "tableau vide", "args": [[]], "attendu": 1 } ], "obligatoire": ["reduce"] },
@@ -154,7 +154,7 @@
       ]
     },
     {
-      "id": "u06-l3",
+      "id": "u07-l3",
       "titre": "Le plus grand",
       "duree": 6,
       "notions": ["reduce-max", "valeur-depart", "ternaire"],
@@ -178,12 +178,12 @@
         }
       ],
       "exercices": [
-        { "id": "u06-l3-e1", "type": "reduce-pas", "notions": ["reduce-max"], "question": "Remplis les tours du maximum.", "tableau": [3, 14, 92, 15], "nom": "numbers", "fonction": "(max, n) => n > max ? n : max", "explication": "Le porte-monnaie garde 3, puis 14, puis 92… et 92 reste devant 15." },
-        { "id": "u06-l3-e2", "type": "reduce-pas", "notions": ["reduce-max"], "question": "Avec des nombres négatifs :", "tableau": [-5, -2, -9], "nom": "numbers", "fonction": "(max, n) => n > max ? n : max", "explication": "Sans départ, on commence avec -5 : -2 est plus grand, -9 non." },
-        { "id": "u06-l3-e3", "type": "predire", "notions": ["reduce-max", "valeur-depart"], "question": "Que va afficher ce code ?", "code": ["console.log([-5, -2, -9].reduce((max, n) => n > max ? n : max, 0));"], "explication": "Départ 0 : aucun négatif n'est plus grand. Faux résultat !" },
-        { "id": "u06-l3-e4", "type": "qcm", "notions": ["reduce-max"], "question": "Quelle fonction garde le **plus petit** ?", "choix": ["(min, n) => n < min ? n : min", "(min, n) => n > min ? n : min", "(min, n) => min + n", "(min, n) => n < min"], "bonne": 0, "mono": true, "explication": "On garde n s'il est plus petit, sinon on garde min. La dernière retourne un booléen, qui deviendrait le acc suivant." },
+        { "id": "u07-l3-e1", "type": "reduce-pas", "notions": ["reduce-max"], "question": "Remplis les tours du maximum.", "tableau": [3, 14, 92, 15], "nom": "numbers", "fonction": "(max, n) => n > max ? n : max", "explication": "Le porte-monnaie garde 3, puis 14, puis 92… et 92 reste devant 15." },
+        { "id": "u07-l3-e2", "type": "reduce-pas", "notions": ["reduce-max"], "question": "Avec des nombres négatifs :", "tableau": [-5, -2, -9], "nom": "numbers", "fonction": "(max, n) => n > max ? n : max", "explication": "Sans départ, on commence avec -5 : -2 est plus grand, -9 non." },
+        { "id": "u07-l3-e3", "type": "predire", "notions": ["reduce-max", "valeur-depart"], "question": "Que va afficher ce code ?", "code": ["console.log([-5, -2, -9].reduce((max, n) => n > max ? n : max, 0));"], "explication": "Départ 0 : aucun négatif n'est plus grand. Faux résultat !" },
+        { "id": "u07-l3-e4", "type": "qcm", "notions": ["reduce-max"], "question": "Quelle fonction garde le **plus petit** ?", "choix": ["(min, n) => n < min ? n : min", "(min, n) => n > min ? n : min", "(min, n) => min + n", "(min, n) => n < min"], "bonne": 0, "mono": true, "explication": "On garde n s'il est plus petit, sinon on garde min. La dernière retourne un booléen, qui deviendrait le acc suivant." },
         {
-          "id": "u06-l3-e5", "type": "ecrire", "notions": ["reduce-max", "reduce"],
+          "id": "u07-l3-e5", "type": "ecrire", "notions": ["reduce-max", "reduce"],
           "question": "Écris `getPlusLong(mots)` qui **retourne** le mot le plus long (le premier en cas d'égalité). Le tableau contient au moins un mot.",
           "depart": ["function getPlusLong(mots) {", "  ", "}", "", "console.log(getPlusLong([\"kiwi\", \"mangue\", \"noix\"]));"],
           "tests": { "fonction": "getPlusLong", "cas": [ { "args": [["kiwi", "mangue", "noix"]], "attendu": "mangue" }, { "args": [["Sator", "Arepo"]], "attendu": "Sator" }, { "args": [["a"]], "attendu": "a" } ] },
@@ -199,7 +199,7 @@
       ]
     },
     {
-      "id": "u06-l4",
+      "id": "u07-l4",
       "titre": "Coller des mots",
       "duree": 5,
       "notions": ["reduce-concat", "valeur-depart", "chaines"],
@@ -224,12 +224,12 @@
         }
       ],
       "exercices": [
-        { "id": "u06-l4-e1", "type": "reduce-pas", "notions": ["reduce-concat"], "question": "Remplis les tours. (Écris les textes avec ou sans guillemets.)", "tableau": ["Sa", "tor"], "nom": "morceaux", "fonction": "(acc, m) => acc + m", "depart": "", "explication": "\"\" + \"Sa\" = \"Sa\", puis \"Sa\" + \"tor\" = \"Sator\"." },
-        { "id": "u06-l4-e2", "type": "predire", "notions": ["reduce-concat", "valeur-depart"], "question": "Que va afficher ce code ?", "code": ["console.log([\"a\", \"b\"].reduce((acc, l) => acc + l, \"\"));"], "explication": "On colle a puis b." },
-        { "id": "u06-l4-e3", "type": "predire", "notions": ["reduce-concat", "valeur-depart"], "question": "Et celui-ci ?", "code": ["console.log([\"a\", \"b\"].reduce((acc, l) => acc + l, 0));"], "explication": "Le départ 0 est collé devant." },
-        { "id": "u06-l4-e4", "type": "predire", "notions": ["reduce-concat"], "question": "Que va afficher ce code ?", "code": ["const initiales = [\"Léa\", \"Sami\", \"Noé\"].reduce((acc, p) => acc + p[0], \"\");", "console.log(initiales);"], "explication": "On colle la première lettre de chaque prénom." },
+        { "id": "u07-l4-e1", "type": "reduce-pas", "notions": ["reduce-concat"], "question": "Remplis les tours. (Écris les textes avec ou sans guillemets.)", "tableau": ["Sa", "tor"], "nom": "morceaux", "fonction": "(acc, m) => acc + m", "depart": "", "explication": "\"\" + \"Sa\" = \"Sa\", puis \"Sa\" + \"tor\" = \"Sator\"." },
+        { "id": "u07-l4-e2", "type": "predire", "notions": ["reduce-concat", "valeur-depart"], "question": "Que va afficher ce code ?", "code": ["console.log([\"a\", \"b\"].reduce((acc, l) => acc + l, \"\"));"], "explication": "On colle a puis b." },
+        { "id": "u07-l4-e3", "type": "predire", "notions": ["reduce-concat", "valeur-depart"], "question": "Et celui-ci ?", "code": ["console.log([\"a\", \"b\"].reduce((acc, l) => acc + l, 0));"], "explication": "Le départ 0 est collé devant." },
+        { "id": "u07-l4-e4", "type": "predire", "notions": ["reduce-concat"], "question": "Que va afficher ce code ?", "code": ["const initiales = [\"Léa\", \"Sami\", \"Noé\"].reduce((acc, p) => acc + p[0], \"\");", "console.log(initiales);"], "explication": "On colle la première lettre de chaque prénom." },
         {
-          "id": "u06-l4-e5", "type": "corriger", "notions": ["reduce-concat", "valeur-depart"],
+          "id": "u07-l4-e5", "type": "corriger", "notions": ["reduce-concat", "valeur-depart"],
           "question": "`getAcronyme(mots)` doit retourner les premières lettres collées (`[\"Programmation\", \"Web\"]` → `\"PW\"`). Corrige-la.",
           "depart": ["function getAcronyme(mots) {", "  return mots.reduce((acc, mot) => acc + mot[0], 0);", "}"],
           "tests": { "fonction": "getAcronyme", "cas": [ { "args": [["Programmation", "Web"]], "attendu": "PW" }, { "args": [["Haute", "École", "Ingénierie", "Gestion"]], "attendu": "HÉIG" }, { "titre": "tableau vide", "args": [[]], "attendu": "" } ] },
@@ -241,7 +241,7 @@
       ]
     },
     {
-      "id": "u06-l5",
+      "id": "u07-l5",
       "titre": "Mélange : filter, map, reduce",
       "duree": 6,
       "notions": ["reduce", "enchainement", "filter", "map"],
@@ -265,13 +265,13 @@
         }
       ],
       "exercices": [
-        { "id": "u06-l5-e1", "type": "types-chaine", "notions": ["enchainement", "reduce"], "question": "Type après chaque maillon ?", "depart": "[3, 14, 15, 92]", "maillons": [".filter((n) => n > 10)", ".map((n) => n / 2)", ".reduce((acc, n) => acc + n, 0)"], "explication": "Tableau, tableau, puis un nombre : reduce réduit à une seule valeur." },
-        { "id": "u06-l5-e2", "type": "types-chaine", "notions": ["enchainement", "reduce-concat"], "question": "Et ici ?", "depart": "[\"Sator\", \"Arepo\"]", "maillons": [".map((w) => w[0])", ".reduce((acc, l) => acc + l, \"\")", ".length"], "explication": "Tableau de lettres, puis une chaîne (\"SA\"), puis sa longueur (un nombre)." },
-        { "id": "u06-l5-e3", "type": "predire", "notions": ["enchainement", "reduce"], "question": "Que va afficher ce code ?", "code": ["const prix = [10, 3, 25];", "console.log(prix.filter((p) => p >= 10).reduce((acc, p) => acc + p, 0));"], "explication": "On garde 10 et 25, puis on additionne." },
-        { "id": "u06-l5-e4", "type": "methode", "notions": ["reduce", "map-vs-filter"], "question": "« Retourner la somme des prix » :", "choix": ["reduce", "map", "filter", "forEach"], "bonne": 0, "explication": "Tout le tableau → une valeur." },
-        { "id": "u06-l5-e5", "type": "tri", "notions": ["reduce", "map-vs-filter", "foreach-vs-map"], "mono": true, "question": "Que retourne chaque méthode ?", "categories": ["un tableau", "une seule valeur", "undefined"], "items": [["map", 0], ["filter", 0], ["reduce", 1], ["forEach", 2]], "explication": "map et filter fabriquent des tableaux, reduce une valeur, forEach rien." },
+        { "id": "u07-l5-e1", "type": "types-chaine", "notions": ["enchainement", "reduce"], "question": "Type après chaque maillon ?", "depart": "[3, 14, 15, 92]", "maillons": [".filter((n) => n > 10)", ".map((n) => n / 2)", ".reduce((acc, n) => acc + n, 0)"], "explication": "Tableau, tableau, puis un nombre : reduce réduit à une seule valeur." },
+        { "id": "u07-l5-e2", "type": "types-chaine", "notions": ["enchainement", "reduce-concat"], "question": "Et ici ?", "depart": "[\"Sator\", \"Arepo\"]", "maillons": [".map((w) => w[0])", ".reduce((acc, l) => acc + l, \"\")", ".length"], "explication": "Tableau de lettres, puis une chaîne (\"SA\"), puis sa longueur (un nombre)." },
+        { "id": "u07-l5-e3", "type": "predire", "notions": ["enchainement", "reduce"], "question": "Que va afficher ce code ?", "code": ["const prix = [10, 3, 25];", "console.log(prix.filter((p) => p >= 10).reduce((acc, p) => acc + p, 0));"], "explication": "On garde 10 et 25, puis on additionne." },
+        { "id": "u07-l5-e4", "type": "methode", "notions": ["reduce", "map-vs-filter"], "question": "« Retourner la somme des prix » :", "choix": ["reduce", "map", "filter", "forEach"], "bonne": 0, "explication": "Tout le tableau → une valeur." },
+        { "id": "u07-l5-e5", "type": "tri", "notions": ["reduce", "map-vs-filter", "foreach-vs-map"], "mono": true, "question": "Que retourne chaque méthode ?", "categories": ["un tableau", "une seule valeur", "undefined"], "items": [["map", 0], ["filter", 0], ["reduce", 1], ["forEach", 2]], "explication": "map et filter fabriquent des tableaux, reduce une valeur, forEach rien." },
         {
-          "id": "u06-l5-e6", "type": "ecrire", "notions": ["reduce", "enchainement", "filter"],
+          "id": "u07-l5-e6", "type": "ecrire", "notions": ["reduce", "enchainement", "filter"],
           "question": "Écris `getSommeDesPairs(numbers)` qui retourne la somme des nombres **pairs** du tableau.",
           "depart": ["function getSommeDesPairs(numbers) {", "  ", "}", "", "console.log(getSommeDesPairs([3, 14, 15, 92]));"],
           "tests": { "fonction": "getSommeDesPairs", "cas": [ { "args": [[3, 14, 15, 92]], "attendu": 106 }, { "args": [[1, 3]], "attendu": 0 }, { "args": [[-2, 4]], "attendu": 2 }, { "titre": "tableau vide", "args": [[]], "attendu": 0 } ] },
@@ -288,54 +288,54 @@
   ],
   "jeux": [
     {
-      "id": "u06-porte-monnaie",
+      "id": "u07-porte-monnaie",
       "titre": "Le porte-monnaie",
       "description": "Suis le porte-monnaie tour après tour, et devine ce qu'il contient à la fin.",
       "tours": 8,
       "badge": "tresorier",
       "seuilBadge": 6,
       "questions": [
-        { "id": "u06-j1-1", "type": "predire", "notions": ["reduce"], "question": "Que va afficher ce code ?", "code": ["console.log([1, 2, 3, 4].reduce((acc, n) => acc + n, 0));"], "explication": "1 + 2 + 3 + 4." },
-        { "id": "u06-j1-2", "type": "predire", "notions": ["valeur-depart"], "question": "Que va afficher ce code ?", "code": ["console.log([1, 2, 3, 4].reduce((acc, n) => acc + n, 10));"], "explication": "Départ 10 : 10 + 10." },
-        { "id": "u06-j1-3", "type": "predire", "notions": ["reduce-max"], "question": "Que va afficher ce code ?", "code": ["console.log([7, 2, 9, 4].reduce((m, n) => n > m ? n : m));"], "explication": "Le plus grand." },
-        { "id": "u06-j1-4", "type": "predire", "notions": ["reduce-concat"], "question": "Que va afficher ce code ?", "code": ["console.log([\"Ro\", \"tas\"].reduce((acc, s) => acc + s, \"\"));"], "explication": "Les morceaux collés." },
-        { "id": "u06-j1-5", "type": "predire", "notions": ["reduce"], "question": "Que va afficher ce code ?", "code": ["console.log([2, 2, 2].reduce((acc, n) => acc * n, 1));"], "explication": "1 × 2 × 2 × 2." },
-        { "id": "u06-j1-6", "type": "reduce-pas", "notions": ["reduce"], "question": "Remplis les tours.", "tableau": [5, -3, 8], "nom": "numbers", "fonction": "(acc, n) => acc + n", "depart": 0, "explication": "5, puis 2, puis 10." },
-        { "id": "u06-j1-7", "type": "reduce-pas", "notions": ["reduce"], "question": "Compter les nombres plus grands que 10 :", "tableau": [3, 14, 15, 9], "nom": "numbers", "fonction": "(acc, n) => n > 10 ? acc + 1 : acc", "depart": 0, "explication": "Le porte-monnaie compte : +1 pour 14, +1 pour 15." },
-        { "id": "u06-j1-8", "type": "predire", "notions": ["reduce"], "question": "Que va afficher ce code ?", "code": ["const r = [3, 1].reduce((acc, n) => {", "  acc + n;", "}, 0);", "console.log(r);"], "explication": "Accolades sans `return` : acc devient undefined dès le tour 1." },
-        { "id": "u06-j1-9", "type": "predire", "notions": ["valeur-depart"], "question": "Que va afficher ce code ?", "code": ["console.log([].reduce((acc, n) => acc + n, 0));"], "explication": "Tableau vide : on retourne le départ." },
-        { "id": "u06-j1-10", "type": "predire", "notions": ["reduce-max", "valeur-depart"], "question": "Que va afficher ce code ?", "code": ["console.log([-1, -7].reduce((m, n) => n > m ? n : m, 0));"], "explication": "Le départ 0 gagne contre des négatifs : faux maximum." }
+        { "id": "u07-j1-1", "type": "predire", "notions": ["reduce"], "question": "Que va afficher ce code ?", "code": ["console.log([1, 2, 3, 4].reduce((acc, n) => acc + n, 0));"], "explication": "1 + 2 + 3 + 4." },
+        { "id": "u07-j1-2", "type": "predire", "notions": ["valeur-depart"], "question": "Que va afficher ce code ?", "code": ["console.log([1, 2, 3, 4].reduce((acc, n) => acc + n, 10));"], "explication": "Départ 10 : 10 + 10." },
+        { "id": "u07-j1-3", "type": "predire", "notions": ["reduce-max"], "question": "Que va afficher ce code ?", "code": ["console.log([7, 2, 9, 4].reduce((m, n) => n > m ? n : m));"], "explication": "Le plus grand." },
+        { "id": "u07-j1-4", "type": "predire", "notions": ["reduce-concat"], "question": "Que va afficher ce code ?", "code": ["console.log([\"Ro\", \"tas\"].reduce((acc, s) => acc + s, \"\"));"], "explication": "Les morceaux collés." },
+        { "id": "u07-j1-5", "type": "predire", "notions": ["reduce"], "question": "Que va afficher ce code ?", "code": ["console.log([2, 2, 2].reduce((acc, n) => acc * n, 1));"], "explication": "1 × 2 × 2 × 2." },
+        { "id": "u07-j1-6", "type": "reduce-pas", "notions": ["reduce"], "question": "Remplis les tours.", "tableau": [5, -3, 8], "nom": "numbers", "fonction": "(acc, n) => acc + n", "depart": 0, "explication": "5, puis 2, puis 10." },
+        { "id": "u07-j1-7", "type": "reduce-pas", "notions": ["reduce"], "question": "Compter les nombres plus grands que 10 :", "tableau": [3, 14, 15, 9], "nom": "numbers", "fonction": "(acc, n) => n > 10 ? acc + 1 : acc", "depart": 0, "explication": "Le porte-monnaie compte : +1 pour 14, +1 pour 15." },
+        { "id": "u07-j1-8", "type": "predire", "notions": ["reduce"], "question": "Que va afficher ce code ?", "code": ["const r = [3, 1].reduce((acc, n) => {", "  acc + n;", "}, 0);", "console.log(r);"], "explication": "Accolades sans `return` : acc devient undefined dès le tour 1." },
+        { "id": "u07-j1-9", "type": "predire", "notions": ["valeur-depart"], "question": "Que va afficher ce code ?", "code": ["console.log([].reduce((acc, n) => acc + n, 0));"], "explication": "Tableau vide : on retourne le départ." },
+        { "id": "u07-j1-10", "type": "predire", "notions": ["reduce-max", "valeur-depart"], "question": "Que va afficher ce code ?", "code": ["console.log([-1, -7].reduce((m, n) => n > m ? n : m, 0));"], "explication": "Le départ 0 gagne contre des négatifs : faux maximum." }
       ]
     }
   ],
   "quiz": {
     "titre": "Quiz : reduce",
     "questions": [
-      { "id": "u06-q1", "type": "reduce-pas", "notions": ["reduce"], "question": "Remplis les tours.", "tableau": [92, 65, 35], "nom": "numbers", "fonction": "(acc, n) => acc + n", "depart": 0, "explication": "92, 157, 192." },
-      { "id": "u06-q2", "type": "pointer-code", "notions": ["reduce"], "question": "Touche l'élément du tour (la pièce).", "code": ["const total = numbers.reduce((acc, ⟦n⟧) => acc + n, 0);"], "explication": "Deuxième paramètre : l'élément." },
-      { "id": "u06-q3", "type": "qcm", "notions": ["valeur-depart"], "question": "Quelle valeur de départ pour coller des mots ?", "choix": ["\"\"", "0", "1", "[]"], "bonne": 0, "mono": true, "explication": "Une chaîne vide." },
-      { "id": "u06-q4", "type": "predire", "notions": ["reduce-max"], "question": "Que va afficher ce code ?", "code": ["console.log([3, 14, 15, 92, 65].reduce((m, n) => n > m ? n : m));"], "explication": "92." },
-      { "id": "u06-q5", "type": "predire", "notions": ["valeur-depart"], "question": "Que va afficher ce code ?", "code": ["console.log([\"x\", \"y\"].reduce((acc, l) => acc + l, 0));"], "explication": "Le 0 est collé devant." },
-      { "id": "u06-q6", "type": "vf", "notions": ["valeur-depart"], "question": "`[].reduce((acc, n) => acc + n)` retourne 0.", "bonne": false, "explication": "Sans départ, sur un tableau vide, reduce plante." },
-      { "id": "u06-q7", "type": "qcm", "notions": ["reduce"], "question": "Dans `(acc, n) => acc + n`, que devient la valeur retournée ?", "choix": ["Le acc du tour suivant", "Le n du tour suivant", "Un élément d'un nouveau tableau", "Elle est affichée"], "bonne": 0, "explication": "C'est le cœur de reduce." },
-      { "id": "u06-q8", "type": "methode", "notions": ["reduce", "map-vs-filter"], "question": "« Retourner le plus grand nombre » :", "choix": ["reduce", "map", "filter", "forEach"], "bonne": 0, "explication": "Tout le tableau → une valeur." },
-      { "id": "u06-q9", "type": "bug", "notions": ["reduce-max", "valeur-depart"], "question": "Ce maximum se trompe pour `[-4, -1]`. Quelle ligne ?", "code": ["function getMax(numbers) {", "  return numbers.reduce((m, n) => n > m ? n : m, 0);", "}"], "ligne": 2, "choix": ["Le départ 0 bat tous les négatifs : il faut l'enlever", "Il faut `n < m`", "Il faut `map`", "Il manque `return`"], "bonne": 0, "explication": "Sans départ, on commence avec le premier nombre." },
-      { "id": "u06-q10", "type": "types-chaine", "notions": ["enchainement"], "question": "Type après chaque maillon ?", "depart": "[1, 2, 3]", "maillons": [".map((n) => n * 2)", ".reduce((acc, n) => acc + n, 0)", " > 10"], "explication": "Tableau, nombre (12), booléen." },
-      { "id": "u06-q11", "type": "predire", "notions": ["reduce", "enchainement"], "question": "Que va afficher ce code ?", "code": ["const notes = [4, 6];", "console.log(notes.reduce((acc, n) => acc + n, 0) / notes.length);"], "explication": "La moyenne : 10 / 2." },
-      { "id": "u06-q12", "type": "reduce-pas", "notions": ["reduce-concat"], "question": "Remplis les tours.", "tableau": ["Te", "n", "et"], "nom": "morceaux", "fonction": "(acc, m) => acc + m", "depart": "", "explication": "Te, Ten, Tenet." },
-      { "id": "u06-q13", "type": "predire", "notions": ["reduce"], "question": "Que va afficher ce code ?", "code": ["console.log([1, 2, 3].reduce((acc, n) => acc + n * n, 0));"], "explication": "1 + 4 + 9 : la somme des carrés." },
-      { "id": "u06-q14", "type": "qcm", "notions": ["reduce"], "question": "Laquelle donne la somme de `prix` ?", "choix": ["prix.reduce((acc, p) => acc + p, 0)", "prix.reduce((p, acc) => acc + p)", "prix.map((p) => p + p)", "prix.forEach((p) => total + p)"], "bonne": 0, "mono": true, "explication": "La 2e inverse les paramètres (et plante sur un tableau vide), la 3e double chaque prix, la 4e ne retourne rien." },
-      { "id": "u06-q15", "type": "predire", "notions": ["reduce", "filter"], "question": "Que va afficher ce code ?", "code": ["console.log([3, 14, 15].filter((n) => n > 100).reduce((acc, n) => acc + n, 0));"], "explication": "Aucun nombre ne passe le filtre : la somme d'un tableau vide, avec départ 0, vaut 0." }
+      { "id": "u07-q1", "type": "reduce-pas", "notions": ["reduce"], "question": "Remplis les tours.", "tableau": [92, 65, 35], "nom": "numbers", "fonction": "(acc, n) => acc + n", "depart": 0, "explication": "92, 157, 192." },
+      { "id": "u07-q2", "type": "pointer-code", "notions": ["reduce"], "question": "Touche l'élément du tour (la pièce).", "code": ["const total = numbers.reduce((acc, ⟦n⟧) => acc + n, 0);"], "explication": "Deuxième paramètre : l'élément." },
+      { "id": "u07-q3", "type": "qcm", "notions": ["valeur-depart"], "question": "Quelle valeur de départ pour coller des mots ?", "choix": ["\"\"", "0", "1", "[]"], "bonne": 0, "mono": true, "explication": "Une chaîne vide." },
+      { "id": "u07-q4", "type": "predire", "notions": ["reduce-max"], "question": "Que va afficher ce code ?", "code": ["console.log([3, 14, 15, 92, 65].reduce((m, n) => n > m ? n : m));"], "explication": "92." },
+      { "id": "u07-q5", "type": "predire", "notions": ["valeur-depart"], "question": "Que va afficher ce code ?", "code": ["console.log([\"x\", \"y\"].reduce((acc, l) => acc + l, 0));"], "explication": "Le 0 est collé devant." },
+      { "id": "u07-q6", "type": "vf", "notions": ["valeur-depart"], "question": "`[].reduce((acc, n) => acc + n)` retourne 0.", "bonne": false, "explication": "Sans départ, sur un tableau vide, reduce plante." },
+      { "id": "u07-q7", "type": "qcm", "notions": ["reduce"], "question": "Dans `(acc, n) => acc + n`, que devient la valeur retournée ?", "choix": ["Le acc du tour suivant", "Le n du tour suivant", "Un élément d'un nouveau tableau", "Elle est affichée"], "bonne": 0, "explication": "C'est le cœur de reduce." },
+      { "id": "u07-q8", "type": "methode", "notions": ["reduce", "map-vs-filter"], "question": "« Retourner le plus grand nombre » :", "choix": ["reduce", "map", "filter", "forEach"], "bonne": 0, "explication": "Tout le tableau → une valeur." },
+      { "id": "u07-q9", "type": "bug", "notions": ["reduce-max", "valeur-depart"], "question": "Ce maximum se trompe pour `[-4, -1]`. Quelle ligne ?", "code": ["function getMax(numbers) {", "  return numbers.reduce((m, n) => n > m ? n : m, 0);", "}"], "ligne": 2, "choix": ["Le départ 0 bat tous les négatifs : il faut l'enlever", "Il faut `n < m`", "Il faut `map`", "Il manque `return`"], "bonne": 0, "explication": "Sans départ, on commence avec le premier nombre." },
+      { "id": "u07-q10", "type": "types-chaine", "notions": ["enchainement"], "question": "Type après chaque maillon ?", "depart": "[1, 2, 3]", "maillons": [".map((n) => n * 2)", ".reduce((acc, n) => acc + n, 0)", " > 10"], "explication": "Tableau, nombre (12), booléen." },
+      { "id": "u07-q11", "type": "predire", "notions": ["reduce", "enchainement"], "question": "Que va afficher ce code ?", "code": ["const notes = [4, 6];", "console.log(notes.reduce((acc, n) => acc + n, 0) / notes.length);"], "explication": "La moyenne : 10 / 2." },
+      { "id": "u07-q12", "type": "reduce-pas", "notions": ["reduce-concat"], "question": "Remplis les tours.", "tableau": ["Te", "n", "et"], "nom": "morceaux", "fonction": "(acc, m) => acc + m", "depart": "", "explication": "Te, Ten, Tenet." },
+      { "id": "u07-q13", "type": "predire", "notions": ["reduce"], "question": "Que va afficher ce code ?", "code": ["console.log([1, 2, 3].reduce((acc, n) => acc + n * n, 0));"], "explication": "1 + 4 + 9 : la somme des carrés." },
+      { "id": "u07-q14", "type": "qcm", "notions": ["reduce"], "question": "Laquelle donne la somme de `prix` ?", "choix": ["prix.reduce((acc, p) => acc + p, 0)", "prix.reduce((p, acc) => acc + p)", "prix.map((p) => p + p)", "prix.forEach((p) => total + p)"], "bonne": 0, "mono": true, "explication": "La 2e inverse les paramètres (et plante sur un tableau vide), la 3e double chaque prix, la 4e ne retourne rien." },
+      { "id": "u07-q15", "type": "predire", "notions": ["reduce", "filter"], "question": "Que va afficher ce code ?", "code": ["console.log([3, 14, 15].filter((n) => n > 100).reduce((acc, n) => acc + n, 0));"], "explication": "Aucun nombre ne passe le filtre : la somme d'un tableau vide, avec départ 0, vaut 0." }
     ]
   },
   "boss": [
     {
-      "id": "u06-b1",
+      "id": "u07-b1",
       "titre": "La somme des nombres",
       "source": "TP Tableaux · nombres, exercice 6",
       "notions": ["reduce", "valeur-depart"],
       "enonce": "À partir du tableau `numbers` : **retourner la somme des nombres**.\n\nÉcris une fonction `getSum(numbers)`.",
-      "regles": ["La structure de données initiale ne doit pas être modifiée.", "Vos solutions se doivent de rester fonctionnelles même si le tableau initial diffère (tableau vide compris : sa somme vaut 0).", "Entraîne-toi avec `reduce`."],
+      "regles": ["La structure de données initiale ne doit pas être modifiée (structure immutable). Utilisez des méthodes qui retournent un nouveau tableau, comme toSorted, plutôt que des méthodes qui modifient le tableau d'origine, comme sort.", "Vos solutions doivent rester fonctionnelles même si le contenu du tableau initial diffère (tableau vide compris : sa somme vaut 0).", "Entraîne-toi avec `reduce`."],
       "donnees": { "numbers": [3, 14, 15, 92, 65, 35, 89, 79, 32, 38] },
       "depart": ["function getSum(numbers) {", "  ", "}", "", "console.log(getSum(numbers));"],
       "tests": {
@@ -359,15 +359,15 @@
         { "code": "function getSum(numbers) {\n  return numbers.reduce((acc, n) => { acc + n }, 0);\n}", "attendu": "echec" },
         { "code": "function getSum(numbers) {\n  let total = 0;\n  numbers.forEach((n) => total = total + n);\n  console.log(total);\n}", "attendu": "echec", "diagnostic": "return-vs-log" }
       ],
-      "explication": "Exercice 6 du TP. (La solution du prof oublie la valeur de départ : elle planterait sur un tableau vide. La tienne, non.)"
+      "explication": "Exercice 6 du TP. Grâce à la valeur de départ 0, ta solution marche aussi avec un tableau vide."
     },
     {
-      "id": "u06-b2",
+      "id": "u07-b2",
       "titre": "Le plus grand nombre",
       "source": "TP Tableaux · nombres, exercice 7",
       "notions": ["reduce-max", "valeur-depart", "ternaire"],
       "enonce": "À partir du tableau `numbers` : **retourner le plus grand nombre**.\n\nÉcris une fonction `getLargest(numbers)`. Le tableau contient toujours au moins un nombre.",
-      "regles": ["La structure de données initiale ne doit pas être modifiée (pas de `sort` !).", "Vos solutions se doivent de rester fonctionnelles même si le tableau initial diffère, y compris avec uniquement des nombres négatifs."],
+      "regles": ["La structure de données initiale ne doit pas être modifiée (structure immutable). Utilisez des méthodes qui retournent un nouveau tableau, comme toSorted, plutôt que des méthodes qui modifient le tableau d'origine, comme sort.", "Vos solutions doivent rester fonctionnelles même si le contenu du tableau initial diffère, y compris avec uniquement des nombres négatifs."],
       "donnees": { "numbers": [3, 14, 15, 92, 65, 35, 89, 79, 32, 38] },
       "depart": ["function getLargest(numbers) {", "  ", "}", "", "console.log(getLargest(numbers));"],
       "tests": {
@@ -395,12 +395,12 @@
       "explication": "Exercice 7 du TP. Autre solution juste, après l'unité sur le spread : `Math.max(...numbers)`."
     },
     {
-      "id": "u06-b3",
+      "id": "u07-b3",
       "titre": "La concaténation de tous les mots",
       "source": "TP Tableaux · chaînes, exercice 6",
       "notions": ["reduce-concat", "valeur-depart"],
       "enonce": "À partir du tableau `strings` : **retourner la concaténation de tous les mots**.\n\nÉcris une fonction `concatAll(strings)`.",
-      "regles": ["La structure de données initiale ne doit pas être modifiée.", "Vos solutions se doivent de rester fonctionnelles même si le tableau initial diffère (tableau vide compris : le résultat est alors une chaîne vide).", "Entraîne-toi avec `reduce` (tu verras `join` à l'unité Chaînes)."],
+      "regles": ["La structure de données initiale ne doit pas être modifiée (structure immutable). Utilisez des méthodes qui retournent un nouveau tableau, comme toSorted, plutôt que des méthodes qui modifient le tableau d'origine, comme sort.", "Vos solutions doivent rester fonctionnelles même si le contenu du tableau initial diffère (tableau vide compris : le résultat est alors une chaîne vide).", "Entraîne-toi avec `reduce` (tu verras `join` à l'unité Chaînes)."],
       "donnees": { "strings": ["Sator", "Arepo", "Tenet", "Opera", "Rotas"] },
       "depart": ["function concatAll(strings) {", "  ", "}", "", "console.log(concatAll(strings));"],
       "tests": {

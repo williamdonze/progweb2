@@ -102,7 +102,7 @@
           "titre": "La division ne coupe pas",
           "texte": "`7 / 2` vaut `3.5`. Pour garder la partie entière, on arrondit vers le bas avec `Math.floor`.",
           "code": ["console.log(7 / 2);", "console.log(Math.floor(7 / 2));", "console.log(Math.round(3.5));"],
-          "astuce": "On s'en servira pour trouver **l'indice du milieu** d'un tableau (unité 4) : `Math.floor((longueur - 1) / 2)`."
+          "astuce": "On s'en servira pour trouver **l'indice du milieu** d'un tableau (unité 5) : `Math.floor((longueur - 1) / 2)`."
         },
         {
           "titre": "Le plus grand, le plus petit",
