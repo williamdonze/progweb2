@@ -325,10 +325,13 @@ main{padding-block:20px 110px}
 .chip.ko{border-color:var(--ko);background:var(--ko-soft);color:var(--ko-ink)}
 .parsons .slots{overflow-x:auto}
 .parsons .chip{white-space:pre;font-family:var(--f-code);font-size:14px;font-weight:600;padding:8px 10px}
+.parsons .pool .chip,.parsons .slots .chip{white-space:pre;max-width:none}   /* programme à reconstituer : l'indentation compte, on fait défiler plutôt que de couper */
 .parsons .pool{flex-direction:column;align-items:stretch}
-.assoc{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.assoc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
 .assoc .col{display:grid;gap:10px;align-content:start;min-width:0}
-.assoc .chip{width:100%;min-height:56px;text-align:center;display:grid;place-items:center;font-size:14px;overflow-wrap:anywhere}
+.assoc .chip{width:100%;min-width:0;min-height:56px;text-align:center;display:grid;place-items:center;font-size:14px;overflow-wrap:anywhere}
+/* étiquettes en police de code dans des colonnes étroites : elles passent à la ligne au lieu de déborder sur la colonne voisine */
+.assoc .chip.c,.cat .chip.c,.pool .chip.c,.pool.c .chip{white-space:pre-wrap;overflow-wrap:anywhere;min-width:0;max-width:100%}
 .assoc .chip[data-pair]{color:#fff;border-color:transparent}
 .cats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px}
 .cat{border:2px dashed var(--line);border-radius:16px;padding:8px;min-height:96px;display:flex;flex-direction:column;gap:6px;background:color-mix(in srgb,var(--paper) 60%,transparent);transition:border-color .15s,background .15s}
