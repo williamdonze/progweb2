@@ -81,10 +81,10 @@ async function testerTout(filtreUnite){
     }
     // exemples des cartes et des fiches
     const exemples = [];
-    u.lecons.forEach(l => l.cartes.forEach((c, k) => { if (c.code && c.executable !== false) exemples.push([`${l.id} carte ${k + 1}`, lignes(c.code), c.erreurVoulue, c.donnees]); }));
-    u.fiches.forEach(f => (f.exemples || []).forEach((ex, k) => exemples.push([`fiche ${f.id} ex ${k + 1}`, lignes(ex.code), ex.erreurVoulue || /erreur/i.test(ex.titre || ""), null])));
-    for (const [lieu, code, voulue, donnees] of exemples) {
-      const r = await executer({ code, donnees: donnees || null });
+    u.lecons.forEach(l => l.cartes.forEach((c, k) => { if (c.code && c.executable !== false) exemples.push([`${l.id} carte ${k + 1}`, lignes(c.code), c.erreurVoulue, c.donnees, c.dom]); }));
+    u.fiches.forEach(f => (f.exemples || []).forEach((ex, k) => exemples.push([`fiche ${f.id} ex ${k + 1}`, lignes(ex.code), ex.erreurVoulue || /erreur/i.test(ex.titre || ""), null, ex.dom])));
+    for (const [lieu, code, voulue, donnees, dom] of exemples) {
+      const r = dom ? await executerDom({ code, dom }) : await executer({ code, donnees: donnees || null });
       stats.exemples++;
       if (r.erreur && !voulue) erreurs.push(`${u.id} · ${lieu} : l'exemple plante (${r.erreur.message.slice(0, 120)})`);
       if (!r.erreur && voulue) avert.push(`${u.id} · ${lieu} : erreur annoncée mais le code ne plante pas`);

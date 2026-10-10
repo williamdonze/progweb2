@@ -1,0 +1,1681 @@
+{
+  "id": "u15",
+  "titre": "DOM : tirer une main",
+  "sousTitre": "TP DOM · exercices 4 à 6",
+  "objectif": "Convertir une NodeList en tableau, cloner des éléments avec leurs enfants, retirer un attribut, remplacer le contenu d'un conteneur en une opération, et assembler tout le TP DOM.",
+  "icone": "🂠",
+  "fiches": [
+    {
+      "id": "nodelist-tableau",
+      "titre": "De la NodeList au tableau",
+      "icone": "[...]",
+      "resume": "`const deck = [...document.querySelectorAll(\".deck playing-card\")];` : le spread vide la NodeList dans un **vrai tableau**, avec map, filter, slice…",
+      "analogie": "La NodeList est une **pile de cartes** posée sur la table : on peut la compter et la parcourir, c'est tout. Le spread range les cartes dans une **boîte d'œufs** (un tableau), avec tous ses outils.",
+      "texte": "- Une NodeList a `length`, `forEach` et les indices `[0]`, mais **pas** `map`, `filter`, `slice`, `toSorted`…\n- `[...liste]` la convertit en tableau (relis [[spread]]).\n- Le TP demande de faire cette récupération **une seule fois**, au démarrage du script, dans un tableau nommé `deck` : les clics réutilisent ce tableau.\n\nLes éléments du tableau sont les **vraies** cartes de la page (pas des copies) : les déplacer les enlèverait du paquet. D'où les clones.",
+      "exemples": [
+        {
+          "code": [
+            "const list = document.querySelectorAll(\".deck playing-card\");",
+            "const deck = [...list];",
+            "console.log(list.length, deck.length);",
+            "console.log(deck.slice(0, 3).map((card) => card.id));"
+          ],
+          "dom": {
+            "page": "cards"
+          }
+        }
+      ],
+      "pieges": [
+        "`list.map(…)` sur une NodeList : « list.map is not a function »."
+      ]
+    },
+    {
+      "id": "clonenode",
+      "titre": "Cloner un élément",
+      "icone": "⎘",
+      "resume": "`card.cloneNode(true)` fabrique une **copie** de la carte **avec ses enfants** (les spans du rang et du symbole). La copie n'est pas encore dans la page.",
+      "analogie": "Une **photocopie** de la carte : l'originale reste dans le paquet. Avec `false`, on ne photocopierait que le cadre, sans le dessin.",
+      "texte": "- `cloneNode(true)` : copie profonde (l'élément et tout ce qu'il contient).\n- `cloneNode()` ou `cloneNode(false)` : l'élément seul, **vide**.\n- La copie garde l'`id`, les classes et les attributs. Deux éléments avec le même id dans une page, c'est interdit : on retire l'id du clone avec `clone.removeAttribute(\"id\")`.\n- Si la carte d'origine était sélectionnée, le clone l'est aussi : `clone.classList.remove(\"selected\")`.\n\nUn clone n'apparaît à l'écran qu'une fois **inséré** dans la page (par exemple avec replaceChildren).",
+      "exemples": [
+        {
+          "code": [
+            "const ace = document.querySelector(\"#SPADE-ACE\");",
+            "const deep = ace.cloneNode(true);",
+            "const empty = ace.cloneNode();",
+            "console.log(deep.children.length, empty.children.length);",
+            "console.log(deep.id);",
+            "deep.removeAttribute(\"id\");",
+            "console.log(deep.id === \"\");"
+          ],
+          "dom": {
+            "page": "cards"
+          }
+        }
+      ],
+      "pieges": [
+        "`cloneNode()` sans true : la carte clonée est vide.",
+        "Garder l'id : deux éléments avec le même id."
+      ]
+    },
+    {
+      "id": "replacechildren",
+      "titre": "Remplacer le contenu : replaceChildren",
+      "icone": "⇆",
+      "resume": "`handEl.replaceChildren(...handCards)` retire tout ce que contient `handEl` et met à la place les éléments donnés, **en une seule opération**.",
+      "analogie": "On **débarrasse la table** et on pose la nouvelle main, d'un seul geste. Pas d'ancienne carte oubliée, pas de main qui s'allonge à chaque tirage.",
+      "texte": "- `el.replaceChildren(a, b, c)` : el contient maintenant a, b et c (et plus rien d'autre).\n- Avec un tableau : le spread sort les éléments de la boîte, `el.replaceChildren(...tableau)`.\n- `el.replaceChildren()` sans argument : vide l'élément.\n\nÀ chaque clic sur Draw a hand, la nouvelle main **remplace** l'ancienne : c'est pour cela que le TP utilise replaceChildren plutôt qu'un ajout.",
+      "exemples": [
+        {
+          "code": [
+            "const handEl = document.querySelector(\"#hand\");",
+            "const aces = [...document.querySelectorAll(\".rank-ace\")].map((card) => card.cloneNode(true));",
+            "aces.forEach((clone) => clone.removeAttribute(\"id\"));",
+            "handEl.replaceChildren(...aces);",
+            "console.log(handEl.children.length);"
+          ],
+          "dom": {
+            "page": "cards"
+          }
+        }
+      ],
+      "pieges": [
+        "`replaceChildren(handCards)` sans les trois points : on donne la boîte, pas les cartes. Le navigateur la transforme en texte, et la main affiche « [object HTMLElement],… »."
+      ]
+    }
+  ],
+  "lecons": [
+    {
+      "id": "u15-l1",
+      "titre": "Le paquet en tableau",
+      "duree": 5,
+      "notions": [
+        "nodelist-tableau",
+        "spread"
+      ],
+      "cartes": [
+        {
+          "titre": "Une pile, pas une boîte",
+          "texte": "`querySelectorAll` retourne une NodeList : on peut la compter et la parcourir, mais pas `slice` ni `map`.",
+          "code": [
+            "const list = document.querySelectorAll(\".deck playing-card\");",
+            "console.log(list.length);",
+            "list.slice(0, 5);"
+          ],
+          "dom": {
+            "page": "cards"
+          },
+          "erreurVoulue": true,
+          "fiche": "nodelist-tableau"
+        },
+        {
+          "titre": "Le spread range la pile dans une boîte",
+          "texte": "`[...list]` : un vrai tableau, avec toutes les méthodes des TP précédents.",
+          "code": [
+            "const deck = [...document.querySelectorAll(\".deck playing-card\")];",
+            "console.log(deck.length);",
+            "console.log(deck.slice(0, 5).map((card) => card.id));"
+          ],
+          "dom": {
+            "page": "cards"
+          },
+          "analogie": "Comme pour sortir les œufs d'une boîte : les trois points sortent les cartes de la pile pour les ranger dans un tableau."
+        },
+        {
+          "titre": "Une seule fois, au démarrage",
+          "texte": "Le TP : « Au démarrage du script, récupérer les 52 éléments du paquet d'origine et les convertir en un tableau nommé `deck`. » Les clics réutiliseront ce tableau, sans refaire la recherche."
+        }
+      ],
+      "exercices": [
+        {
+          "id": "u15-l1-e1",
+          "type": "qcm",
+          "notions": [
+            "nodelist-tableau"
+          ],
+          "question": "Que donne `document.querySelectorAll(\".heart\").map((c) => c.id)` ?",
+          "choix": [
+            "Une erreur : une NodeList n'a pas de map",
+            "Les 13 id des cœurs",
+            "Un tableau vide",
+            "undefined"
+          ],
+          "bonne": 0,
+          "explication": "Il faut d'abord la convertir : `[...document.querySelectorAll(\".heart\")].map(…)`."
+        },
+        {
+          "id": "u15-l1-e2",
+          "type": "tri",
+          "notions": [
+            "nodelist-tableau"
+          ],
+          "mono": true,
+          "question": "Disponible sur une NodeList ?",
+          "categories": [
+            "oui",
+            "non (il faut un tableau)"
+          ],
+          "items": [
+            [
+              "list.length",
+              0
+            ],
+            [
+              "list.forEach(…)",
+              0
+            ],
+            [
+              "list.map(…)",
+              1
+            ],
+            [
+              "list.slice(0, 5)",
+              1
+            ]
+          ],
+          "explication": "length, forEach et les indices : oui. Le reste : après `[...list]`."
+        },
+        {
+          "id": "u15-l1-e3",
+          "type": "ecrire",
+          "notions": [
+            "nodelist-tableau",
+            "spread",
+            "map"
+          ],
+          "question": "Crée le tableau `deck` des 52 cartes du paquet, puis affiche sa longueur, puis l'**id de la dernière carte**.",
+          "dom": {
+            "page": "cards"
+          },
+          "depart": [
+            "",
+            ""
+          ],
+          "tests": {
+            "etapes": [
+              {
+                "titre": "Au chargement de la page",
+                "verifier": [
+                  {
+                    "sortie": [
+                      "52",
+                      "DIAMOND-KING"
+                    ],
+                    "message": "La console doit afficher 52, puis DIAMOND-KING."
+                  }
+                ]
+              }
+            ],
+            "obligatoire": [
+              "querySelectorAll"
+            ]
+          },
+          "indices": [
+            "Le spread : `[...document.querySelectorAll(…)]`.",
+            "La dernière carte : `deck.at(-1)` ou `deck[deck.length - 1]`, puis `.id`.",
+            {
+              "code": "const deck = [...document.querySelectorAll(\"___\")];\nconsole.log(deck.length);\nconsole.log(___);"
+            }
+          ],
+          "solution": [
+            "const deck = [...document.querySelectorAll(\".deck playing-card\")];",
+            "console.log(deck.length);",
+            "console.log(deck.at(-1).id);"
+          ],
+          "erreursTypiques": [
+            {
+              "code": "const deck = document.querySelectorAll(\".deck playing-card\");\nconsole.log(deck.length);\nconsole.log(deck.at(-1).id);",
+              "attendu": "erreur"
+            },
+            {
+              "code": "const deck = [...document.querySelectorAll(\".deck playing-card\")];\nconsole.log(deck.length);\nconsole.log(deck.at(-1));",
+              "attendu": "echec"
+            }
+          ],
+          "explication": "Les cartes sont rangées cœur, pique, trèfle, carreau ; la dernière est le roi de carreau."
+        }
+      ]
+    },
+    {
+      "id": "u15-l2",
+      "titre": "Cloner sans abîmer le paquet",
+      "duree": 7,
+      "notions": [
+        "clonenode",
+        "replacechildren"
+      ],
+      "cartes": [
+        {
+          "titre": "Déplacer n'est pas copier",
+          "texte": "Si on met une **vraie** carte du paquet dans `#hand`, elle **quitte** le paquet : un élément ne peut être qu'à un seul endroit.",
+          "code": [
+            "const handEl = document.querySelector(\"#hand\");",
+            "handEl.replaceChildren(document.querySelector(\"#SPADE-ACE\"));",
+            "console.log(document.querySelectorAll(\".deck playing-card\").length);"
+          ],
+          "dom": {
+            "page": "cards"
+          },
+          "piege": "Le TP : afficher la main « sans déplacer ni modifier » les cartes du paquet."
+        },
+        {
+          "titre": "Une photocopie avec le dessin",
+          "texte": "`cloneNode(true)` copie la carte **et ses enfants** (les spans). Sans `true`, la copie est vide.",
+          "code": [
+            "const ace = document.querySelector(\"#SPADE-ACE\");",
+            "console.log(ace.cloneNode(true).children.length);",
+            "console.log(ace.cloneNode().children.length);"
+          ],
+          "dom": {
+            "page": "cards"
+          },
+          "analogie": "Une photocopie : l'originale reste dans le paquet.",
+          "fiche": "clonenode"
+        },
+        {
+          "titre": "Pas deux fois le même id",
+          "texte": "Le clone a le même id que l'original : on le retire. On retire aussi `selected`, au cas où la carte d'origine était sélectionnée.",
+          "code": [
+            "const ace = document.querySelector(\"#SPADE-ACE\");",
+            "ace.classList.add(\"selected\");",
+            "const clone = ace.cloneNode(true);",
+            "clone.removeAttribute(\"id\");",
+            "clone.classList.remove(\"selected\");",
+            "document.querySelector(\"#hand\").replaceChildren(clone);",
+            "console.log(document.querySelectorAll(\"#SPADE-ACE\").length);"
+          ],
+          "dom": {
+            "page": "cards"
+          }
+        },
+        {
+          "titre": "Remplacer, pas ajouter",
+          "texte": "`replaceChildren(...cards)` débarrasse la table et pose les nouvelles cartes, d'un seul geste. Le spread sort les cartes du tableau.",
+          "code": [
+            "const handEl = document.querySelector(\"#hand\");",
+            "const kings = [...document.querySelectorAll(\".rank-king\")].map((card) => card.cloneNode(true));",
+            "kings.forEach((clone) => clone.removeAttribute(\"id\"));",
+            "handEl.replaceChildren(...kings);",
+            "handEl.replaceChildren(...kings.slice(0, 2));",
+            "console.log(handEl.children.length);"
+          ],
+          "dom": {
+            "page": "cards"
+          },
+          "fiche": "replacechildren"
+        }
+      ],
+      "exercices": [
+        {
+          "id": "u15-l2-e1",
+          "type": "qcm",
+          "notions": [
+            "clonenode"
+          ],
+          "question": "Pourquoi `cloneNode(true)` et pas `cloneNode()` ?",
+          "choix": [
+            "Pour copier aussi les enfants (le rang et le symbole de la carte)",
+            "Pour que la copie apparaisse tout de suite dans la page",
+            "Pour retirer l'id automatiquement",
+            "Pour que la copie soit sélectionnée"
+          ],
+          "bonne": 0,
+          "explication": "true : copie profonde, avec les spans."
+        },
+        {
+          "id": "u15-l2-e2",
+          "type": "qcm",
+          "notions": [
+            "clonenode"
+          ],
+          "question": "Pourquoi retirer l'attribut id du clone ?",
+          "choix": [
+            "Pour ne pas avoir deux éléments avec le même id",
+            "Parce qu'un clone ne peut pas avoir d'id",
+            "Pour que le CSS s'applique",
+            "Pour pouvoir le cloner à nouveau"
+          ],
+          "bonne": 0,
+          "explication": "Un id est unique dans la page."
+        },
+        {
+          "id": "u15-l2-e3",
+          "type": "bug",
+          "notions": [
+            "replacechildren",
+            "spread"
+          ],
+          "question": "La main affiche « [object HTMLElement],[object HTMLElement],… » au lieu des cartes. Quelle ligne corriger ?",
+          "code": [
+            "const handEl = document.querySelector(\"#hand\");",
+            "const handCards = [first, second, third];",
+            "handEl.replaceChildren(handCards);"
+          ],
+          "ligne": 3,
+          "choix": [
+            "Sortir les cartes du tableau : `replaceChildren(...handCards)`",
+            "Il faut appendChild",
+            "Il faut `handCards.cloneNode(true)`",
+            "handEl doit être un tableau"
+          ],
+          "bonne": 0,
+          "explication": "replaceChildren attend des éléments, pas une boîte d'éléments : sans les trois points, le tableau est transformé en texte."
+        },
+        {
+          "id": "u15-l2-e4",
+          "type": "ordre",
+          "notions": [
+            "clonenode",
+            "replacechildren"
+          ],
+          "question": "Remets dans l'ordre la fabrication d'une carte de la main.",
+          "items": [
+            "Cloner la carte avec cloneNode(true)",
+            "Retirer l'id du clone avec removeAttribute",
+            "Retirer la classe selected du clone",
+            "Placer les clones dans #hand avec replaceChildren"
+          ],
+          "explication": "C'est l'exercice 5 du TP."
+        },
+        {
+          "id": "u15-l2-e5",
+          "type": "ecrire",
+          "notions": [
+            "clonenode",
+            "replacechildren"
+          ],
+          "question": "Affiche dans la main (`#hand`) une **copie** de la **dame de pique** (`#SPADE-QUEEN`), avec son rang et son symbole, **sans id**. La dame d'origine reste dans le paquet.",
+          "dom": {
+            "page": "cards"
+          },
+          "depart": [
+            "const handEl = document.querySelector(\"#hand\");",
+            ""
+          ],
+          "tests": {
+            "etapes": [
+              {
+                "titre": "Une carte dans la main",
+                "verifier": [
+                  {
+                    "compter": "#hand playing-card",
+                    "egal": 1,
+                    "libelle": "Cartes dans la main"
+                  }
+                ]
+              },
+              {
+                "titre": "Une vraie copie",
+                "verifier": [
+                  {
+                    "compter": ".deck playing-card",
+                    "egal": 52,
+                    "libelle": "Cartes restées dans le paquet"
+                  },
+                  {
+                    "compter": "#SPADE-QUEEN",
+                    "egal": 1,
+                    "libelle": "Éléments avec l'id SPADE-QUEEN"
+                  }
+                ],
+                "siEchec": "La carte a quitté le paquet ou son id est en double : clone-la (`cloneNode(true)`), puis retire l'id du **clone**."
+              },
+              {
+                "titre": "Avec son rang et son symbole",
+                "verifier": [
+                  {
+                    "compter": "#hand .rank",
+                    "egal": 1,
+                    "libelle": "Rangs affichés dans la main"
+                  },
+                  {
+                    "compter": "#hand .spade.rank-queen",
+                    "egal": 1,
+                    "libelle": "Dame de pique dans la main"
+                  }
+                ],
+                "siEchec": "Sans `true`, cloneNode ne copie pas les enfants : `cloneNode(true)`."
+              }
+            ],
+            "obligatoire": [
+              "cloneNode",
+              "removeAttribute",
+              "replaceChildren"
+            ]
+          },
+          "indices": [
+            "Trouver la dame, la cloner, retirer l'id du clone, la placer : relis [[clonenode]].",
+            {
+              "code": "const clone = document.querySelector(\"#SPADE-QUEEN\").cloneNode(___);\nclone.removeAttribute(\"___\");\nhandEl.replaceChildren(___);"
+            }
+          ],
+          "solution": [
+            "const handEl = document.querySelector(\"#hand\");",
+            "const clone = document.querySelector(\"#SPADE-QUEEN\").cloneNode(true);",
+            "clone.removeAttribute(\"id\");",
+            "handEl.replaceChildren(clone);"
+          ],
+          "erreursTypiques": [
+            {
+              "code": "const handEl = document.querySelector(\"#hand\");\nconst queen = document.querySelector(\"#SPADE-QUEEN\");\nqueen.removeAttribute(\"id\");\nhandEl.replaceChildren(queen.cloneNode(true));",
+              "attendu": "echec",
+              "diagnostic": "contenu"
+            },
+            {
+              "code": "const handEl = document.querySelector(\"#hand\");\nconst clone = document.querySelector(\"#SPADE-QUEEN\").cloneNode();\nclone.removeAttribute(\"id\");\nhandEl.replaceChildren(clone);",
+              "attendu": "echec",
+              "diagnostic": "contenu"
+            },
+            {
+              "code": "const handEl = document.querySelector(\"#hand\");\nconst queen = document.querySelector(\"#SPADE-QUEEN\");\nqueen.removeAttribute(\"id\");\nhandEl.replaceChildren(queen);\nqueen.cloneNode(true);",
+              "attendu": "echec",
+              "diagnostic": "contenu"
+            }
+          ],
+          "explication": "On retire l'id **du clone**, pas de l'original : l'original garde son id dans le paquet."
+        }
+      ]
+    },
+    {
+      "id": "u15-l3",
+      "titre": "Une main au clic",
+      "duree": 6,
+      "notions": [
+        "replacechildren",
+        "addeventlistener",
+        "map"
+      ],
+      "cartes": [
+        {
+          "titre": "Fabriquer plusieurs clones avec map",
+          "texte": "`map` transforme chaque carte en son clone préparé : une boîte de clones, prête pour replaceChildren.",
+          "code": [
+            "const aces = [...document.querySelectorAll(\".deck .rank-ace\")];",
+            "const clones = aces.map((card) => {",
+            "  const clone = card.cloneNode(true);",
+            "  clone.removeAttribute(\"id\");",
+            "  return clone;",
+            "});",
+            "document.querySelector(\"#hand\").replaceChildren(...clones);",
+            "console.log(clones.length);"
+          ],
+          "dom": {
+            "page": "cards"
+          }
+        },
+        {
+          "titre": "À chaque clic, une nouvelle main",
+          "texte": "Le même travail dans un écouteur : chaque clic **remplace** la main. Exécute, puis clique plusieurs fois sur Draw a hand : la main ne s'allonge pas.",
+          "code": [
+            "const handEl = document.querySelector(\"#hand\");",
+            "const twos = [...document.querySelectorAll(\".deck .rank-2\")];",
+            "let count = 0;",
+            "document.querySelector(\"#draw-hand\").addEventListener(\"click\", () => {",
+            "  count++;",
+            "  const clones = twos.slice(0, count % 4 + 1).map((card) => card.cloneNode(true));",
+            "  clones.forEach((clone) => clone.removeAttribute(\"id\"));",
+            "  handEl.replaceChildren(...clones);",
+            "  console.log(\"cartes dans la main :\", handEl.children.length);",
+            "});"
+          ],
+          "dom": {
+            "page": "cards"
+          }
+        }
+      ],
+      "exercices": [
+        {
+          "id": "u15-l3-e1",
+          "type": "qcm",
+          "notions": [
+            "replacechildren"
+          ],
+          "question": "La main contient 5 cartes. Après `handEl.replaceChildren(...threeCards)`, combien en contient-elle ?",
+          "choix": [
+            "3",
+            "8",
+            "5",
+            "0"
+          ],
+          "bonne": 0,
+          "explication": "replaceChildren remplace tout le contenu."
+        },
+        {
+          "id": "u15-l3-e2",
+          "type": "vf",
+          "notions": [
+            "clonenode"
+          ],
+          "question": "Après `const clone = card.cloneNode(true);`, le clone est déjà visible dans la page.",
+          "bonne": false,
+          "explication": "Il faut l'insérer (replaceChildren, append…)."
+        },
+        {
+          "id": "u15-l3-e3",
+          "type": "ecrire",
+          "notions": [
+            "replacechildren",
+            "clonenode",
+            "addeventlistener"
+          ],
+          "question": "À chaque clic sur **Draw a hand**, la main (`#hand`) doit contenir des copies **sans id** des **quatre as** du paquet. Plusieurs clics ne doivent pas allonger la main.",
+          "dom": {
+            "page": "cards"
+          },
+          "depart": [
+            "const handEl = document.querySelector(\"#hand\");",
+            "const aces = [...document.querySelectorAll(\".deck .rank-ace\")];",
+            "",
+            "document.querySelector(\"#draw-hand\").addEventListener(\"click\", () => {",
+            "  ",
+            "});"
+          ],
+          "tests": {
+            "etapes": [
+              {
+                "titre": "Avant le clic",
+                "verifier": [
+                  {
+                    "compter": "#hand playing-card",
+                    "egal": 0,
+                    "libelle": "Cartes dans la main avant le clic"
+                  }
+                ]
+              },
+              {
+                "titre": "Un clic",
+                "actions": [
+                  {
+                    "clic": "#draw-hand"
+                  }
+                ],
+                "verifier": [
+                  {
+                    "compter": "#hand .rank-ace",
+                    "egal": 4,
+                    "libelle": "As dans la main"
+                  },
+                  {
+                    "compter": "#hand [id]",
+                    "egal": 0,
+                    "libelle": "Cartes de la main avec un id"
+                  },
+                  {
+                    "compter": ".deck playing-card",
+                    "egal": 52,
+                    "libelle": "Cartes restées dans le paquet"
+                  }
+                ]
+              },
+              {
+                "titre": "Trois clics de plus",
+                "actions": [
+                  {
+                    "clic": "#draw-hand"
+                  },
+                  {
+                    "clic": "#draw-hand"
+                  },
+                  {
+                    "clic": "#draw-hand"
+                  }
+                ],
+                "verifier": [
+                  {
+                    "compter": "#hand playing-card",
+                    "egal": 4,
+                    "libelle": "Cartes dans la main après 4 clics"
+                  }
+                ],
+                "siEchec": "La main s'allonge : remplace son contenu avec `handEl.replaceChildren(...clones)`."
+              }
+            ],
+            "obligatoire": [
+              "cloneNode",
+              "removeAttribute",
+              "replaceChildren"
+            ]
+          },
+          "indices": [
+            "Dans la flèche : fabriquer les clones avec map, puis les placer.",
+            {
+              "code": "const clones = aces.map((card) => {\n  const clone = card.cloneNode(true);\n  clone.___(\"id\");\n  return clone;\n});\nhandEl.replaceChildren(___);"
+            }
+          ],
+          "solution": [
+            "const handEl = document.querySelector(\"#hand\");",
+            "const aces = [...document.querySelectorAll(\".deck .rank-ace\")];",
+            "",
+            "document.querySelector(\"#draw-hand\").addEventListener(\"click\", () => {",
+            "  const clones = aces.map((card) => {",
+            "    const clone = card.cloneNode(true);",
+            "    clone.removeAttribute(\"id\");",
+            "    return clone;",
+            "  });",
+            "  handEl.replaceChildren(...clones);",
+            "});"
+          ],
+          "erreursTypiques": [
+            {
+              "code": "const handEl = document.querySelector(\"#hand\");\nconst aces = [...document.querySelectorAll(\".deck .rank-ace\")];\ndocument.querySelector(\"#draw-hand\").addEventListener(\"click\", () => {\n  aces.forEach((card) => {\n    const clone = card.cloneNode(true);\n    clone.removeAttribute(\"id\");\n    handEl.append(clone);\n  });\n  handEl.replaceChildren(...handEl.children);\n});",
+              "attendu": "echec",
+              "diagnostic": "contenu"
+            },
+            {
+              "code": "const handEl = document.querySelector(\"#hand\");\nconst aces = [...document.querySelectorAll(\".deck .rank-ace\")];\ndocument.querySelector(\"#draw-hand\").addEventListener(\"click\", () => {\n  const clones = aces.map((card) => card.cloneNode(true));\n  handEl.replaceChildren(...clones);\n  clones.removeAttribute(\"id\");\n});",
+              "attendu": "erreur"
+            }
+          ],
+          "explication": "C'est la forme exacte du bouton Draw a hand du TP ; il ne manque plus que le mélange."
+        }
+      ]
+    }
+  ],
+  "jeux": [
+    {
+      "id": "u15-photocopieuse",
+      "titre": "La photocopieuse",
+      "description": "Cloner, retirer, remplacer : qui reste où ?",
+      "tours": 6,
+      "questions": [
+        {
+          "id": "u15-j1-1",
+          "type": "qcm",
+          "notions": [
+            "clonenode"
+          ],
+          "question": "Combien d'enfants a `document.querySelector(\"#HEART-2\").cloneNode().children.length` ?",
+          "choix": [
+            "0",
+            "2",
+            "1",
+            "52"
+          ],
+          "bonne": 0,
+          "explication": "Sans true : l'élément seul, sans ses spans."
+        },
+        {
+          "id": "u15-j1-2",
+          "type": "qcm",
+          "notions": [
+            "clonenode"
+          ],
+          "question": "Après `const c = card.cloneNode(true);`, que vaut `c.id` si card est l'as de pique ?",
+          "choix": [
+            "\"SPADE-ACE\"",
+            "\"\"",
+            "undefined",
+            "null"
+          ],
+          "bonne": 0,
+          "explication": "Le clone copie aussi l'id : il faut le retirer."
+        },
+        {
+          "id": "u15-j1-3",
+          "type": "qcm",
+          "notions": [
+            "replacechildren"
+          ],
+          "question": "`handEl.replaceChildren()` sans argument…",
+          "choix": [
+            "vide la main",
+            "ne fait rien",
+            "provoque une erreur",
+            "remet les cartes dans le paquet"
+          ],
+          "bonne": 0,
+          "explication": "Remplacer par rien : vider."
+        },
+        {
+          "id": "u15-j1-4",
+          "type": "qcm",
+          "notions": [
+            "nodelist-tableau"
+          ],
+          "question": "Quelle écriture convertit la NodeList en tableau ?",
+          "choix": [
+            "[...document.querySelectorAll(\".deck playing-card\")]",
+            "[document.querySelectorAll(\".deck playing-card\")]",
+            "document.querySelectorAll([\".deck playing-card\"])",
+            "document.querySelectorAll(\".deck playing-card\").toArray()"
+          ],
+          "bonne": 0,
+          "mono": true,
+          "explication": "Le spread vide la pile dans un tableau. Sans les trois points, on obtient un tableau qui contient la NodeList."
+        },
+        {
+          "id": "u15-j1-5",
+          "type": "vf",
+          "notions": [
+            "clonenode"
+          ],
+          "question": "Mettre une vraie carte du paquet dans `#hand` (sans la cloner) la retire du paquet.",
+          "bonne": true,
+          "explication": "Un élément n'est qu'à un seul endroit de la page."
+        },
+        {
+          "id": "u15-j1-6",
+          "type": "ordre",
+          "notions": [
+            "sur-place",
+            "clonenode"
+          ],
+          "question": "Remets dans l'ordre un clic sur Draw a hand.",
+          "items": [
+            "Copier le tableau deck",
+            "Mélanger la copie avec shuffleInPlace",
+            "Prendre les cinq premières cartes",
+            "Cloner chacune et retirer id et selected",
+            "Remplacer le contenu de #hand"
+          ],
+          "explication": "L'exercice 5 du TP, dans l'ordre."
+        }
+      ]
+    }
+  ],
+  "quiz": {
+    "titre": "Quiz : tirer une main",
+    "questions": [
+      {
+        "id": "u15-q1",
+        "type": "qcm",
+        "notions": [
+          "nodelist-tableau"
+        ],
+        "question": "Pourquoi convertir la NodeList en tableau pour le tirage ?",
+        "choix": [
+          "Pour pouvoir copier, mélanger et slice",
+          "Parce que querySelectorAll est lent",
+          "Pour cloner les cartes",
+          "Parce que forEach n'existe pas sur une NodeList"
+        ],
+        "bonne": 0,
+        "explication": "Une NodeList n'a ni slice ni les autres méthodes de tableau."
+      },
+      {
+        "id": "u15-q2",
+        "type": "qcm",
+        "notions": [
+          "clonenode"
+        ],
+        "question": "Que copie `cloneNode(true)` ?",
+        "choix": [
+          "L'élément, ses attributs et tous ses enfants",
+          "Seulement l'élément, sans enfants",
+          "Seulement le texte",
+          "Les écouteurs d'événements"
+        ],
+        "bonne": 0,
+        "explication": "Copie profonde (mais pas les écouteurs ajoutés avec addEventListener)."
+      },
+      {
+        "id": "u15-q3",
+        "type": "bug",
+        "notions": [
+          "clonenode"
+        ],
+        "question": "La page contient deux éléments avec le même id. Quelle ligne manque-t-il après la ligne 1 ?",
+        "code": [
+          "const clone = card.cloneNode(true);",
+          "clone.classList.remove(\"selected\");",
+          "handCards.push(clone);"
+        ],
+        "ligne": 1,
+        "choix": [
+          "`clone.removeAttribute(\"id\");`",
+          "`card.removeAttribute(\"id\");`",
+          "`clone.id = card.id;`",
+          "`clone.classList.remove(\"id\");`"
+        ],
+        "bonne": 0,
+        "explication": "On retire l'id du clone ; l'original garde le sien."
+      },
+      {
+        "id": "u15-q4",
+        "type": "qcm",
+        "notions": [
+          "replacechildren"
+        ],
+        "question": "Pourquoi `replaceChildren` plutôt que d'ajouter les cartes une à une ?",
+        "choix": [
+          "Chaque tirage remplace la main précédente, en une seule opération",
+          "C'est la seule méthode qui accepte des clones",
+          "Pour garder les anciennes cartes",
+          "Pour retirer les id"
+        ],
+        "bonne": 0,
+        "explication": "Le TP : « Remplacer le contenu du conteneur #hand en une seule opération »."
+      },
+      {
+        "id": "u15-q5",
+        "type": "vf",
+        "notions": [
+          "sur-place"
+        ],
+        "question": "Dans le bouton Draw a hand, on peut mélanger directement le tableau `deck` sans le copier : ça ne change rien à la page.",
+        "bonne": false,
+        "explication": "La page ne bougerait pas, mais le TP demande de mélanger une copie : `deck` reste le paquet d'origine, dans l'ordre (comme drawCards)."
+      },
+      {
+        "id": "u15-q6",
+        "type": "qcm",
+        "notions": [
+          "clonenode",
+          "classlist"
+        ],
+        "question": "Pourquoi retirer la classe `selected` des clones ?",
+        "choix": [
+          "Si la carte d'origine était sélectionnée, son clone le serait aussi",
+          "Parce que les clones ne peuvent pas avoir de classes",
+          "Pour que le paquet soit désélectionné",
+          "Pour éviter une erreur"
+        ],
+        "bonne": 0,
+        "explication": "Le clone copie toutes les classes."
+      },
+      {
+        "id": "u15-q7",
+        "type": "tri",
+        "notions": [
+          "clonenode",
+          "replacechildren",
+          "nodelist-tableau"
+        ],
+        "mono": true,
+        "question": "Modifie la page, ou non ?",
+        "categories": [
+          "modifie la page",
+          "ne modifie pas la page"
+        ],
+        "items": [
+          [
+            "card.cloneNode(true)",
+            1
+          ],
+          [
+            "handEl.replaceChildren(...clones)",
+            0
+          ],
+          [
+            "[...deckEl.querySelectorAll(\"playing-card\")]",
+            1
+          ],
+          [
+            "card.classList.add(\"selected\")",
+            0
+          ]
+        ],
+        "explication": "Un clone n'est pas dans la page tant qu'on ne l'insère pas."
+      },
+      {
+        "id": "u15-q8",
+        "type": "ordre",
+        "notions": [
+          "clonenode",
+          "replacechildren"
+        ],
+        "question": "Remets dans l'ordre le code du bouton Draw a hand.",
+        "items": [
+          "const copy = [...deck];",
+          "shuffleInPlace(copy);",
+          "const handCards = copy.slice(0, 5).map(prepareClone);",
+          "handEl.replaceChildren(...handCards);"
+        ],
+        "mono": true,
+        "explication": "Copier, mélanger, prendre et préparer, remplacer."
+      },
+      {
+        "id": "u15-q9",
+        "type": "qcm",
+        "notions": [
+          "replacechildren",
+          "spread"
+        ],
+        "question": "Que montre la main après `handEl.replaceChildren(handCards)` (sans les trois points) ?",
+        "choix": [
+          "Le texte « [object HTMLElement],… »",
+          "Les cinq cartes",
+          "Rien : une erreur",
+          "Une seule carte"
+        ],
+        "bonne": 0,
+        "explication": "Le tableau est transformé en texte. Avec `...handCards`, ce sont les cartes qui sont insérées."
+      },
+      {
+        "id": "u15-q10",
+        "type": "qcm",
+        "notions": [
+          "nodelist-tableau"
+        ],
+        "question": "Où créer le tableau `deck`, selon le TP ?",
+        "choix": [
+          "Une seule fois, au démarrage du script, avant les clics",
+          "Dans l'écouteur de Draw a hand, à chaque clic",
+          "Dans clearSelection",
+          "Dans shuffleInPlace"
+        ],
+        "bonne": 0,
+        "explication": "« Cette récupération doit être effectuée une seule et unique fois, avant les clics sur les boutons. »"
+      },
+      {
+        "id": "u15-q11",
+        "type": "vf",
+        "notions": [
+          "clonenode"
+        ],
+        "question": "Un clone créé avec `cloneNode(true)` garde les classes de la carte d'origine (`heart`, `rank-ace`…).",
+        "bonne": true,
+        "explication": "C'est pourquoi la carte clonée garde son dessin, et pourquoi il faut retirer `selected`."
+      },
+      {
+        "id": "u15-q12",
+        "type": "bug",
+        "notions": [
+          "clonenode",
+          "sur-place"
+        ],
+        "question": "Après un tirage, le paquet n'a plus que 47 cartes. Quelle ligne corriger ?",
+        "code": [
+          "const copy = [...deck];",
+          "shuffleInPlace(copy);",
+          "const handCards = copy.slice(0, 5);",
+          "handEl.replaceChildren(...handCards);"
+        ],
+        "ligne": 3,
+        "choix": [
+          "Il faut des clones : `copy.slice(0, 5).map((card) => card.cloneNode(true))` (puis retirer id et selected)",
+          "Il faut `slice(1, 6)`",
+          "Il ne faut pas copier deck",
+          "Il faut appeler shuffleInPlace après slice"
+        ],
+        "bonne": 0,
+        "explication": "Les vraies cartes insérées dans #hand quittent le paquet."
+      },
+      {
+        "id": "u15-q13",
+        "type": "qcm",
+        "notions": [
+          "conteneur"
+        ],
+        "question": "Après un tirage, le bouton B sélectionne 15 cartes au lieu de 13. Pourquoi ?",
+        "choix": [
+          "Il cherche dans document : les cœurs de la main sont pris aussi",
+          "La main a des cartes en double",
+          "clearSelection ne marche plus",
+          "Les clones ont gardé leur id"
+        ],
+        "bonne": 0,
+        "explication": "Chercher dans `deckEl` garde les sélections dans le paquet."
+      },
+      {
+        "id": "u15-q14",
+        "type": "assoc",
+        "notions": [
+          "clonenode",
+          "replacechildren",
+          "nodelist-tableau"
+        ],
+        "mono": true,
+        "question": "Associe chaque outil à son rôle dans le TP.",
+        "paires": [
+          [
+            "[...list]",
+            "convertir la NodeList en tableau"
+          ],
+          [
+            "cloneNode(true)",
+            "copier une carte avec ses enfants"
+          ],
+          [
+            "removeAttribute(\"id\")",
+            "éviter les id en double"
+          ],
+          [
+            "replaceChildren(...cards)",
+            "remplacer la main en une opération"
+          ]
+        ],
+        "explication": "Les quatre ressources de la fin du TP."
+      },
+      {
+        "id": "u15-q15",
+        "type": "qcm",
+        "notions": [
+          "fisher-yates",
+          "sur-place"
+        ],
+        "question": "Pourquoi le bouton Draw a hand mélange-t-il une **copie** de `deck` ?",
+        "choix": [
+          "Pour garder deck dans l'ordre d'origine, comme drawCards du TP Tableaux",
+          "Parce que shuffleInPlace ne marche pas sur deck",
+          "Pour que les cartes soient clonées",
+          "Pour que le paquet à l'écran se mélange"
+        ],
+        "bonne": 0,
+        "explication": "Même idée que drawCards : on ne touche pas au paquet reçu."
+      }
+    ]
+  },
+  "boss": [
+    {
+      "id": "u15-b1",
+      "titre": "Tirer une main",
+      "source": "TP DOM · exercices 4, 5 et 6",
+      "notions": [
+        "nodelist-tableau",
+        "clonenode",
+        "replacechildren",
+        "fisher-yates",
+        "addeventlistener"
+      ],
+      "enonce": "4) **Au démarrage du script**, récupérer les 52 éléments `<playing-card>` du paquet d'origine et les convertir en un tableau nommé `deck` (une seule fois, avant les clics).\n\n5) Associer un écouteur de `click` au bouton **Draw a hand** (`#draw-hand`). À chaque clic :\n- créer une **copie** du tableau `deck`, puis la mélanger avec `shuffleInPlace` ;\n- prendre les **cinq premiers** éléments du tableau mélangé ;\n- **cloner** chacune de ces cartes avec `cloneNode(true)` ;\n- retirer l'attribut `id` du clone avec `removeAttribute`, puis retirer sa classe `selected` ;\n- stocker les cinq clones dans un tableau nommé `handCards` ;\n- remplacer le contenu du conteneur `#hand` **en une seule opération** avec `replaceChildren(...handCards)`.\n\n6) Chaque tirage remplace les cinq cartes précédentes, sans déplacer ni modifier celles du paquet d'origine.",
+      "regles": [
+        "Les cartes du paquet d'origine ne sont ni déplacées ni modifiées.",
+        "Les cartes de la main sont des clones : sans id, sans classe selected.",
+        "shuffleInPlace est reprise du TP sur les tableaux (elle est déjà dans le code de départ)."
+      ],
+      "dom": {
+        "page": "cards"
+      },
+      "depart": [
+        "const deckEl = document.querySelector('.deck');",
+        "const handEl = document.querySelector('#hand');",
+        "",
+        "// 4) le tableau deck : les 52 cartes du paquet, récupérées une seule fois",
+        "",
+        "",
+        "// shuffleInPlace, reprise du TP sur les tableaux",
+        "function shuffleInPlace(cards) {",
+        "  for (let i = cards.length - 1; i >= 1; i--) {",
+        "    const j = Math.floor(Math.random() * (i + 1));",
+        "    [cards[i], cards[j]] = [cards[j], cards[i]];",
+        "  }",
+        "}",
+        "",
+        "// 5) le bouton Draw a hand",
+        ""
+      ],
+      "tests": {
+        "etapes": [
+          {
+            "titre": "Au démarrage",
+            "actions": [
+              {
+                "script": "window.__ordre = [...document.querySelectorAll('.deck playing-card')].map((c) => c.id).join()"
+              }
+            ],
+            "verifier": [
+              {
+                "compter": "#hand playing-card",
+                "egal": 0,
+                "libelle": "Cartes dans la main avant tout clic"
+              },
+              {
+                "compter": ".deck playing-card",
+                "egal": 52,
+                "libelle": "Cartes dans le paquet"
+              }
+            ],
+            "siEchec": "Rien ne doit être tiré avant le clic : le tirage va **dans** la flèche donnée à addEventListener."
+          },
+          {
+            "titre": "Un tirage : 5 cartes dans la main",
+            "actions": [
+              {
+                "clic": "#draw-hand"
+              }
+            ],
+            "verifier": [
+              {
+                "compter": "#hand playing-card",
+                "egal": 5,
+                "libelle": "Cartes dans la main"
+              },
+              {
+                "compter": "#hand > playing-card",
+                "egal": 5,
+                "libelle": "Cartes placées directement dans #hand"
+              }
+            ],
+            "siEchec": "Cinq cartes : `copy.slice(0, 5)`, puis `handEl.replaceChildren(...handCards)` (avec les trois points)."
+          },
+          {
+            "titre": "Le paquet n'a pas bougé",
+            "verifier": [
+              {
+                "compter": ".deck playing-card",
+                "egal": 52,
+                "libelle": "Cartes restées dans le paquet"
+              },
+              {
+                "vrai": "[...document.querySelectorAll('.deck playing-card')].map((c) => c.id).join() === window.__ordre",
+                "message": "Les cartes du paquet ont changé de place ou d'id."
+              }
+            ],
+            "siEchec": "Les cartes de la main doivent être des **clones** (`card.cloneNode(true)`) : une vraie carte placée dans #hand quitte le paquet."
+          },
+          {
+            "titre": "Des clones sans id",
+            "verifier": [
+              {
+                "compter": "#hand [id]",
+                "egal": 0,
+                "libelle": "Cartes de la main avec un id"
+              }
+            ],
+            "siEchec": "Retire l'id de chaque **clone** : `clone.removeAttribute('id')`."
+          },
+          {
+            "titre": "Des clones complets",
+            "verifier": [
+              {
+                "compter": "#hand playing-card .rank",
+                "egal": 5,
+                "libelle": "Rangs affichés sur les cartes de la main"
+              },
+              {
+                "compter": "#hand playing-card .suit",
+                "egal": 5,
+                "libelle": "Symboles affichés sur les cartes de la main"
+              }
+            ],
+            "siEchec": "`cloneNode(true)` : avec true, la copie emporte aussi les enfants (le rang et le symbole)."
+          },
+          {
+            "titre": "Cinq cartes différentes",
+            "verifier": [
+              {
+                "vrai": "new Set([...document.querySelectorAll('#hand playing-card')].map((c) => c.className)).size === 5",
+                "message": "La main contient deux fois la même carte."
+              }
+            ]
+          },
+          {
+            "titre": "Des cartes du paquet sélectionnées",
+            "actions": [
+              {
+                "script": "document.querySelectorAll('.deck playing-card').forEach((c) => c.classList.add('selected'))"
+              },
+              {
+                "clic": "#draw-hand"
+              }
+            ],
+            "verifier": [
+              {
+                "compter": "#hand .selected",
+                "egal": 0,
+                "libelle": "Cartes de la main sélectionnées"
+              },
+              {
+                "compter": ".deck .selected",
+                "egal": 52,
+                "libelle": "Cartes du paquet encore sélectionnées"
+              }
+            ],
+            "siEchec": "Retire la classe selected du **clone** (`clone.classList.remove('selected')`), sans toucher aux cartes du paquet."
+          },
+          {
+            "titre": "Chaque tirage remplace le précédent",
+            "actions": [
+              {
+                "script": "document.querySelectorAll('.deck playing-card').forEach((c) => c.classList.remove('selected'))"
+              },
+              {
+                "clic": "#draw-hand"
+              },
+              {
+                "clic": "#draw-hand"
+              },
+              {
+                "clic": "#draw-hand"
+              }
+            ],
+            "verifier": [
+              {
+                "compter": "#hand playing-card",
+                "egal": 5,
+                "libelle": "Cartes dans la main après plusieurs tirages"
+              }
+            ],
+            "siEchec": "La main s'allonge : `handEl.replaceChildren(...handCards)` remplace tout le contenu en une opération."
+          },
+          {
+            "titre": "Des mains au hasard",
+            "actions": [
+              {
+                "script": "window.__mains = new Set(); for (let k = 0; k < 12; k++) { document.querySelector('#draw-hand').click(); window.__mains.add([...document.querySelectorAll('#hand playing-card')].map((c) => c.className).sort().join()); }"
+              }
+            ],
+            "verifier": [
+              {
+                "vrai": "window.__mains.size > 1",
+                "message": "Douze tirages ont donné exactement la même main."
+              }
+            ],
+            "siEchec": "Mélange la **copie** avec shuffleInPlace **avant** de prendre les cinq premières cartes."
+          }
+        ],
+        "obligatoire": [
+          "addEventListener",
+          "cloneNode",
+          "removeAttribute",
+          "replaceChildren",
+          "shuffleInPlace()"
+        ]
+      },
+      "indices": [
+        "Au démarrage : `const deck = [...deckEl.querySelectorAll('playing-card')];` (relis [[nodelist-tableau]]). Dans l'écouteur : copier, mélanger, garder cinq cartes ([[sur-place]]).",
+        "Chaque carte gardée devient un clone préparé : `cloneNode(true)`, `removeAttribute('id')`, `classList.remove('selected')`. map est parfait pour fabriquer `handCards` ([[clonenode]]). Puis [[replacechildren]].",
+        {
+          "code": "document.querySelector('#draw-hand').addEventListener('click', () => {\n  const copy = [...deck];\n  shuffleInPlace(copy);\n  const handCards = copy.slice(0, 5).map((card) => {\n    const clone = ___;\n    ___\n    ___\n    return clone;\n  });\n  handEl.replaceChildren(___);\n});"
+        }
+      ],
+      "solution": [
+        "const deckEl = document.querySelector('.deck');",
+        "const handEl = document.querySelector('#hand');",
+        "",
+        "// 4) le tableau deck : les 52 cartes du paquet, récupérées une seule fois",
+        "const deck = [...deckEl.querySelectorAll('playing-card')];",
+        "",
+        "// shuffleInPlace, reprise du TP sur les tableaux",
+        "function shuffleInPlace(cards) {",
+        "  for (let i = cards.length - 1; i >= 1; i--) {",
+        "    const j = Math.floor(Math.random() * (i + 1));",
+        "    [cards[i], cards[j]] = [cards[j], cards[i]];",
+        "  }",
+        "}",
+        "",
+        "// 5) le bouton Draw a hand",
+        "document.querySelector('#draw-hand').addEventListener('click', () => {",
+        "  const copy = [...deck];",
+        "  shuffleInPlace(copy);",
+        "  const handCards = copy.slice(0, 5).map((card) => {",
+        "    const clone = card.cloneNode(true);",
+        "    clone.removeAttribute('id');",
+        "    clone.classList.remove('selected');",
+        "    return clone;",
+        "  });",
+        "  handEl.replaceChildren(...handCards);",
+        "});"
+      ],
+      "erreursTypiques": [
+        {
+          "code": "const deckEl = document.querySelector('.deck');\nconst handEl = document.querySelector('#hand');\nconst deck = [...deckEl.querySelectorAll('playing-card')];\nfunction shuffleInPlace(cards) {\n  for (let i = cards.length - 1; i >= 1; i--) {\n    const j = Math.floor(Math.random() * (i + 1));\n    [cards[i], cards[j]] = [cards[j], cards[i]];\n  }\n}\ndocument.querySelector('#draw-hand').addEventListener('click', () => {\n  const copy = [...deck];\n  shuffleInPlace(copy);\n  const handCards = copy.slice(0, 5);\n  handCards.forEach((card) => card.cloneNode(true));\n  handCards.forEach((card) => card.removeAttribute('id'));\n  handEl.replaceChildren(...handCards);\n});",
+          "attendu": "echec",
+          "diagnostic": "contenu"
+        },
+        {
+          "code": "const deckEl = document.querySelector('.deck');\nconst handEl = document.querySelector('#hand');\nconst deck = [...deckEl.querySelectorAll('playing-card')];\nfunction shuffleInPlace(cards) {\n  for (let i = cards.length - 1; i >= 1; i--) {\n    const j = Math.floor(Math.random() * (i + 1));\n    [cards[i], cards[j]] = [cards[j], cards[i]];\n  }\n}\ndocument.querySelector('#draw-hand').addEventListener('click', () => {\n  const copy = [...deck];\n  shuffleInPlace(copy);\n  const handCards = copy.slice(0, 5).map((card) => {\n    const clone = card.cloneNode();\n    clone.removeAttribute('id');\n    clone.classList.remove('selected');\n    return clone;\n  });\n  handEl.replaceChildren(...handCards);\n});",
+          "attendu": "echec",
+          "diagnostic": "contenu"
+        },
+        {
+          "code": "const deckEl = document.querySelector('.deck');\nconst handEl = document.querySelector('#hand');\nconst deck = [...deckEl.querySelectorAll('playing-card')];\nfunction shuffleInPlace(cards) {\n  for (let i = cards.length - 1; i >= 1; i--) {\n    const j = Math.floor(Math.random() * (i + 1));\n    [cards[i], cards[j]] = [cards[j], cards[i]];\n  }\n}\ndocument.querySelector('#draw-hand').addEventListener('click', () => {\n  const copy = [...deck];\n  shuffleInPlace(copy);\n  const handCards = copy.slice(0, 5).map((card) => {\n    const clone = card.cloneNode(true);\n    clone.classList.remove('selected');\n    return clone;\n  });\n  handEl.replaceChildren(...handCards);\n});",
+          "attendu": "echec",
+          "diagnostic": "obligatoire"
+        },
+        {
+          "code": "const deckEl = document.querySelector('.deck');\nconst handEl = document.querySelector('#hand');\nconst deck = [...deckEl.querySelectorAll('playing-card')];\nfunction shuffleInPlace(cards) {\n  for (let i = cards.length - 1; i >= 1; i--) {\n    const j = Math.floor(Math.random() * (i + 1));\n    [cards[i], cards[j]] = [cards[j], cards[i]];\n  }\n}\ndocument.querySelector('#draw-hand').addEventListener('click', () => {\n  const copy = [...deck];\n  shuffleInPlace(copy);\n  const handCards = copy.slice(0, 5).map((card) => {\n    const clone = card.cloneNode(true);\n    clone.removeAttribute('id');\n    return clone;\n  });\n  handEl.replaceChildren(...handCards);\n});",
+          "attendu": "echec",
+          "diagnostic": "contenu"
+        },
+        {
+          "code": "const deckEl = document.querySelector('.deck');\nconst handEl = document.querySelector('#hand');\nconst deck = [...deckEl.querySelectorAll('playing-card')];\nfunction shuffleInPlace(cards) {\n  for (let i = cards.length - 1; i >= 1; i--) {\n    const j = Math.floor(Math.random() * (i + 1));\n    [cards[i], cards[j]] = [cards[j], cards[i]];\n  }\n}\ndocument.querySelector('#draw-hand').addEventListener('click', () => {\n  const copy = [...deck];\n  shuffleInPlace(copy);\n  const handCards = copy.slice(0, 5).map((card) => {\n    const clone = card.cloneNode(true);\n    clone.removeAttribute('id');\n    clone.classList.remove('selected');\n    return clone;\n  });\n  handEl.replaceChildren(handCards);\n});",
+          "attendu": "echec",
+          "diagnostic": "contenu"
+        },
+        {
+          "code": "const deckEl = document.querySelector('.deck');\nconst handEl = document.querySelector('#hand');\nconst deck = [...deckEl.querySelectorAll('playing-card')];\nfunction shuffleInPlace(cards) {\n  for (let i = cards.length - 1; i >= 1; i--) {\n    const j = Math.floor(Math.random() * (i + 1));\n    [cards[i], cards[j]] = [cards[j], cards[i]];\n  }\n}\ndocument.querySelector('#draw-hand').addEventListener('click', () => {\n  const copy = [...deck];\n  const handCards = copy.slice(0, 5).map((card) => {\n    const clone = card.cloneNode(true);\n    clone.removeAttribute('id');\n    clone.classList.remove('selected');\n    return clone;\n  });\n  shuffleInPlace(handCards);\n  handEl.replaceChildren(...handCards);\n});",
+          "attendu": "echec",
+          "diagnostic": "contenu"
+        }
+      ],
+      "explication": "Exercices 4 à 6 du TP DOM. Sans les trois points, `replaceChildren(handCards)` transforme le tableau en texte : la main affiche « [object HTMLElement],… ». Si une carte de la main était insérée sans clone, elle quitterait le paquet."
+    },
+    {
+      "id": "u15-b2",
+      "titre": "Le TP DOM complet",
+      "source": "TP DOM · exercices 1 à 6",
+      "notions": [
+        "selecteurs-css",
+        "addeventlistener",
+        "classlist",
+        "clonenode",
+        "replacechildren",
+        "conteneur"
+      ],
+      "enonce": "Le grand final : **tout le fichier `cards.js`** du TP DOM, d'un seul tenant.\n\n1) `clearSelection` retire la classe `selected` de toutes les cartes du paquet.\n\n2-3) Les six boutons **A à F** sélectionnent respectivement **1, 13, 26, 12, 6 et 39** cartes (as de pique par son id ; cœurs ; cœurs ou carreaux ; figures avec `data-face-card` ; figures rouges ; tout sauf les piques avec `:not()`). Chaque clic remplace la sélection précédente. Un seul sélecteur CSS par bouton.\n\n4-6) Le tableau `deck` est récupéré une fois au démarrage ; le bouton **Draw a hand** affiche dans `#hand` cinq clones mélangés, sans id ni `selected`, avec `replaceChildren`.\n\nToutes les sélections restent **limitées au paquet d'origine** : après un tirage, les boutons ne sélectionnent jamais les cartes de la main.",
+      "regles": [
+        "Un seul sélecteur CSS par bouton : pas de filtre en JavaScript.",
+        "Les sélections sont limitées à .deck.",
+        "Les cartes du paquet ne sont ni déplacées ni modifiées par le tirage."
+      ],
+      "dom": {
+        "page": "cards"
+      },
+      "depart": [
+        "// cards.js : tout le TP DOM",
+        "",
+        "const deckEl = document.querySelector('.deck');",
+        "const handEl = document.querySelector('#hand');",
+        "",
+        "// 1) clearSelection",
+        "",
+        "// 2) les six boutons A à F",
+        "",
+        "// 4) le tableau deck",
+        "",
+        "// 5) shuffleInPlace et le bouton Draw a hand",
+        ""
+      ],
+      "tests": {
+        "etapes": [
+          {
+            "titre": "Au démarrage",
+            "verifier": [
+              {
+                "compter": ".deck .selected",
+                "egal": 0,
+                "libelle": "Cartes sélectionnées"
+              },
+              {
+                "compter": "#hand playing-card",
+                "egal": 0,
+                "libelle": "Cartes dans la main"
+              }
+            ]
+          },
+          {
+            "titre": "A · 1 carte",
+            "actions": [
+              {
+                "clic": "#select-ace-spade"
+              }
+            ],
+            "verifier": [
+              {
+                "identique": [
+                  ".deck .selected",
+                  "#SPADE-ACE"
+                ],
+                "message": "A doit sélectionner l'as de pique, et lui seul."
+              }
+            ]
+          },
+          {
+            "titre": "B · 13 cartes",
+            "actions": [
+              {
+                "clic": "#select-hearts"
+              }
+            ],
+            "verifier": [
+              {
+                "identique": [
+                  ".deck .selected",
+                  ".deck .heart"
+                ],
+                "message": "B doit sélectionner exactement les 13 cœurs."
+              }
+            ],
+            "siEchec": "Si une carte en trop reste sélectionnée, appelle clearSelection() au début de chaque clic."
+          },
+          {
+            "titre": "C · 26 cartes",
+            "actions": [
+              {
+                "clic": "#select-red"
+              }
+            ],
+            "verifier": [
+              {
+                "identique": [
+                  ".deck .selected",
+                  ".deck .heart, .deck .diamond"
+                ],
+                "message": "C doit sélectionner exactement les 26 cartes rouges."
+              }
+            ]
+          },
+          {
+            "titre": "D · 12 cartes",
+            "actions": [
+              {
+                "clic": "#select-face-cards"
+              }
+            ],
+            "verifier": [
+              {
+                "identique": [
+                  ".deck .selected",
+                  ".deck [data-face-card]"
+                ],
+                "message": "D doit sélectionner exactement les 12 figures."
+              }
+            ]
+          },
+          {
+            "titre": "E · 6 cartes",
+            "actions": [
+              {
+                "clic": "#select-red-face-cards"
+              }
+            ],
+            "verifier": [
+              {
+                "identique": [
+                  ".deck .selected",
+                  ".deck .heart[data-face-card], .deck .diamond[data-face-card]"
+                ],
+                "message": "E doit sélectionner exactement les 6 figures rouges."
+              }
+            ]
+          },
+          {
+            "titre": "F · 39 cartes",
+            "actions": [
+              {
+                "clic": "#select-not-spades"
+              }
+            ],
+            "verifier": [
+              {
+                "identique": [
+                  ".deck .selected",
+                  ".deck playing-card:not(.spade)"
+                ],
+                "message": "F doit sélectionner exactement les 39 cartes qui ne sont pas des piques (pas leurs spans)."
+              }
+            ],
+            "siEchec": "`playing-card:not(.spade)` : sans la balise, les spans des cartes sont sélectionnés aussi."
+          },
+          {
+            "titre": "Tirer une main",
+            "actions": [
+              {
+                "clic": "#draw-hand"
+              }
+            ],
+            "verifier": [
+              {
+                "compter": "#hand playing-card",
+                "egal": 5,
+                "libelle": "Cartes dans la main"
+              },
+              {
+                "compter": "#hand [id]",
+                "egal": 0,
+                "libelle": "Cartes de la main avec un id"
+              },
+              {
+                "compter": "#hand .selected",
+                "egal": 0,
+                "libelle": "Cartes de la main sélectionnées"
+              },
+              {
+                "compter": "#hand playing-card .rank",
+                "egal": 5,
+                "libelle": "Rangs affichés dans la main"
+              },
+              {
+                "compter": ".deck playing-card",
+                "egal": 52,
+                "libelle": "Cartes restées dans le paquet"
+              }
+            ],
+            "siEchec": "Cinq clones (`cloneNode(true)`), sans id ni selected, placés avec `handEl.replaceChildren(...handCards)`."
+          },
+          {
+            "titre": "Les boutons après un tirage",
+            "actions": [
+              {
+                "clic": "#select-hearts"
+              },
+              {
+                "clic": "#select-face-cards"
+              },
+              {
+                "clic": "#select-not-spades"
+              }
+            ],
+            "verifier": [
+              {
+                "compter": "#hand .selected",
+                "egal": 0,
+                "libelle": "Cartes de la main sélectionnées"
+              },
+              {
+                "identique": [
+                  ".deck .selected",
+                  ".deck playing-card:not(.spade)"
+                ],
+                "message": "Après le tirage, F doit toujours sélectionner les 39 cartes du paquet."
+              }
+            ],
+            "siEchec": "Les boutons doivent chercher **dans le paquet** (`deckEl.querySelectorAll`), jamais dans toute la page : la main contient maintenant des cartes avec les mêmes classes."
+          },
+          {
+            "titre": "Plusieurs tirages",
+            "actions": [
+              {
+                "clic": "#draw-hand"
+              },
+              {
+                "clic": "#draw-hand"
+              }
+            ],
+            "verifier": [
+              {
+                "compter": "#hand playing-card",
+                "egal": 5,
+                "libelle": "Cartes dans la main"
+              },
+              {
+                "compter": "#hand .selected",
+                "egal": 0,
+                "libelle": "Cartes de la main sélectionnées"
+              }
+            ]
+          },
+          {
+            "titre": "Des mains au hasard",
+            "actions": [
+              {
+                "script": "window.__mains = new Set(); for (let k = 0; k < 12; k++) { document.querySelector('#draw-hand').click(); window.__mains.add([...document.querySelectorAll('#hand playing-card')].map((c) => c.className).sort().join()); }"
+              }
+            ],
+            "verifier": [
+              {
+                "vrai": "window.__mains.size > 1",
+                "message": "Douze tirages ont donné exactement la même main."
+              }
+            ]
+          }
+        ],
+        "obligatoire": [
+          "addEventListener",
+          "querySelectorAll",
+          "classList",
+          "cloneNode",
+          "removeAttribute",
+          "replaceChildren"
+        ],
+        "interdit": [
+          "filter"
+        ]
+      },
+      "indices": [
+        "Rassemble les boss des deux unités DOM : clearSelection, les six boutons, puis le tirage. Chaque morceau a déjà été écrit et testé.",
+        "Ordre conseillé : les constantes (deckEl, handEl, deck), les fonctions (clearSelection, shuffleInPlace), puis les écouteurs. Toutes les recherches de cartes passent par `deckEl`.",
+        {
+          "code": "function selectCards(selector) {\n  clearSelection();\n  deckEl.querySelectorAll(selector).forEach((card) => card.classList.add('selected'));\n}\ndocument.querySelector('#select-hearts').addEventListener('click', () => selectCards('___'));"
+        }
+      ],
+      "solution": [
+        "// cards.js : tout le TP DOM",
+        "",
+        "const deckEl = document.querySelector('.deck');",
+        "const handEl = document.querySelector('#hand');",
+        "",
+        "// 1) clearSelection",
+        "function clearSelection() {",
+        "  deckEl.querySelectorAll('playing-card').forEach((card) => card.classList.remove('selected'));",
+        "}",
+        "",
+        "// 2) les six boutons A à F",
+        "document.querySelector('#select-ace-spade').addEventListener('click', () => {",
+        "  clearSelection();",
+        "  deckEl.querySelector('#SPADE-ACE').classList.add('selected');",
+        "});",
+        "",
+        "const buttons = [",
+        "  ['#select-hearts', '.heart'],",
+        "  ['#select-red', '.heart, .diamond'],",
+        "  ['#select-face-cards', '[data-face-card]'],",
+        "  ['#select-red-face-cards', '.heart[data-face-card], .diamond[data-face-card]'],",
+        "  ['#select-not-spades', 'playing-card:not(.spade)'],",
+        "];",
+        "buttons.forEach(([buttonSelector, cardSelector]) => {",
+        "  document.querySelector(buttonSelector).addEventListener('click', () => {",
+        "    clearSelection();",
+        "    deckEl.querySelectorAll(cardSelector).forEach((card) => card.classList.add('selected'));",
+        "  });",
+        "});",
+        "",
+        "// 4) le tableau deck",
+        "const deck = [...deckEl.querySelectorAll('playing-card')];",
+        "",
+        "// 5) shuffleInPlace et le bouton Draw a hand",
+        "function shuffleInPlace(cards) {",
+        "  for (let i = cards.length - 1; i >= 1; i--) {",
+        "    const j = Math.floor(Math.random() * (i + 1));",
+        "    [cards[i], cards[j]] = [cards[j], cards[i]];",
+        "  }",
+        "}",
+        "",
+        "document.querySelector('#draw-hand').addEventListener('click', () => {",
+        "  const copy = [...deck];",
+        "  shuffleInPlace(copy);",
+        "  const handCards = copy.slice(0, 5).map((card) => {",
+        "    const clone = card.cloneNode(true);",
+        "    clone.removeAttribute('id');",
+        "    clone.classList.remove('selected');",
+        "    return clone;",
+        "  });",
+        "  handEl.replaceChildren(...handCards);",
+        "});"
+      ],
+      "erreursTypiques": [
+        {
+          "code": "const deckEl = document.querySelector('.deck');\nconst handEl = document.querySelector('#hand');\nfunction clearSelection() {\n  document.querySelectorAll('playing-card').forEach((card) => card.classList.remove('selected'));\n}\nconst buttons = [['#select-ace-spade', '#SPADE-ACE'], ['#select-hearts', '.heart'], ['#select-red', '.heart, .diamond'], ['#select-face-cards', '[data-face-card]'], ['#select-red-face-cards', '.heart[data-face-card], .diamond[data-face-card]'], ['#select-not-spades', 'playing-card:not(.spade)']];\nbuttons.forEach(([b, s]) => {\n  document.querySelector(b).addEventListener('click', () => {\n    clearSelection();\n    document.querySelectorAll(s).forEach((card) => card.classList.add('selected'));\n  });\n});\nconst deck = [...deckEl.querySelectorAll('playing-card')];\nfunction shuffleInPlace(cards) {\n  for (let i = cards.length - 1; i >= 1; i--) {\n    const j = Math.floor(Math.random() * (i + 1));\n    [cards[i], cards[j]] = [cards[j], cards[i]];\n  }\n}\ndocument.querySelector('#draw-hand').addEventListener('click', () => {\n  const copy = [...deck];\n  shuffleInPlace(copy);\n  const handCards = copy.slice(0, 5).map((card) => {\n    const clone = card.cloneNode(true);\n    clone.removeAttribute('id');\n    clone.classList.remove('selected');\n    return clone;\n  });\n  handEl.replaceChildren(...handCards);\n});",
+          "attendu": "echec",
+          "diagnostic": "contenu"
+        },
+        {
+          "code": "const deckEl = document.querySelector('.deck');\nconst handEl = document.querySelector('#hand');\nfunction clearSelection() {\n  deckEl.querySelectorAll('playing-card').forEach((card) => card.classList.remove('selected'));\n}\nconst buttons = [['#select-ace-spade', '#SPADE-ACE'], ['#select-hearts', '.heart'], ['#select-red', '.heart, .diamond'], ['#select-face-cards', '[data-face-card]'], ['#select-red-face-cards', '.heart[data-face-card], .diamond[data-face-card]'], ['#select-not-spades', 'playing-card:not(.spade)']];\nbuttons.forEach(([b, s]) => {\n  document.querySelector(b).addEventListener('click', () => {\n    clearSelection();\n    deckEl.querySelectorAll(s).forEach((card) => card.classList.add('selected'));\n  });\n});\nconst deck = [...deckEl.querySelectorAll('playing-card')];\ndocument.querySelector('#draw-hand').addEventListener('click', () => {\n  const handCards = deck.slice(0, 5).map((card) => {\n    const clone = card.cloneNode(true);\n    clone.removeAttribute('id');\n    clone.classList.remove('selected');\n    return clone;\n  });\n  handEl.replaceChildren(...handCards);\n});",
+          "attendu": "echec"
+        }
+      ],
+      "explication": "Le TP DOM en entier. Ici, une petite liste `[bouton, sélecteur]` évite de recopier cinq fois le même écouteur ; six écouteurs écrits un par un sont tout aussi justes. Dans ton dossier, ce fichier s'appelle cards.js et se charge avec `<script src=\"cards.js\" type=\"module\"></script>`."
+    }
+  ]
+}

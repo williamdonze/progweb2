@@ -13,20 +13,11 @@
     "content/unites/u10-trier.json",
     "content/unites/u11-chaines.json",
     "content/unites/u12-cartes.json",
-    "content/unites/u13-melanger.json"
+    "content/unites/u13-melanger.json",
+    "content/unites/u14-dom-selection.json",
+    "content/unites/u15-dom-clones.json"
   ],
-  "aVenir": [
-    {
-      "titre": "DOM : sélectionner",
-      "resume": "TP DOM : querySelector, querySelectorAll, sélecteurs CSS (id, classe, OU, attribut, :not), classList",
-      "icone": "<>"
-    },
-    {
-      "titre": "DOM : événements et clones",
-      "resume": "TP DOM : addEventListener, cloneNode, removeAttribute, replaceChildren, tirer une main",
-      "icone": "⚡"
-    }
-  ],
+  "aVenir": [],
   "rangs": [
     {
       "xp": 0,

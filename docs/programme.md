@@ -16,26 +16,16 @@ Source : les pages du cours enregistrées le 10 octobre 2026 : **Exercice JS - F
 | 5 | Les tableaux | boîte d'œufs, indices, `at(-1)`, **length vs dernier indice**, milieu, Object.freeze, méthodes mutantes, `===` entre tableaux | Premier, dernier, milieu (préparation au mot du milieu) |
 | 6 | Parcourir et transformer | **nom du paramètre**, forEach, map, filter, **forEach vs map**, **map vs filter**, condition booléenne, enchaînements | **TP Tableaux** nombres : 1 (afficher), 2 (doublées), 3 (impaires) |
 | 7 | Réduire | reduce, le porte-monnaie, valeur de départ (0, `""`, 1, aucune), maximum, concaténation, chaîne filter / map / reduce | **TP Tableaux** nombres : 6 (somme), 7 (plus grand) ; chaînes : 6 (concaténation) |
+| 8 | Tester : some, every | some (au moins un), every (tous), tableau vide (`some` → false, `every` → true), find / findIndex / includes, `0` n'est pas positif | **TP Tableaux** nombres : 8 (un multiple de 9), 9 (que des positifs) ; chaînes : 2 (tous les mots font 5 lettres) |
+| 9 | Extraire et assembler | slice (copie d'un morceau), spread (sortir les œufs), with (copie avec une case changée), ordre relatif conservé | **TP Tableaux** nombres : 4 (sans le premier), 5 (sans le dernier), 10 (pairs puis impairs) ; chaînes : 3 (Lorem au début), 4 (Ipsum à la fin), 5 (radar au milieu) |
+| 10 | Trier | toSorted vs sort, le piège de l'ordre « texte » (10 avant 9), le comparateur (l'arbitre), localeCompare | **TP Tableaux** chaînes : 7 (le premier dans l'ordre alphabétique) |
+| 11 | Les chaînes | méthodes des chaînes (includes, toLowerCase…), split / join, renverser une chaîne | **TP Tableaux** chaînes : 1 (les mots avec un r), 8 (le palindrome) |
+| 12 | Objets : le jeu de cartes | objet `{ rank, suit }`, raccourci, tableau d'objets, flatMap (map dans map), objet comme dictionnaire (`symbols[card.suit]`), couleurs du terminal (ANSI) | **TP Tableaux** cartes : 1 (structure), 2 (`buildBaseDeck`), 5 (`compareRank`), 6 (`getHighestCard`), 7 (`displayRank`, `showCard`) |
+| 13 | Mélanger et tirer | échanger deux cases (déstructuration), indice au hasard de 0 à i, Fisher–Yates (simulateur + test d'équité), sur place ou copie | **TP Tableaux** cartes : 3 (`shuffleInPlace`), 4 (`drawCards`), fin du 5 (annoncer la plus forte), 6 et 7 (la main de cinq cartes, affichée en couleur) |
+| 14 | DOM : sélectionner | le DOM, querySelector / querySelectorAll, NodeList, sélecteurs CSS (id, classe, `,` OU, attribut, ET collé, `:not()`), classList, chercher dans `.deck`, addEventListener | **TP DOM** 1 (`clearSelection`), 2 et 3 (les six boutons A à F : 1, 13, 26, 12, 6, 39 cartes) |
+| 15 | DOM : tirer une main | `[...NodeList]`, cloneNode(true), removeAttribute, replaceChildren(...cartes) | **TP DOM** 4 à 6 (Draw a hand), puis le TP DOM complet en un seul fichier |
 
-**TP Fonctions : complet** (10 exercices sur 10).
-
-## Unités à venir
-
-| # | Unité | Exercices du cours visés |
-|---|---|---|
-| 8 | Tester : some, every | nombres 8 (au moins un multiple de 9), 9 (que des positifs) ; chaînes 2 (tous les mots font 5 lettres) |
-| 9 | Extraire et assembler : slice, spread, with | nombres 4 (sans le premier), 5 (sans le dernier), 10 (les pairs puis les impairs, ordre relatif conservé) ; chaînes 3 (« Lorem » au début), 4 (« Ipsum » à la fin), 5 (le mot du milieu → « radar ») |
-| 10 | Trier : toSorted, comparateurs, localeCompare | chaînes 7 (le premier mot dans l'ordre alphabétique, sans modifier le tableau) |
-| 11 | Chaînes : includes, toLowerCase, split, join, toReversed | chaînes 1 (les mots contenant un r), 8 (concaténer, minuscules, palindrome) |
-| 12 | Objets : le jeu de cartes | cartes 1 (structure d'une carte et du paquet), 2 (`buildBaseDeck` : map imbriqués / flatMap), 5 (`compareRank`), 6 (`getHighestCard`), 7 (`displayRank`, `showCard` avec les couleurs du terminal) |
-| 13 | Mélanger et tirer | cartes 3 (`shuffleInPlace`, Fisher–Yates), 4 (`drawCards` : copier, mélanger, prendre n cartes) ; simulateur Fisher–Yates déjà prêt dans le moteur |
-| 14 | DOM : sélectionner | TP DOM 1 à 3 : `querySelector`, `querySelectorAll`, `classList`, sélecteurs CSS (id, classe, `,` pour OU, attribut `[data-face-card]`, combinaisons, `:not()`), sélection limitée à `.deck` |
-| 15 | DOM : événements et clones | TP DOM 4 à 6 : `addEventListener`, convertir une NodeList en tableau avec `...`, `cloneNode(true)`, `removeAttribute`, `replaceChildren(...cartes)`, tirer une main |
-
-### À prévoir dans le moteur
-
-- **Couleurs du terminal** (cartes 7, `showCard`) : la console de l'appli devra interpréter les codes `\x1b[31;47m` (rouge sur blanc), `\x1b[30;47m`, `\x1b[0m`.
-- **Bac à sable DOM** (unités 14-15) : le Web Worker n'a pas de DOM. Il faudra un second bac à sable, une `<iframe sandbox="allow-scripts">` contenant une copie de `cards.html` / `cards.css` (52 `<playing-card>`, boutons A à F, `#hand`), où le code de l'élève s'exécute ; les tests cliqueront sur les boutons et compteront les cartes `.selected` (1, 13, 26, 12, 6, 39 attendues) et les enfants de `#hand`.
+**Les trois TP sont complets** : Fonctions (10 exercices), Tableaux (10 + 8 + 8), DOM (6). Les exercices DOM tournent sur la page du TP (`content/pages/cards.html` et `cards.css`) dans une iframe isolée : les tests cliquent sur les boutons et comptent les cartes.
 
 ## Les difficultés ciblées
 
@@ -50,12 +40,12 @@ Source : les pages du cours enregistrées le 10 octobre 2026 : **Exercice JS - F
 | 7. if dans une fléchée, la comparaison est déjà un booléen | u02 l3 et l5, u06 l4 |
 | 8. reduce, accumulateur, valeur de départ | u07 entière (porte-monnaie, simulateur pas à pas), diagnostics `depart-zero`, `depart-texte` |
 | 9. `&&` / `||`, `==` / `===` | u02 l3 et l4, u04 l3, conseil `egal-souple` |
-| 10. Oublier le spread | u05 l4 (avant-goût), u04 l6 (les `...` du paramètre du reste), diagnostic `oublie-spread` (unité 9 à venir) |
+| 10. Oublier le spread | u05 l4 (avant-goût), u04 l6 (les `...` du paramètre du reste), u09 entière, u15 (`replaceChildren(...cartes)`), diagnostic `oublie-spread` |
 | 11. length vs dernier indice, milieu | u05 l3, boss u05 |
-| 12. Comparateur de toSorted | conseil `tosorted-imbrique` (unité 10 à venir) |
+| 12. Comparateur de toSorted | u10 (l'arbitre), boss compareRank (u12), conseil `tosorted-imbrique` |
 | 13. Comparer deux tableaux avec === | u05 l5, conseil `egalite-tableaux` |
-| 14. Objets, `(x) => ({ … })` | u03 l5 (« Construis l'objet »), u04 l4 (retourner `{ tails, heads }`), conseil `objet-sans-parentheses` |
-| 15. map imbriqués, flatMap | unité 12 à venir (buildBaseDeck) |
-| 16. for à l'envers, Math.random et ses bornes | u02 l1, boss getRandomInt (u03), u04 l2 (à l'envers), boss pile ou face (u04), simulateur Fisher–Yates |
+| 14. Objets, `(x) => ({ … })` | u03 l5 (« Construis l'objet »), u04 l4 (retourner `{ tails, heads }`), u12 entière (le jeu de cartes), conseil `objet-sans-parentheses` |
+| 15. map imbriqués, flatMap | u12 l3, boss buildBaseDeck (u12) |
+| 16. for à l'envers, Math.random et ses bornes | u02 l1, boss getRandomInt (u03), u04 l2 (à l'envers), boss pile ou face (u04), u13 (indice de 0 à i, Fisher–Yates, test d'équité) |
 | 17. Portée des variables, ordre de déclaration | u01 l2, u03 l4, u04 l4 (compteur déclaré avant la boucle) |
 | 18. Enchaînements de méthodes et types | u06 l5 et u07 l5 (exercice « Suis les types ») |

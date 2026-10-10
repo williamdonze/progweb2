@@ -545,6 +545,8 @@ Q.selecteur = (q, onChange) => {
     const els = trouver(v);
     if (!els) { compte.textContent = "Sélecteur invalide (vérifie la syntaxe : . pour une classe, # pour un id, [ ] pour un attribut)."; compte.classList.add("ko"); onChange(); return; }
     els.forEach(x => x.classList.add("pw-trouve"));
+    const vue = els.find(x => x.localName === "playing-card") || els[0];   // amène le premier élément trouvé dans la vue (sans faire défiler l'appli)
+    if (vue && doc.scrollingElement) doc.scrollingElement.scrollTop = Math.max(0, vue.getBoundingClientRect().top + doc.scrollingElement.scrollTop - 12);
     const cartes = els.filter(x => x.localName === "playing-card").length;
     compte.classList.remove("ko");
     compte.textContent = `${pluriel(els.length, "élément trouvé", "éléments trouvés")}${els.length !== cartes && cartes ? ` (dont ${cartes} carte${cartes > 1 ? "s" : ""} : les autres sont des éléments à l'intérieur des cartes ou ailleurs)` : ""}.`;

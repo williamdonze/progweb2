@@ -4,9 +4,10 @@ Site pédagogique façon **Duolingo** pour apprendre le JavaScript **de zéro** 
 
 ## État actuel
 
-- Unités 1 à 7 complètes : 36 leçons, 44 fiches de théorie, 7 jeux, 7 quiz, 19 boss (exercices du cours), 421 questions. **TP Fonctions complet** ; TP Tableaux : nombres 1, 2, 3, 6, 7 et chaînes 6. Détail, unités à venir (8 à 15, dont le jeu de cartes et le DOM) et correspondance avec les TP : `docs/programme.md`.
+- **Programme complet** : 15 unités, 64 leçons, 75 fiches de théorie, 15 jeux, 15 quiz, 46 boss (exercices du cours), 757 questions. **Tous les exercices des trois TP** (Fonctions, Tableaux : nombres, chaînes, jeu de cartes ; DOM) sont des boss. Détail et correspondance avec les TP : `docs/programme.md`.
+- `content/pages/cards.css` est le fichier du prof ; `cards.html` a été **reconstruit** à partir d'un export texte de la page (structure décrite par le TP : ids `SUIT-RANK`, classes `rank-… suit`, `data-face-card`, boutons, `.deck`, `#hand`). Si l'élève envoie le vrai HTML (« Page web, HTML uniquement »), le remplacer et relancer les tests.
 - Source des énoncés : pages du cours enregistrées le 10 octobre 2026, copiées dans `docs/cours/` (tp1-fonctions, tp2-tableaux, tp3-dom). Les boss reprennent les énoncés tels quels.
-- 22 types d'exercices (dont 4 avec du code exécuté et testé), éditeur de code mobile, bac à sable (Web Worker), tests automatiques, diagnostics et erreurs JavaScript traduits en français.
+- 23 types d'exercices (dont 4 avec du code exécuté et testé), éditeur de code mobile, deux bacs à sable (Web Worker pour le JavaScript, iframe isolée avec la page du TP pour le DOM), console qui comprend les couleurs ANSI, tests automatiques, diagnostics et erreurs JavaScript traduits en français.
 - Gamification de Pampre : XP, 7 rangs, badges, série de jours, défi du jour, graphique 7 jours. **Pas de vies**, volontairement (choix de l'élève).
 - Répétition espacée **par notion** (boîtes de Leitner), fiches de théorie consultables partout, console libre.
 - Sauvegarde `localStorage` (`progweb2-sauvegarde-v1`), export / import par code, thème clair / sombre, appli installable (PWA, hors connexion).
@@ -30,10 +31,13 @@ js/worker.js               Web Worker : importe banc.js, exécute le code de l'�
 js/base.js                 Utilitaires, icônes, mascotte Coco, sauvegarde, progression, répétition espacée, toasts,
                            modale, affichage du code, executer() (lance le worker, timeout 2 s), texte enrichi, fiches, illustrations
 js/editeur.js              Éditeur de code maison (textarea transparente sur un <pre> coloré) + barre de symboles
-js/questions.js            Moteur d'exercices : Q[type] pour les 22 types
+js/dom.js                  Bac à sable DOM : page du TP dans une <iframe sandbox="allow-scripts">, executerDom(), apercuDom()
+js/dom-harnais.js          Chargé DANS l'iframe (après banc.js) : exécute le code de l'élève comme module, joue les étapes des tests
+js/questions.js            Moteur d'exercices : Q[type] pour les 23 types
 js/app.js                  runSession, lancement des leçons / jeux / quiz / boss, défi du jour, vues, démarrage
 content/config.json        Sommaire des unités (ordre), rangs, badges, unités « bientôt »
 content/unites/uNN-*.json  Une unité par fichier : fiches, leçons, jeux, quiz, boss
+content/pages/             Pages web des exercices DOM (cards.html = contenu du <body>, cards.css)
 tools/                     Tests et outils (voir « Tests »)
 docs/format-contenu.md     LA référence du format du contenu (tous les types, les tests, les diagnostics)
 docs/programme.md          Programme, correspondance unités ↔ exercices du cours, difficultés ciblées
@@ -45,7 +49,7 @@ manifest.webmanifest, sw.js, icones/   Appli installable, hors connexion (change
 
 ## Architecture
 
-- Scripts classiques (pas de modules), qui partagent leurs déclarations globales, chargés dans l'ordre : `banc.js`, `base.js`, `editeur.js`, `questions.js`, `app.js`.
+- Scripts classiques (pas de modules), qui partagent leurs déclarations globales, chargés dans l'ordre : `banc.js`, `base.js`, `editeur.js`, `dom.js`, `questions.js`, `app.js`.
 - **Contrat d'un type d'exercice** (repris de Pampre) : `Q.monType = (q, onChange) => ({ el, ready(), check(), key?, cleanup?, reouvrir?, resoudre? })`.
   - `check()` verrouille, marque juste / faux, renvoie `{ ok, answer?, answerHTML?, detailHTML?, retry? }`, ou une **promesse** (exercices de code, prédictions sans réponse écrite).
   - `retry: true` : exercice de code raté ; la feuille rouge propose « Corriger mon code » (`reouvrir()`), puis « Passer » après 3 essais. **Jamais de solution affichée.**
@@ -56,7 +60,9 @@ manifest.webmanifest, sw.js, icones/   Appli installable, hors connexion (change
   2. pour chaque cas de test, relance le code (données éventuellement différentes), appelle la fonction avec des arguments **gelés** (Object.freeze profond), compare (`egal`, profonde, tolérance 1e-9 sur les nombres, types stricts) ;
   3. analyse statique (`analyseStatique`) : méthodes interdites / obligatoires, conseils (nom du paramètre, `==`, `===` entre tableaux, accolades sans return, objet sans parenthèses…) ;
   4. diagnostics (`diagnostiquer`) sur le premier cas raté : return vs console.log, forEach, texte vs nombre, spread oublié, map / filter, départ de reduce, données en dur…
-  - Le code de l'élève tourne dans `new Function("console", "__donnees", "use strict" + entête + code + ";return (__n) => eval(__n);")` : la fonction retournée lit n'importe quel nom du programme (fonction à tester, variables). Décalage de lignes = 3 + nombre de données (vérifié dans Chromium).
+  - Le code de l'élève tourne dans `new Function("console", "__donnees", "use strict" + entête + prélude + code + ";return (__n) => eval(__n);")` : la fonction retournée lit n'importe quel nom du programme (fonction à tester, variables). Décalage de lignes = 3 + nombre de données + lignes du prélude (vérifié dans Chromium).
+  - Tests au hasard : `repetitions` (bornes, toutes les valeurs), `verifie` (propriété du résultat), `melange` (Fisher–Yates : compte les ordres sur des dizaines de milliers d'essais ; 3 éléments × 24 000 ou 4 × 96 000, sinon le hasard seul fait échouer une bonne solution).
+- **Bac à sable DOM** (champ `dom` d'un exercice, d'une carte ou d'un exemple) : `executerDom` (dom.js) crée une iframe cachée `sandbox="allow-scripts"` (sans `allow-same-origin` : ni l'appli ni la sauvegarde ne sont accessibles) avec la page, `banc.js` et `dom-harnais.js` ; le harnais importe le code de l'élève comme module (blob), capture la console, joue `tests.etapes` (clics, scripts) et vérifie le DOM (`compter`, `identique`, `vrai`, `sortie`), puis renvoie un résultat au même format que `executerTout`. L'analyse statique (interdit, obligatoire, conseils) est la même. Délai : 4 s. « Exécuter » affiche la même page, visible et cliquable (`apercuDom`).
 - **Progression** : unité ouverte si première, ou déjà ouverte (`ST.ouvertes`), ou quiz précédent validé (80 %). Nœuds du parcours ouverts l'un après l'autre. Identifiants explicites partout : ajouter du contenu ne casse jamais une sauvegarde. Ne **jamais** changer l'`id` d'un élément existant.
 - **Répétition espacée** : `noterNotions(q, ok)` après chaque question (ok seulement si réussi au premier essai sans indice) ; boîtes 1 à 5, intervalles 1, 2, 4, 8, 16 jours ; une erreur ramène à la boîte 1, due aujourd'hui. Le défi du jour prend d'abord une question par notion due, puis les erreurs récentes (`ST.erreurs`), puis des révisions (1 exercice de code au plus).
 
@@ -110,4 +116,5 @@ GitHub Actions (`.github/workflows/tests.yml`) lance les trois tests à chaque p
 
 - Une seule exécution à la fois par exercice ; timeout fixe de 2 s.
 - Les erreurs de syntaxe n'ont pas de numéro de ligne dans Chromium : il est déduit d'une analyse des parenthèses et des mots sans guillemets (`verifierParentheses`, `texteSansGuillemets`).
-- `aVenir` et `docs/programme.md` décrivent les unités 8 à 15 : à écrire avec la procédure ci-dessus. Les unités DOM demandent un second bac à sable (iframe), et `showCard` des couleurs ANSI dans la console : voir « À prévoir dans le moteur » dans `docs/programme.md`.
+- Le harnais DOM ne voit pas les variables du module de l'élève : pour appeler une de ses fonctions dans un test, la déclarer dans `tests.exposer`.
+- `test-parcours.py` joue tout le parcours (environ 6 minutes, surtout les mélanges et les pages DOM).

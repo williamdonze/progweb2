@@ -72,7 +72,7 @@ def verifier_question(q, ou):
         n = len(re.findall(r"_{3,}", lignes(q.get("code"))))
         if n != len(q.get("solution", [])): E(f"{ou} : {n} trous mais {len(q.get('solution', []))} valeurs de solution")
     if t in CODE:
-        cas = q.get("tests", {}).get("cas", [])
+        cas = q.get("tests", {}).get("cas") or q.get("tests", {}).get("etapes", [])
         if not cas: E(f"{ou} : aucun cas de test")
         if t != "trous" and len(cas) < 2 and t == "boss": W(f"{ou} : un boss devrait tester plusieurs jeux de données")
         if len(q.get("indices", [])) < (3 if t == "boss" else 1): W(f"{ou} : indices progressifs insuffisants")

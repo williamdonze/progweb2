@@ -1,0 +1,428 @@
+{
+  "id": "u14",
+  "titre": "DOM : sélectionner",
+  "sousTitre": "TP DOM · exercices 1 à 3",
+  "objectif": "Trouver des éléments de la page avec querySelector et querySelectorAll, écrire des sélecteurs CSS (id, classe, OU, attribut, :not), ajouter et retirer des classes avec classList, réagir à un clic.",
+  "icone": "<>",
+  "fiches": [
+    {
+      "id": "dom",
+      "titre": "Le DOM : la page vue par JavaScript",
+      "icone": "🌳",
+      "resume": "Le navigateur transforme le HTML en **objets** que JavaScript peut lire et modifier : le DOM. `document` est la porte d'entrée.",
+      "analogie": "Le HTML est la **recette** écrite ; le DOM est le **plat** posé sur la table. JavaScript ne retouche pas la recette : il modifie le plat, et l'écran change aussitôt.",
+      "texte": "- Chaque balise devient un **élément** : `<playing-card id=\"SPADE-ACE\" class=\"rank-ace spade\">` est un objet avec un `id`, des classes, des enfants (les deux `<span>`).\n- `document.querySelector(…)` trouve un élément ; on peut ensuite changer ses classes, son texte, ajouter des écouteurs…\n- Le script du TP est chargé avec `type=\"module\"` : il s'exécute une fois le HTML analysé, donc toutes les cartes existent déjà.\n\nDans ProgWeb 2, ton code tourne dans une copie de la page du TP (`cards.html` et `cards.css`) : clique sur les boutons pour essayer.",
+      "exemples": [
+        { "code": ["const card = document.querySelector(\"#SPADE-ACE\");", "console.log(card.id);", "console.log(card.className);", "card.classList.add(\"selected\");"], "dom": { "page": "cards" } }
+      ]
+    },
+    {
+      "id": "queryselector",
+      "titre": "querySelector et querySelectorAll",
+      "icone": "🔎",
+      "resume": "`querySelector(sel)` retourne **le premier** élément trouvé (ou `null`). `querySelectorAll(sel)` retourne **tous** les éléments trouvés, dans une collection (`NodeList`).",
+      "analogie": "querySelector : « donne-moi **une** carte qui… ». querySelectorAll : « donne-moi **la pile** de toutes les cartes qui… ». Une pile n'a pas de classes : il faut prendre les cartes une par une.",
+      "texte": "- `document.querySelector(\"#SPADE-ACE\")` : un élément.\n- `document.querySelectorAll(\".heart\")` : une `NodeList` de 13 éléments. Elle a `length` et `forEach`, mais **pas** `map`, `filter`… (pour ça, la convertir en tableau : `[...liste]`, unité suivante).\n- Rien trouvé : `querySelector` retourne `null`, `querySelectorAll` une liste **vide**.\n\nLe piège : `document.querySelectorAll(\".heart\").classList.add(\"selected\")`. La liste n'a pas de `classList` : il faut parcourir avec `forEach` et modifier **chaque** carte.",
+      "exemples": [
+        { "code": ["const hearts = document.querySelectorAll(\".heart\");", "console.log(hearts.length);", "hearts.forEach((card) => card.classList.add(\"selected\"));", "console.log(document.querySelector(\"#NOPE\"));"], "dom": { "page": "cards" } }
+      ],
+      "pieges": ["`classList` sur une NodeList : il faut forEach.", "Oublier le `#` d'un id ou le `.` d'une classe : `querySelector(\"SPADE-ACE\")` cherche une **balise** <SPADE-ACE>."]
+    },
+    {
+      "id": "selecteurs-css",
+      "titre": "Les sélecteurs CSS",
+      "icone": "#.",
+      "resume": "`#id`, `.classe`, `balise`, `A B` (B à l'intérieur de A), `A, B` (A **ou** B), `.a.b` ou `.a[attr]` (les deux **à la fois**), `[attr]` (l'attribut est présent), `:not(…)` (sauf).",
+      "texte": "- `#SPADE-ACE` : l'élément dont l'id est SPADE-ACE.\n- `.heart` : les éléments qui ont la classe heart.\n- `playing-card` : toutes les balises <playing-card>.\n- `.deck .heart` (avec espace) : les .heart **à l'intérieur** de .deck.\n- `.heart, .diamond` (virgule) : les cœurs **ou** les carreaux.\n- `.heart[data-face-card]` (collés, sans espace) : les éléments qui sont cœur **et** ont l'attribut data-face-card.\n- `[data-face-card]` : l'attribut est présent (même sans valeur).\n- `playing-card:not(.spade)` : les cartes qui ne sont pas des piques.\n\nAttention aux espaces : `.heart [data-face-card]` (avec espace) cherche un élément **à l'intérieur** d'un cœur ! Et `:not(.spade)` tout seul attrape aussi les `<span>` à l'intérieur des cartes : précise `playing-card:not(.spade)`.\n\nAvec la virgule, chaque morceau est un sélecteur complet : `.heart[data-face-card], .diamond[data-face-card]`.",
+      "pieges": ["Un espace en trop ou en moins change tout le sens.", "`:not(.spade)` sans `playing-card` : les spans des cartes sont pris aussi."]
+    },
+    {
+      "id": "classlist",
+      "titre": "classList : ajouter, retirer des classes",
+      "icone": "🏷",
+      "resume": "`el.classList.add(\"selected\")`, `.remove(\"selected\")`, `.toggle(\"selected\")`, `.contains(\"selected\")`. Les autres classes ne bougent pas.",
+      "texte": "- `add` : ajoute la classe (rien ne change si elle y est déjà).\n- `remove` : la retire (pas d'erreur si elle n'y était pas).\n- `toggle` : l'ajoute si elle manque, la retire sinon.\n- `contains` : true / false.\n\nLe CSS du TP dessine les cartes `.selected` en surbrillance : changer une classe suffit à changer l'affichage.\n\nÀ éviter : `el.className = \"selected\"` remplace **toutes** les classes (la carte perd `heart`, `rank-ace`…).",
+      "exemples": [
+        { "code": ["const king = document.querySelector(\"#HEART-KING\");", "king.classList.add(\"selected\");", "console.log(king.classList.contains(\"selected\"));", "console.log(king.className);"], "dom": { "page": "cards" } }
+      ],
+      "pieges": ["`className = …` efface les autres classes.", "`classList.add(\".selected\")` : pas de point dans le nom de la classe."]
+    },
+    {
+      "id": "conteneur",
+      "titre": "Chercher dans un conteneur",
+      "icone": "📦",
+      "resume": "`querySelector` et `querySelectorAll` existent aussi sur un **élément** : `deckEl.querySelectorAll(\".heart\")` cherche seulement à l'intérieur de `deckEl`.",
+      "analogie": "Chercher les cœurs **dans le paquet** et pas sur toute la table : la main du joueur, posée à côté, n'est pas concernée.",
+      "texte": "Le TP le demande : les sélections doivent être « limitées aux cartes du paquet d'origine, dans .deck ». Plus tard, des copies de cartes seront ajoutées dans `#hand` : `document.querySelectorAll(\".heart\")` les attraperait aussi.\n\n```\nconst deckEl = document.querySelector(\".deck\");\ndeckEl.querySelectorAll(\".heart\");   // seulement les cœurs du paquet\n```\n\nOn peut aussi l'écrire dans le sélecteur : `document.querySelectorAll(\".deck .heart\")`.",
+      "exemples": [
+        { "code": ["const deckEl = document.querySelector(\".deck\");", "const handEl = document.querySelector(\"#hand\");", "console.log(deckEl.querySelectorAll(\"playing-card\").length);", "console.log(handEl.querySelectorAll(\"playing-card\").length);"], "dom": { "page": "cards" } }
+      ]
+    },
+    {
+      "id": "addeventlistener",
+      "titre": "Réagir à un clic : addEventListener",
+      "icone": "👆",
+      "resume": "`bouton.addEventListener(\"click\", () => { … })` : la fonction donnée sera appelée **à chaque clic**, plus tard.",
+      "analogie": "On laisse un **numéro de téléphone** au bouton : « appelle ce numéro quand on te clique ». On ne passe pas l'appel tout de suite.",
+      "texte": "- Premier argument : le nom de l'événement, `\"click\"`.\n- Deuxième : une **fonction** (souvent une flèche). Elle ne s'exécute pas tout de suite, mais à chaque clic.\n\nLe piège : `bouton.addEventListener(\"click\", clearSelection())`. Les parenthèses **appellent** clearSelection immédiatement, et c'est son résultat (undefined) qui est donné au bouton. Il faut donner la fonction elle-même : `clearSelection` (sans parenthèses), ou une flèche : `() => clearSelection()`.\n\nC'est le même principe que les fonctions données à map ou forEach : relis [[fonction-en-parametre]].",
+      "exemples": [
+        { "code": ["const button = document.querySelector(\"#select-hearts\");", "button.addEventListener(\"click\", () => {", "  console.log(\"clic sur Hearts !\");", "});", "console.log(\"écouteur posé : clique sur B · Hearts\");"], "dom": { "page": "cards" } }
+      ],
+      "pieges": ["`addEventListener(\"click\", f())` : f est appelée tout de suite, une seule fois.", "`addEventListener` sur une NodeList : il faut un élément (querySelector)."]
+    }
+  ],
+  "lecons": [
+    {
+      "id": "u14-l1",
+      "titre": "La page vue par JavaScript",
+      "duree": 6,
+      "notions": ["dom", "queryselector"],
+      "cartes": [
+        {
+          "titre": "Des cartes dans une page",
+          "texte": "Le TP reprend le jeu de 52 cartes, cette fois en HTML. Chaque carte est une balise `<playing-card>` avec un **id** (couleur et rang) et des **classes**.",
+          "code": ["<playing-card id=\"SPADE-ACE\" class=\"rank-ace spade\">", "    <span class=\"rank\">A</span>", "    <span class=\"suit\">♠</span>", "</playing-card>"],
+          "executable": false,
+          "fiche": "dom"
+        },
+        {
+          "titre": "Trouver une carte",
+          "texte": "`document.querySelector(\"#SPADE-ACE\")` : le `#` veut dire « l'id ». On obtient l'**élément**, un objet qu'on peut lire et modifier. Exécute : la page s'affiche, avec l'as de pique sélectionné.",
+          "code": ["const ace = document.querySelector(\"#SPADE-ACE\");", "console.log(ace.id);", "ace.classList.add(\"selected\");"],
+          "dom": { "page": "cards" },
+          "analogie": "Le HTML est la recette, le DOM est le plat : JavaScript modifie le plat, et l'écran change aussitôt."
+        },
+        {
+          "titre": "Toute une pile de cartes",
+          "texte": "`querySelectorAll` retourne **toutes** les cartes trouvées, dans une liste. On la parcourt avec `forEach`, comme un tableau.",
+          "code": ["const hearts = document.querySelectorAll(\".heart\");", "console.log(hearts.length);", "hearts.forEach((card) => card.classList.add(\"selected\"));"],
+          "dom": { "page": "cards" },
+          "fiche": "queryselector"
+        },
+        {
+          "titre": "Une pile n'a pas de classes",
+          "texte": "La liste n'est pas une carte : elle n'a pas de `classList`. C'est l'erreur la plus fréquente du TP.",
+          "code": ["const hearts = document.querySelectorAll(\".heart\");", "hearts.classList.add(\"selected\");"],
+          "dom": { "page": "cards" },
+          "erreurVoulue": true,
+          "piege": "Avec querySelectorAll, il faut **toujours** parcourir : `forEach((card) => …)`."
+        }
+      ],
+      "exercices": [
+        { "id": "u14-l1-e1", "type": "qcm", "notions": ["queryselector"], "question": "Que retourne `document.querySelectorAll(\".heart\")` ?", "choix": ["Une liste (NodeList) de toutes les cartes de cœur", "La première carte de cœur", "Un tableau de textes \"heart\"", "true s'il y a des cœurs"], "bonne": 0, "explication": "querySelectorAll : tous les éléments, dans une NodeList." },
+        { "id": "u14-l1-e2", "type": "qcm", "notions": ["queryselector"], "question": "Que retourne `document.querySelector(\"#JOKER\")` s'il n'y a pas d'élément avec cet id ?", "choix": ["null", "undefined", "une liste vide", "une erreur"], "bonne": 0, "explication": "Rien trouvé : null. Lire `.classList` sur null provoque ensuite une erreur." },
+        { "id": "u14-l1-e3", "type": "selecteur", "notions": ["selecteurs-css", "queryselector"], "question": "Écris le sélecteur qui trouve le **roi de cœur** par son identifiant.", "dom": { "page": "cards" }, "attendu": "#HEART-KING", "nombre": 1, "explication": "`#` + l'id : `#HEART-KING`." },
+        { "id": "u14-l1-e4", "type": "bug", "notions": ["queryselector", "classlist"], "question": "Ce code plante. Quelle ligne corriger ?", "code": ["const clubs = document.querySelectorAll(\".club\");", "clubs.classList.add(\"selected\");"], "ligne": 2, "choix": ["Parcourir la liste : `clubs.forEach((card) => card.classList.add(\"selected\"))`", "Il faut `querySelector`", "Il faut `.add(\".selected\")`", "Il faut `const` à la ligne 2"], "bonne": 0, "explication": "La NodeList n'a pas de classList : chaque carte en a une." },
+        {
+          "id": "u14-l1-e5", "type": "ecrire", "notions": ["queryselector", "classlist"],
+          "question": "Ajoute la classe `selected` à **l'as de cœur** (id `HEART-ACE`).",
+          "dom": { "page": "cards" },
+          "depart": ["", ""],
+          "tests": { "etapes": [
+            { "titre": "Au chargement de la page", "verifier": [ { "compter": ".deck .selected", "egal": 1, "libelle": "Cartes sélectionnées" }, { "identique": [".deck .selected", "#HEART-ACE"], "message": "Ce n'est pas l'as de cœur qui est sélectionné." } ] }
+          ], "obligatoire": ["querySelector", "classList"] },
+          "indices": ["Trouver un élément par son id : `#` devant l'id.", { "code": "document.querySelector(\"___\").classList.add(\"___\");" }],
+          "solution": ["const ace = document.querySelector(\"#HEART-ACE\");", "ace.classList.add(\"selected\");"],
+          "erreursTypiques": [
+            { "code": "const ace = document.querySelector(\"HEART-ACE\");\nace.classList.add(\"selected\");", "attendu": "erreur" },
+            { "code": "const ace = document.querySelector(\"#HEART-ACE\");\nace.classList.add(\".selected\");", "attendu": "echec" }
+          ],
+          "explication": "Sans `#`, le sélecteur cherche une balise <HEART-ACE> : il ne trouve rien (null)."
+        },
+        {
+          "id": "u14-l1-e6", "type": "ecrire", "notions": ["queryselector", "classlist", "foreach"],
+          "question": "Ajoute la classe `selected` à **tous les rois** (ils ont la classe `rank-king`).",
+          "dom": { "page": "cards" },
+          "depart": ["", ""],
+          "tests": { "etapes": [
+            { "titre": "Au chargement de la page", "verifier": [ { "compter": ".deck .selected", "egal": 4, "libelle": "Cartes sélectionnées" }, { "identique": [".deck .selected", ".rank-king"], "message": "Ce ne sont pas les quatre rois qui sont sélectionnés." } ] }
+          ], "obligatoire": ["querySelectorAll", "classList"] },
+          "indices": ["Plusieurs cartes : querySelectorAll, puis forEach.", { "code": "document.querySelectorAll(\"___\").forEach((card) => card.classList.add(\"selected\"));" }],
+          "solution": ["const kings = document.querySelectorAll(\".rank-king\");", "kings.forEach((card) => card.classList.add(\"selected\"));"],
+          "erreursTypiques": [
+            { "code": "const kings = document.querySelectorAll(\".rank-king\");\nkings.classList.add(\"selected\");", "attendu": "erreur" },
+            { "code": "const king = document.querySelector(\".rank-king\");\nking.classList.add(\"selected\");", "attendu": "echec", "diagnostic": "obligatoire" }
+          ],
+          "explication": "querySelector n'aurait sélectionné que le premier roi (celui de cœur)."
+        }
+      ]
+    },
+    {
+      "id": "u14-l2",
+      "titre": "Les sélecteurs CSS",
+      "duree": 8,
+      "notions": ["selecteurs-css"],
+      "cartes": [
+        {
+          "titre": "Id, classe, balise",
+          "texte": "`#id` pour un identifiant, `.classe` pour une classe, le nom seul pour une balise. Les mêmes que dans un fichier CSS.",
+          "code": ["console.log(document.querySelectorAll(\"#CLUB-7\").length);", "console.log(document.querySelectorAll(\".club\").length);", "console.log(document.querySelectorAll(\"playing-card\").length);"],
+          "dom": { "page": "cards" },
+          "fiche": "selecteurs-css"
+        },
+        {
+          "titre": "La virgule : OU",
+          "texte": "`.spade, .club` : les piques **ou** les trèfles. Chaque morceau entre les virgules est un sélecteur complet.",
+          "code": ["console.log(document.querySelectorAll(\".spade, .club\").length);"],
+          "dom": { "page": "cards" }
+        },
+        {
+          "titre": "Collés : ET",
+          "texte": "Sans espace, les conditions s'additionnent : `.club[data-face-card]` = trèfle **et** figure. `[data-face-card]` veut dire « l'attribut est présent ».",
+          "code": ["console.log(document.querySelectorAll(\"[data-face-card]\").length);", "console.log(document.querySelectorAll(\".club[data-face-card]\").length);"],
+          "dom": { "page": "cards" },
+          "piege": "Avec un espace, `.club [data-face-card]` cherche un élément **à l'intérieur** d'un trèfle : 0 résultat."
+        },
+        {
+          "titre": ":not() : sauf",
+          "texte": "`playing-card:not(.club)` : les cartes qui ne sont pas des trèfles. Sans `playing-card`, `:not(.club)` prend aussi les `<span>` à l'intérieur des cartes (et le reste de la page).",
+          "code": ["console.log(document.querySelectorAll(\".deck playing-card:not(.club)\").length);", "console.log(document.querySelectorAll(\".deck :not(.club)\").length);"],
+          "dom": { "page": "cards" }
+        }
+      ],
+      "exercices": [
+        { "id": "u14-l2-e1", "type": "selecteur", "notions": ["selecteurs-css"], "question": "Sélectionne **tous les trèfles** par leur classe.", "dom": { "page": "cards" }, "attendu": ".club", "nombre": 13, "explication": "`.club` : le point veut dire « la classe »." },
+        { "id": "u14-l2-e2", "type": "selecteur", "notions": ["selecteurs-css"], "question": "Sélectionne les **cartes noires** : les piques **ou** les trèfles (26 cartes).", "dom": { "page": "cards" }, "attendu": ".spade, .club", "nombre": 26, "explication": "La virgule exprime le OU." },
+        { "id": "u14-l2-e3", "type": "selecteur", "notions": ["selecteurs-css"], "question": "Sélectionne les **quatre as** (ils ont la classe `rank-ace`).", "dom": { "page": "cards" }, "attendu": ".rank-ace", "nombre": 4, "explication": "Le rang est aussi une classe." },
+        { "id": "u14-l2-e4", "type": "selecteur", "notions": ["selecteurs-css"], "question": "Sélectionne les **figures de trèfle** (valet, dame, roi de trèfle) : trèfle **et** attribut `data-face-card`.", "dom": { "page": "cards" }, "attendu": ".club[data-face-card]", "nombre": 3, "explication": "Collés, sans espace : les deux conditions à la fois." },
+        { "id": "u14-l2-e5", "type": "selecteur", "notions": ["selecteurs-css"], "question": "Sélectionne toutes les **cartes** du paquet **sauf les trèfles** (39 cartes, et pas leurs spans).", "dom": { "page": "cards" }, "attendu": ".deck playing-card:not(.club)", "nombre": 39, "explication": "`playing-card:not(.club)` : seulement des cartes. Regarde le compteur si tu écris `:not(.club)` seul." },
+        { "id": "u14-l2-e6", "type": "selecteur", "notions": ["selecteurs-css"], "question": "Sélectionne les piques qui **ne sont pas** des figures (10 cartes : de l'as au 10).", "dom": { "page": "cards" }, "attendu": "playing-card.spade:not([data-face-card])", "nombre": 10, "explication": "On peut mettre un attribut dans :not(…)." },
+        { "id": "u14-l2-e7", "type": "assoc", "notions": ["selecteurs-css"], "mono": true, "question": "Associe chaque sélecteur à son sens.", "paires": [["#CLUB-7", "l'élément dont l'id est CLUB-7"], [".club, .spade", "les trèfles ou les piques"], [".club.rank-7", "les éléments trèfle et rang 7 à la fois"], [".deck .club", "les trèfles à l'intérieur de .deck"]], "explication": "Virgule : OU ; collés : ET ; espace : à l'intérieur." },
+        { "id": "u14-l2-e8", "type": "qcm", "notions": ["selecteurs-css"], "question": "Combien d'éléments trouve `.heart [data-face-card]` (avec un espace) dans la page du TP ?", "choix": ["0", "3", "13", "16"], "bonne": 0, "explication": "Avec l'espace, on cherche un élément à data-face-card **dans** une carte de cœur : les spans n'en ont pas." }
+      ]
+    },
+    {
+      "id": "u14-l3",
+      "titre": "classList et le paquet",
+      "duree": 6,
+      "notions": ["classlist", "conteneur"],
+      "cartes": [
+        {
+          "titre": "Ajouter, retirer",
+          "texte": "`classList.add` et `classList.remove` changent **une** classe sans toucher aux autres. Le CSS du TP met en surbrillance les cartes `.selected`.",
+          "code": ["const card = document.querySelector(\"#DIAMOND-QUEEN\");", "card.classList.add(\"selected\");", "console.log(card.className);", "card.classList.remove(\"selected\");", "console.log(card.className);"],
+          "dom": { "page": "cards" },
+          "fiche": "classlist"
+        },
+        {
+          "titre": "Ne pas tout écraser",
+          "texte": "`className = \"…\"` remplace toutes les classes : la carte perd `diamond`, `rank-queen`, et son dessin.",
+          "code": ["const card = document.querySelector(\"#DIAMOND-QUEEN\");", "card.className = \"selected\";", "console.log(card.className);"],
+          "dom": { "page": "cards" },
+          "piege": "Toujours passer par classList."
+        },
+        {
+          "titre": "Seulement dans le paquet",
+          "texte": "Plus tard, des copies de cartes apparaîtront dans `#hand`. Le TP demande que les sélections restent **dans .deck** : on cherche à l'intérieur du conteneur.",
+          "code": ["const deckEl = document.querySelector(\".deck\");", "const diamonds = deckEl.querySelectorAll(\".diamond\");", "console.log(diamonds.length);"],
+          "dom": { "page": "cards" },
+          "fiche": "conteneur",
+          "analogie": "Chercher les carreaux dans le paquet, pas sur toute la table."
+        }
+      ],
+      "exercices": [
+        { "id": "u14-l3-e1", "type": "qcm", "notions": ["classlist"], "question": "Une carte a les classes `rank-ace heart selected`. Après `card.classList.remove(\"selected\")`, quelles classes reste-t-il ?", "choix": ["rank-ace heart", "aucune", "selected", "rank-ace heart selected"], "bonne": 0, "explication": "remove ne retire que la classe demandée." },
+        { "id": "u14-l3-e2", "type": "qcm", "notions": ["classlist"], "question": "Que fait `card.classList.toggle(\"selected\")` sur une carte **déjà** sélectionnée ?", "choix": ["Elle retire la classe", "Elle l'ajoute une deuxième fois", "Rien", "Une erreur"], "bonne": 0, "explication": "toggle : ajoute si absente, retire si présente." },
+        { "id": "u14-l3-e3", "type": "vf", "notions": ["conteneur"], "question": "`deckEl.querySelectorAll(\".heart\")` trouve aussi les cœurs qui sont dans `#hand`.", "bonne": false, "explication": "Sur un élément, la recherche reste à l'intérieur de cet élément." },
+        {
+          "id": "u14-l3-e4", "type": "ecrire", "notions": ["conteneur", "classlist", "queryselector"],
+          "question": "En cherchant **dans le paquet** (`.deck`), ajoute la classe `selected` à tous les **carreaux** (`diamond`).",
+          "dom": { "page": "cards" },
+          "depart": ["const deckEl = document.querySelector(\".deck\");", ""],
+          "tests": { "etapes": [
+            { "titre": "Au chargement de la page", "verifier": [ { "compter": ".deck .selected", "egal": 13, "libelle": "Cartes sélectionnées" }, { "identique": [".deck .selected", ".deck .diamond"], "message": "Ce ne sont pas les carreaux qui sont sélectionnés." } ] }
+          ], "obligatoire": ["querySelectorAll", "classList"] },
+          "indices": ["Appelle querySelectorAll **sur deckEl**, pas sur document.", { "code": "deckEl.querySelectorAll(\"___\").forEach((card) => ___);" }],
+          "solution": ["const deckEl = document.querySelector(\".deck\");", "deckEl.querySelectorAll(\".diamond\").forEach((card) => card.classList.add(\"selected\"));"],
+          "erreursTypiques": [
+            { "code": "const deckEl = document.querySelector(\".deck\");\ndeckEl.querySelectorAll(\".diamond\").forEach((card) => card.className = \"selected\");", "attendu": "echec" },
+            { "code": "const deckEl = document.querySelector(\".deck\");\ndeckEl.querySelectorAll(\"diamond\").forEach((card) => card.classList.add(\"selected\"));", "attendu": "echec" }
+          ],
+          "explication": "Sans le point, `diamond` chercherait des balises <diamond>."
+        },
+        {
+          "id": "u14-l3-e5", "type": "ecrire", "notions": ["classlist", "queryselector"],
+          "question": "Le code de départ sélectionne quelques cartes. Ajoute en dessous le code qui **retire** la classe `selected` de **toutes** les cartes du paquet, sans toucher à leurs autres classes.",
+          "dom": { "page": "cards" },
+          "depart": ["document.querySelectorAll(\".rank-7, .rank-8\").forEach((card) => card.classList.add(\"selected\"));", "", ""],
+          "tests": { "etapes": [
+            { "titre": "Au chargement de la page", "verifier": [ { "compter": ".deck .selected", "egal": 0, "libelle": "Cartes encore sélectionnées" }, { "compter": ".deck .rank-7.club", "egal": 1, "libelle": "Le 7 de trèfle (ses classes doivent rester)" } ] }
+          ], "obligatoire": ["classList"] },
+          "indices": ["Toutes les cartes du paquet : `.deck playing-card`.", { "code": "document.querySelectorAll(\".deck playing-card\").forEach((card) => card.classList.___(\"selected\"));" }],
+          "solution": ["document.querySelectorAll(\".rank-7, .rank-8\").forEach((card) => card.classList.add(\"selected\"));", "", "document.querySelectorAll(\".deck playing-card\").forEach((card) => card.classList.remove(\"selected\"));"],
+          "erreursTypiques": [
+            { "code": "document.querySelectorAll(\".rank-7, .rank-8\").forEach((card) => card.classList.add(\"selected\"));\ndocument.querySelectorAll(\".deck playing-card\").forEach((card) => card.className = \"\");", "attendu": "echec" },
+            { "code": "document.querySelectorAll(\".rank-7, .rank-8\").forEach((card) => card.classList.add(\"selected\"));\ndocument.querySelector(\".deck .selected\").classList.remove(\"selected\");", "attendu": "echec" }
+          ],
+          "explication": "C'est presque `clearSelection`, le premier exercice du TP."
+        }
+      ]
+    },
+    {
+      "id": "u14-l4",
+      "titre": "Réagir à un clic",
+      "duree": 6,
+      "notions": ["addeventlistener", "fonction-en-parametre"],
+      "cartes": [
+        {
+          "titre": "Un numéro de téléphone pour le bouton",
+          "texte": "`addEventListener(\"click\", fonction)` : la fonction est rangée, et le navigateur l'appellera **à chaque clic**. Exécute, puis clique plusieurs fois sur « B · Hearts ».",
+          "code": ["const button = document.querySelector(\"#select-hearts\");", "button.addEventListener(\"click\", () => {", "  console.log(\"clic !\");", "});"],
+          "dom": { "page": "cards" },
+          "analogie": "On laisse un numéro au bouton : « appelle-moi quand on te clique ».",
+          "fiche": "addeventlistener"
+        },
+        {
+          "titre": "Les parenthèses de trop",
+          "texte": "`addEventListener(\"click\", hello())` appelle `hello` **tout de suite**, une fois, et donne son résultat (undefined) au bouton. Les clics ne font plus rien.",
+          "code": ["function hello() {", "  console.log(\"bonjour\");", "}", "document.querySelector(\"#select-red\").addEventListener(\"click\", hello);", "console.log(\"clique sur C · Red cards\");"],
+          "dom": { "page": "cards" },
+          "piege": "On donne la fonction (`hello`), on ne l'appelle pas (`hello()`)."
+        },
+        {
+          "titre": "Chaque clic remplace la sélection",
+          "texte": "Le TP veut que chaque bouton **remplace** la sélection précédente : on efface d'abord, puis on sélectionne.",
+          "code": ["const deckEl = document.querySelector(\".deck\");", "document.querySelector(\"#select-hearts\").addEventListener(\"click\", () => {", "  deckEl.querySelectorAll(\".selected\").forEach((card) => card.classList.remove(\"selected\"));", "  deckEl.querySelectorAll(\".rank-2\").forEach((card) => card.classList.add(\"selected\"));", "});"],
+          "dom": { "page": "cards" }
+        }
+      ],
+      "exercices": [
+        { "id": "u14-l4-e1", "type": "bug", "notions": ["addeventlistener"], "question": "Le message s'affiche une fois au chargement, puis plus jamais. Quelle ligne corriger ?", "code": ["function announce() {", "  console.log(\"clic !\");", "}", "const button = document.querySelector(\"#draw-hand\");", "button.addEventListener(\"click\", announce());"], "ligne": 5, "choix": ["Donner la fonction sans l'appeler : `addEventListener(\"click\", announce)`", "Il faut `\"onclick\"`", "Il faut querySelectorAll", "Il manque return dans announce"], "bonne": 0, "explication": "Les parenthèses appellent la fonction tout de suite." },
+        { "id": "u14-l4-e2", "type": "qcm", "notions": ["addeventlistener"], "question": "Quand la flèche donnée à `addEventListener(\"click\", () => { … })` s'exécute-t-elle ?", "choix": ["À chaque clic sur l'élément", "Une fois, tout de suite", "Une seule fois, au premier clic", "Jamais, il faut l'appeler"], "bonne": 0, "explication": "Le navigateur l'appelle à chaque clic." },
+        { "id": "u14-l4-e3", "type": "ordre", "notions": ["addeventlistener", "classlist"], "question": "Remets dans l'ordre le travail d'un bouton du TP.", "items": ["Sélectionner le bouton avec querySelector", "Lui associer un écouteur de click", "Au clic : effacer la sélection précédente", "Au clic : sélectionner les cartes demandées et leur ajouter selected"], "explication": "C'est la démarche décrite dans l'exercice 2 du TP." },
+        {
+          "id": "u14-l4-e4", "type": "ecrire", "notions": ["addeventlistener", "classlist"],
+          "question": "Quand on clique sur le bouton **Draw a hand** (`#draw-hand`), ajoute la classe `selected` à **l'as de carreau** (`#DIAMOND-ACE`). Avant le clic, rien n'est sélectionné.",
+          "dom": { "page": "cards" },
+          "depart": ["", ""],
+          "tests": { "etapes": [
+            { "titre": "Avant le clic", "verifier": [ { "compter": ".deck .selected", "egal": 0, "libelle": "Cartes sélectionnées avant tout clic" } ], "siEchec": "Rien ne doit se passer avant le clic : as-tu mis des parenthèses de trop dans addEventListener ?" },
+            { "titre": "Après un clic sur Draw a hand", "actions": [ { "clic": "#draw-hand" } ], "verifier": [ { "identique": [".deck .selected", "#DIAMOND-ACE"], "message": "Après le clic, seul l'as de carreau doit être sélectionné." } ] }
+          ], "obligatoire": ["addEventListener", "classList"] },
+          "indices": ["Deux étapes : trouver le bouton, puis lui donner une fonction pour le clic.", { "code": "document.querySelector(\"#draw-hand\").addEventListener(\"click\", () => {\n  ___\n});" }],
+          "solution": ["const button = document.querySelector(\"#draw-hand\");", "button.addEventListener(\"click\", () => {", "  document.querySelector(\"#DIAMOND-ACE\").classList.add(\"selected\");", "});"],
+          "erreursTypiques": [
+            { "code": "function select() {\n  document.querySelector(\"#DIAMOND-ACE\").classList.add(\"selected\");\n}\ndocument.querySelector(\"#draw-hand\").addEventListener(\"click\", select());", "attendu": "echec", "diagnostic": "contenu" },
+            { "code": "document.querySelector(\"#DIAMOND-ACE\").classList.add(\"selected\");", "attendu": "echec" }
+          ],
+          "explication": "La flèche ne s'exécute qu'au clic."
+        }
+      ]
+    }
+  ],
+  "jeux": [
+    {
+      "id": "u14-chasse",
+      "titre": "La chasse aux cartes",
+      "description": "Un sélecteur, une cible : vise juste du premier coup.",
+      "tours": 7,
+      "questions": [
+        { "id": "u14-j1-1", "type": "selecteur", "notions": ["selecteurs-css"], "question": "Le **7 de cœur**, par son id.", "dom": { "page": "cards" }, "attendu": "#HEART-7", "nombre": 1, "explication": "L'id combine la couleur et le rang." },
+        { "id": "u14-j1-2", "type": "selecteur", "notions": ["selecteurs-css"], "question": "Toutes les **dames** (classe `rank-queen`).", "dom": { "page": "cards" }, "attendu": ".rank-queen", "nombre": 4, "explication": "Le rang est une classe." },
+        { "id": "u14-j1-3", "type": "selecteur", "notions": ["selecteurs-css"], "question": "Les **as et les rois** (8 cartes).", "dom": { "page": "cards" }, "attendu": ".rank-ace, .rank-king", "nombre": 8, "explication": "La virgule : OU." },
+        { "id": "u14-j1-4", "type": "selecteur", "notions": ["selecteurs-css"], "question": "Le **10 de pique**, sans utiliser son id (deux classes collées).", "dom": { "page": "cards" }, "attendu": ".spade.rank-10", "nombre": 1, "explication": "Deux classes collées : les deux à la fois." },
+        { "id": "u14-j1-5", "type": "selecteur", "notions": ["selecteurs-css"], "question": "Toutes les **figures de pique et de trèfle** (6 cartes).", "dom": { "page": "cards" }, "attendu": ".spade[data-face-card], .club[data-face-card]", "nombre": 6, "explication": "Chaque morceau de la virgule est complet." },
+        { "id": "u14-j1-6", "type": "selecteur", "notions": ["selecteurs-css"], "question": "Toutes les cartes du paquet qui **ne sont pas des figures** (40 cartes).", "dom": { "page": "cards" }, "attendu": ".deck playing-card:not([data-face-card])", "nombre": 40, "explication": "52 - 12 figures = 40." },
+        { "id": "u14-j1-7", "type": "selecteur", "notions": ["selecteurs-css"], "question": "Les **symboles** (les `<span class=\"suit\">`) des cartes de carreau.", "dom": { "page": "cards" }, "attendu": ".diamond .suit", "nombre": 13, "explication": "Avec un espace : les .suit **à l'intérieur** des carreaux." }
+      ]
+    }
+  ],
+  "quiz": {
+    "titre": "Quiz : sélectionner dans le DOM",
+    "questions": [
+      { "id": "u14-q1", "type": "qcm", "notions": ["selecteurs-css"], "question": "Quel sélecteur trouve l'élément dont l'**id** est `HEART-2` ?", "choix": ["#HEART-2", ".HEART-2", "HEART-2", "[HEART-2]"], "bonne": 0, "mono": true, "explication": "# pour un id, . pour une classe." },
+      { "id": "u14-q2", "type": "selecteur", "notions": ["selecteurs-css"], "question": "Toutes les cartes de **carreau**.", "dom": { "page": "cards" }, "attendu": ".diamond", "nombre": 13, "explication": "Par la classe." },
+      { "id": "u14-q3", "type": "qcm", "notions": ["selecteurs-css"], "question": "Que veut dire la **virgule** dans `.heart, .diamond` ?", "choix": ["OU : les cœurs ou les carreaux", "ET : les cartes à la fois cœur et carreau", "À L'INTÉRIEUR : les carreaux dans un cœur", "SAUF : les cœurs sauf les carreaux"], "bonne": 0, "explication": "La virgule réunit deux sélecteurs." },
+      { "id": "u14-q4", "type": "qcm", "notions": ["queryselector"], "question": "Quelle méthode utiliser pour **une seule** carte attendue (par exemple l'as de pique) ?", "choix": ["querySelector", "querySelectorAll", "getElementsByClassName", "forEach"], "bonne": 0, "explication": "Le TP : « Utiliser querySelector lorsqu'une seule carte est attendue »." },
+      { "id": "u14-q5", "type": "bug", "notions": ["queryselector", "classlist"], "question": "Erreur : « Cannot read properties of undefined (reading 'add') ». Quelle ligne ?", "code": ["const deckEl = document.querySelector(\".deck\");", "const reds = deckEl.querySelectorAll(\".heart, .diamond\");", "reds.classList.add(\"selected\");"], "ligne": 3, "choix": ["Une NodeList n'a pas de classList : il faut forEach", "Il faut `.heart .diamond`", "deckEl est null", "Il faut toggle"], "bonne": 0, "explication": "`reds.classList` vaut undefined." },
+      { "id": "u14-q6", "type": "selecteur", "notions": ["selecteurs-css"], "question": "Les **figures de cœur** (3 cartes).", "dom": { "page": "cards" }, "attendu": ".heart[data-face-card]", "nombre": 3, "explication": "Classe et attribut collés." },
+      { "id": "u14-q7", "type": "vf", "notions": ["classlist"], "question": "`card.className = \"selected\"` ajoute la classe selected en gardant les autres.", "bonne": false, "explication": "className remplace tout ; classList.add ajoute." },
+      { "id": "u14-q8", "type": "qcm", "notions": ["addeventlistener"], "question": "Quelle ligne associe correctement `clearSelection` au clic sur `button` ?", "choix": ["button.addEventListener(\"click\", clearSelection);", "button.addEventListener(\"click\", clearSelection());", "button.addEventListener(clearSelection, \"click\");", "button.click(clearSelection);"], "bonne": 0, "mono": true, "explication": "Le nom de l'événement, puis la fonction elle-même." },
+      { "id": "u14-q9", "type": "qcm", "notions": ["selecteurs-css"], "question": "Pourquoi le TP précise-t-il « sélectionner les cartes elles-mêmes, pas leurs éléments enfants » pour `:not()` ?", "choix": ["`:not(.spade)` seul attrape aussi les spans à l'intérieur des cartes", "`:not` ne marche que sur les spans", "Les enfants n'ont pas de classes", "Pour aller plus vite"], "bonne": 0, "explication": "Les spans n'ont pas la classe spade : ils passent le filtre. Il faut `playing-card:not(.spade)`." },
+      { "id": "u14-q10", "type": "qcm", "notions": ["conteneur"], "question": "Pourquoi chercher les cartes dans `.deck` plutôt que dans tout `document` ?", "choix": ["Pour ne pas sélectionner les cartes de la main (#hand), ajoutées plus tard", "Parce que document ne contient pas les cartes", "Parce que querySelectorAll ne marche que sur .deck", "Pour éviter une erreur de syntaxe"], "bonne": 0, "explication": "La main contiendra des copies des cartes, avec les mêmes classes." },
+      { "id": "u14-q11", "type": "tri", "notions": ["queryselector"], "mono": true, "question": "Qu'est-ce que ça retourne ?", "categories": ["un élément (ou null)", "une liste d'éléments"], "items": [["document.querySelector(\".heart\")", 0], ["document.querySelectorAll(\".heart\")", 1], ["deckEl.querySelector(\"#SPADE-ACE\")", 0], ["deckEl.querySelectorAll(\"[data-face-card]\")", 1]], "explication": "All : une liste ; sans All : un seul élément." },
+      { "id": "u14-q12", "type": "selecteur", "notions": ["selecteurs-css"], "question": "Toutes les cartes du paquet **sauf les cœurs** (39 cartes).", "dom": { "page": "cards" }, "attendu": ".deck playing-card:not(.heart)", "nombre": 39, "explication": "Précise playing-card, sinon les spans viennent aussi." }
+    ]
+  },
+  "boss": [
+    {
+      "id": "u14-b1",
+      "titre": "Effacer la sélection",
+      "source": "TP DOM · exercice 1",
+      "notions": ["queryselector", "classlist", "conteneur"],
+      "enonce": "Écrire une fonction `clearSelection` qui **sélectionne toutes les cartes du paquet d'origine** avec `querySelectorAll`, **les parcourt et retire la classe `selected`** de chacune avec `classList`.",
+      "regles": ["Toutes les sélections doivent être limitées aux cartes du paquet d'origine, dans .deck.", "Seule la classe selected est retirée : les autres classes des cartes restent."],
+      "dom": { "page": "cards" },
+      "depart": ["const deckEl = document.querySelector('.deck');", "", "function clearSelection() {", "  ", "}"],
+      "tests": { "exposer": ["clearSelection"], "etapes": [
+        { "titre": "Efface une sélection", "actions": [ { "script": "document.querySelectorAll('.deck playing-card:nth-child(4n+1)').forEach((c) => c.classList.add('selected'))" }, { "script": "__pw.clearSelection()" } ], "verifier": [ { "compter": ".deck .selected", "egal": 0, "libelle": "Cartes encore sélectionnées dans le paquet" } ] },
+        { "titre": "Les autres classes restent", "verifier": [ { "compter": ".deck playing-card.heart", "egal": 13, "libelle": "Cartes de cœur" }, { "compter": ".deck playing-card.rank-ace", "egal": 4, "libelle": "As" } ], "siEchec": "Retire **seulement** la classe selected : `card.classList.remove('selected')`. Ne vide pas className." },
+        { "titre": "Rien à effacer", "actions": [ { "script": "__pw.clearSelection()" } ], "verifier": [ { "compter": ".deck .selected", "egal": 0, "libelle": "Cartes sélectionnées" } ], "siEchec": "clearSelection doit marcher même quand aucune carte n'est sélectionnée." },
+        { "titre": "Effacer deux fois de suite", "actions": [ { "script": "document.querySelectorAll('.deck .spade').forEach((c) => c.classList.add('selected'))" }, { "script": "__pw.clearSelection()" }, { "script": "document.querySelector('#CLUB-9').classList.add('selected')" }, { "script": "__pw.clearSelection()" } ], "verifier": [ { "compter": ".deck .selected", "egal": 0, "libelle": "Cartes encore sélectionnées" } ] }
+      ], "obligatoire": ["querySelectorAll", "classList"] },
+      "indices": ["Toutes les cartes du paquet : `deckEl.querySelectorAll('playing-card')` (relis [[conteneur]]).", "Une liste n'a pas de classList : parcours-la avec forEach, et retire la classe de **chaque** carte ([[classlist]]).", { "code": "deckEl.querySelectorAll('___').forEach((card) => card.classList.___('selected'));" }],
+      "solution": ["const deckEl = document.querySelector('.deck');", "", "function clearSelection() {", "  const cards = deckEl.querySelectorAll('playing-card');", "  cards.forEach((card) => card.classList.remove('selected'));", "}"],
+      "erreursTypiques": [
+        { "code": "const deckEl = document.querySelector('.deck');\n\nfunction clearSelection() {\n  deckEl.querySelectorAll('playing-card').classList.remove('selected');\n}", "attendu": "erreur" },
+        { "code": "const deckEl = document.querySelector('.deck');\n\nfunction clearSelection() {\n  deckEl.querySelectorAll('playing-card').forEach((card) => card.className = '');\n}", "attendu": "echec", "diagnostic": "contenu" },
+        { "code": "const deckEl = document.querySelector('.deck');\n\nfunction clearSelection() {\n  deckEl.querySelector('.selected').classList.remove('selected');\n}", "attendu": "echec", "diagnostic": "obligatoire" },
+        { "code": "const deckEl = document.querySelector('.deck');\n\nfunction clearselection() {\n  deckEl.querySelectorAll('playing-card').forEach((card) => card.classList.remove('selected'));\n}", "attendu": "erreur" }
+      ],
+      "explication": "Exercice 1 du TP DOM. On peut aussi ne chercher que les cartes sélectionnées : `deckEl.querySelectorAll('.selected')`. Les deux marchent : remove ne fait rien sur une carte qui n'a pas la classe."
+    },
+    {
+      "id": "u14-b2",
+      "titre": "Les boutons A, B, C",
+      "source": "TP DOM · exercices 2 et 3 (boutons A à C)",
+      "notions": ["addeventlistener", "selecteurs-css", "classlist", "conteneur"],
+      "enonce": "Programmer les boutons **A, B et C**. Pour chaque bouton : le sélectionner avec `querySelector` et lui associer un écouteur de `click` avec `addEventListener`. Lors du clic, appeler `clearSelection`, puis **sélectionner les cartes demandées** et leur ajouter la classe `selected`.\n\n- **A) Ace of spades** (`select-ace-spade`) : l'as de pique **par son identifiant**.\n- **B) Hearts** (`select-hearts`) : toutes les cartes de cœur **par leur classe**.\n- **C) Red cards** (`select-red`) : les cœurs **et** les carreaux (un OU entre deux sélecteurs CSS).\n\nUtiliser `querySelector` lorsqu'une seule carte est attendue, `querySelectorAll` pour une collection.",
+      "regles": ["La sélection de chaque bouton repose sur un seul sélecteur CSS : ne pas filtrer les cartes en JavaScript.", "Les sélections sont limitées au paquet d'origine (.deck).", "Chaque clic remplace la sélection précédente."],
+      "dom": { "page": "cards" },
+      "depart": ["const deckEl = document.querySelector('.deck');", "", "function clearSelection() {", "  deckEl.querySelectorAll('playing-card').forEach((card) => card.classList.remove('selected'));", "}", "", "// A) Ace of spades", "", "// B) Hearts", "", "// C) Red cards", ""],
+      "tests": { "etapes": [
+        { "titre": "Avant tout clic", "verifier": [ { "compter": ".deck .selected", "egal": 0, "libelle": "Cartes sélectionnées avant tout clic" } ], "siEchec": "Rien ne doit être sélectionné avant un clic : le code de sélection va **dans** la flèche donnée à addEventListener." },
+        { "titre": "A · Ace of spades : 1 carte", "actions": [ { "clic": "#select-ace-spade" } ], "verifier": [ { "compter": ".deck .selected", "egal": 1, "libelle": "Cartes sélectionnées" }, { "identique": [".deck .selected", "#SPADE-ACE"], "message": "Ce n'est pas l'as de pique qui est sélectionné." } ] },
+        { "titre": "B · Hearts : 13 cartes", "actions": [ { "clic": "#select-hearts" } ], "verifier": [ { "compter": ".deck .selected", "egal": 13, "libelle": "Cartes sélectionnées" }, { "identique": [".deck .selected", ".deck .heart"], "message": "Ce ne sont pas exactement les cœurs qui sont sélectionnés." } ], "siEchec": "Si tu en as 14, la sélection précédente est restée : appelle `clearSelection()` au début de **chaque** clic." },
+        { "titre": "C · Red cards : 26 cartes", "actions": [ { "clic": "#select-red" } ], "verifier": [ { "compter": ".deck .selected", "egal": 26, "libelle": "Cartes sélectionnées" }, { "identique": [".deck .selected", ".deck .heart, .deck .diamond"], "message": "Ce ne sont pas exactement les cœurs et les carreaux." } ], "siEchec": "Un OU en CSS, c'est la **virgule** : `'.heart, .diamond'`. Avec un espace, on chercherait des carreaux à l'intérieur des cœurs." },
+        { "titre": "Dans un autre ordre : C puis A", "actions": [ { "clic": "#select-red" }, { "clic": "#select-ace-spade" } ], "verifier": [ { "identique": [".deck .selected", "#SPADE-ACE"], "message": "Après C puis A, seul l'as de pique doit rester sélectionné." } ], "siEchec": "Chaque clic doit **remplacer** la sélection : clearSelection() d'abord, dans chaque bouton." },
+        { "titre": "Seulement les cartes du paquet", "actions": [ { "script": "const c = document.querySelector('#HEART-5').cloneNode(true); c.removeAttribute('id'); c.classList.remove('selected'); document.querySelector('#hand').append(c);" }, { "clic": "#select-hearts" } ], "verifier": [ { "compter": "#hand .selected", "egal": 0, "libelle": "Cartes de la main sélectionnées" }, { "compter": ".deck .selected", "egal": 13, "libelle": "Cartes du paquet sélectionnées" } ], "siEchec": "Cherche les cartes **dans le paquet** : `deckEl.querySelectorAll(…)` plutôt que `document.querySelectorAll(…)`." }
+      ], "obligatoire": ["addEventListener", "querySelector", "querySelectorAll", "classList"], "interdit": ["filter"] },
+      "indices": ["Pour chaque bouton : `document.querySelector('#select-…').addEventListener('click', () => { … });`. Relis [[addeventlistener]].", "Dans la flèche : `clearSelection();` puis la sélection. A : `#SPADE-ACE` avec querySelector. B : `.heart`. C : la virgule ([[selecteurs-css]]). Toujours sur `deckEl`.", { "code": "document.querySelector('#select-hearts').addEventListener('click', () => {\n  clearSelection();\n  deckEl.querySelectorAll('___').forEach((card) => card.classList.add('selected'));\n});" }],
+      "solution": ["const deckEl = document.querySelector('.deck');", "", "function clearSelection() {", "  deckEl.querySelectorAll('playing-card').forEach((card) => card.classList.remove('selected'));", "}", "", "// A) Ace of spades", "document.querySelector('#select-ace-spade').addEventListener('click', () => {", "  clearSelection();", "  deckEl.querySelector('#SPADE-ACE').classList.add('selected');", "});", "", "// B) Hearts", "document.querySelector('#select-hearts').addEventListener('click', () => {", "  clearSelection();", "  deckEl.querySelectorAll('.heart').forEach((card) => card.classList.add('selected'));", "});", "", "// C) Red cards", "document.querySelector('#select-red').addEventListener('click', () => {", "  clearSelection();", "  deckEl.querySelectorAll('.heart, .diamond').forEach((card) => card.classList.add('selected'));", "});"],
+      "erreursTypiques": [
+        { "code": "const deckEl = document.querySelector('.deck');\nfunction clearSelection() {\n  deckEl.querySelectorAll('playing-card').forEach((card) => card.classList.remove('selected'));\n}\ndocument.querySelector('#select-ace-spade').addEventListener('click', () => {\n  deckEl.querySelector('#SPADE-ACE').classList.add('selected');\n});\ndocument.querySelector('#select-hearts').addEventListener('click', () => {\n  deckEl.querySelectorAll('.heart').forEach((card) => card.classList.add('selected'));\n});\ndocument.querySelector('#select-red').addEventListener('click', () => {\n  deckEl.querySelectorAll('.heart, .diamond').forEach((card) => card.classList.add('selected'));\n});", "attendu": "echec", "diagnostic": "contenu" },
+        { "code": "const deckEl = document.querySelector('.deck');\nfunction clearSelection() {\n  deckEl.querySelectorAll('playing-card').forEach((card) => card.classList.remove('selected'));\n}\ndocument.querySelector('#select-ace-spade').addEventListener('click', () => {\n  clearSelection();\n  document.querySelector('#SPADE-ACE').classList.add('selected');\n});\ndocument.querySelector('#select-hearts').addEventListener('click', () => {\n  clearSelection();\n  document.querySelectorAll('.heart').forEach((card) => card.classList.add('selected'));\n});\ndocument.querySelector('#select-red').addEventListener('click', () => {\n  clearSelection();\n  document.querySelectorAll('.heart, .diamond').forEach((card) => card.classList.add('selected'));\n});", "attendu": "echec", "diagnostic": "contenu" },
+        { "code": "const deckEl = document.querySelector('.deck');\nfunction clearSelection() {\n  deckEl.querySelectorAll('playing-card').forEach((card) => card.classList.remove('selected'));\n}\ndocument.querySelector('#select-ace-spade').addEventListener('click', () => {\n  clearSelection();\n  deckEl.querySelector('#SPADE-ACE').classList.add('selected');\n});\ndocument.querySelector('#select-hearts').addEventListener('click', () => {\n  clearSelection();\n  deckEl.querySelectorAll('.heart').classList.add('selected');\n});\ndocument.querySelector('#select-red').addEventListener('click', () => {\n  clearSelection();\n  deckEl.querySelectorAll('.heart, .diamond').forEach((card) => card.classList.add('selected'));\n});", "attendu": "erreur" },
+        { "code": "const deckEl = document.querySelector('.deck');\nfunction clearSelection() {\n  deckEl.querySelectorAll('playing-card').forEach((card) => card.classList.remove('selected'));\n}\ndocument.querySelector('#select-ace-spade').addEventListener('click', () => {\n  clearSelection();\n  deckEl.querySelector('#SPADE-ACE').classList.add('selected');\n});\ndocument.querySelector('#select-hearts').addEventListener('click', () => {\n  clearSelection();\n  deckEl.querySelectorAll('.heart').forEach((card) => card.classList.add('selected'));\n});\ndocument.querySelector('#select-red').addEventListener('click', () => {\n  clearSelection();\n  deckEl.querySelectorAll('.heart .diamond').forEach((card) => card.classList.add('selected'));\n});", "attendu": "echec", "diagnostic": "contenu" },
+        { "code": "const deckEl = document.querySelector('.deck');\nfunction clearSelection() {\n  deckEl.querySelectorAll('playing-card').forEach((card) => card.classList.remove('selected'));\n}\ndocument.querySelector('#select-ace-spade').addEventListener('click', () => {\n  clearSelection();\n  deckEl.querySelector('#SPADE-ACE').classList.add('selected');\n});\ndocument.querySelector('#select-hearts').addEventListener('click', () => {\n  clearSelection();\n  deckEl.querySelectorAll('.heart').forEach((card) => card.classList.add('selected'));\n});\ndocument.querySelector('#select-red').addEventListener('click', () => {\n  clearSelection();\n  [...deckEl.querySelectorAll('playing-card')].filter((card) => card.classList.contains('heart') || card.classList.contains('diamond')).forEach((card) => card.classList.add('selected'));\n});", "attendu": "echec", "diagnostic": "interdit" }
+      ],
+      "explication": "Exercices 2 et 3 du TP DOM (boutons A à C). Les trois écouteurs se ressemblent beaucoup : seul le sélecteur change. Une fonction `selectCards(selector)` pourrait éviter de répéter le même code."
+    },
+    {
+      "id": "u14-b3",
+      "titre": "Les boutons D, E, F",
+      "source": "TP DOM · exercices 2 et 3 (boutons D à F)",
+      "notions": ["selecteurs-css", "addeventlistener", "classlist"],
+      "enonce": "Programmer les boutons **D, E et F**, comme A, B et C : `clearSelection`, puis un **seul sélecteur CSS** et la classe `selected`.\n\n- **D) Face cards** (`select-face-cards`) : les valets, dames et rois, à l'aide de l'attribut `data-face-card`.\n- **E) Red face cards** (`select-red-face-cards`) : uniquement les figures de cœur **ou** de carreau, en combinant classes et attribut.\n- **F) All except spades** (`select-not-spades`) : toutes les cartes qui ne sont pas des piques, à l'aide de la pseudo-classe `:not()`. Veiller à sélectionner **les cartes elles-mêmes**, pas leurs éléments enfants.\n\nVérifier que D, E et F sélectionnent respectivement **12, 6 et 39** cartes.",
+      "regles": ["Un seul sélecteur CSS par bouton : pas de filtre en JavaScript.", "Les sélections sont limitées au paquet d'origine (.deck).", "Chaque clic remplace la sélection précédente."],
+      "dom": { "page": "cards" },
+      "depart": ["const deckEl = document.querySelector('.deck');", "", "function clearSelection() {", "  deckEl.querySelectorAll('playing-card').forEach((card) => card.classList.remove('selected'));", "}", "", "// D) Face cards", "", "// E) Red face cards", "", "// F) All except spades", ""],
+      "tests": { "etapes": [
+        { "titre": "D · Face cards : 12 cartes", "actions": [ { "clic": "#select-face-cards" } ], "verifier": [ { "compter": ".deck .selected", "egal": 12, "libelle": "Éléments sélectionnés" }, { "identique": [".deck .selected", ".deck [data-face-card]"], "message": "Ce ne sont pas exactement les valets, dames et rois." } ], "siEchec": "Un attribut dans un sélecteur s'écrit entre crochets : `[data-face-card]`." },
+        { "titre": "E · Red face cards : 6 cartes", "actions": [ { "clic": "#select-red-face-cards" } ], "verifier": [ { "compter": ".deck .selected", "egal": 6, "libelle": "Éléments sélectionnés" }, { "identique": [".deck .selected", ".deck .heart[data-face-card], .deck .diamond[data-face-card]"], "message": "Ce ne sont pas exactement les figures rouges." } ], "siEchec": "La virgule sépare deux sélecteurs **complets** : chacun a besoin de son `[data-face-card]`, collé à la classe (sans espace) : `.heart[data-face-card], .diamond[data-face-card]`." },
+        { "titre": "F · All except spades : 39 cartes", "actions": [ { "clic": "#select-not-spades" } ], "verifier": [ { "compter": ".deck .selected", "egal": 39, "libelle": "Éléments sélectionnés" }, { "identique": [".deck .selected", ".deck playing-card:not(.spade)"], "message": "Ce ne sont pas exactement les 39 cartes qui ne sont pas des piques." } ], "siEchec": "`:not(.spade)` seul prend aussi les `<span>` à l'intérieur des cartes : précise la balise, `playing-card:not(.spade)`." },
+        { "titre": "Dans un autre ordre : F, D puis E", "actions": [ { "clic": "#select-not-spades" }, { "clic": "#select-face-cards" }, { "clic": "#select-red-face-cards" } ], "verifier": [ { "compter": ".deck .selected", "egal": 6, "libelle": "Éléments sélectionnés après F, D, E" } ], "siEchec": "Chaque clic doit **remplacer** la sélection : clearSelection() d'abord, dans chaque bouton." },
+        { "titre": "Seulement les cartes du paquet", "actions": [ { "script": "const c = document.querySelector('#HEART-KING').cloneNode(true); c.removeAttribute('id'); c.classList.remove('selected'); document.querySelector('#hand').append(c);" }, { "clic": "#select-face-cards" }, { "clic": "#select-not-spades" } ], "verifier": [ { "compter": "#hand .selected", "egal": 0, "libelle": "Cartes de la main sélectionnées" } ], "siEchec": "Cherche les cartes **dans le paquet** : `deckEl.querySelectorAll(…)`." }
+      ], "obligatoire": ["addEventListener", "querySelectorAll", "classList"], "interdit": ["filter"] },
+      "indices": ["Même forme que A, B, C : seul le sélecteur change. Relis [[selecteurs-css]].", "D : `[data-face-card]`. E : deux morceaux séparés par une virgule, chacun « classe + attribut » collés. F : `playing-card:not(.spade)`.", { "code": "document.querySelector('#select-face-cards').addEventListener('click', () => {\n  clearSelection();\n  deckEl.querySelectorAll('___').forEach((card) => card.classList.add('selected'));\n});" }],
+      "solution": ["const deckEl = document.querySelector('.deck');", "", "function clearSelection() {", "  deckEl.querySelectorAll('playing-card').forEach((card) => card.classList.remove('selected'));", "}", "", "// D) Face cards", "document.querySelector('#select-face-cards').addEventListener('click', () => {", "  clearSelection();", "  deckEl.querySelectorAll('[data-face-card]').forEach((card) => card.classList.add('selected'));", "});", "", "// E) Red face cards", "document.querySelector('#select-red-face-cards').addEventListener('click', () => {", "  clearSelection();", "  deckEl.querySelectorAll('.heart[data-face-card], .diamond[data-face-card]').forEach((card) => card.classList.add('selected'));", "});", "", "// F) All except spades", "document.querySelector('#select-not-spades').addEventListener('click', () => {", "  clearSelection();", "  deckEl.querySelectorAll('playing-card:not(.spade)').forEach((card) => card.classList.add('selected'));", "});"],
+      "erreursTypiques": [
+        { "code": "const deckEl = document.querySelector('.deck');\nfunction clearSelection() {\n  deckEl.querySelectorAll('playing-card').forEach((card) => card.classList.remove('selected'));\n}\ndocument.querySelector('#select-face-cards').addEventListener('click', () => {\n  clearSelection();\n  deckEl.querySelectorAll('[data-face-card]').forEach((card) => card.classList.add('selected'));\n});\ndocument.querySelector('#select-red-face-cards').addEventListener('click', () => {\n  clearSelection();\n  deckEl.querySelectorAll('.heart, .diamond[data-face-card]').forEach((card) => card.classList.add('selected'));\n});\ndocument.querySelector('#select-not-spades').addEventListener('click', () => {\n  clearSelection();\n  deckEl.querySelectorAll('playing-card:not(.spade)').forEach((card) => card.classList.add('selected'));\n});", "attendu": "echec", "diagnostic": "contenu" },
+        { "code": "const deckEl = document.querySelector('.deck');\nfunction clearSelection() {\n  deckEl.querySelectorAll('playing-card').forEach((card) => card.classList.remove('selected'));\n}\ndocument.querySelector('#select-face-cards').addEventListener('click', () => {\n  clearSelection();\n  deckEl.querySelectorAll('[data-face-card]').forEach((card) => card.classList.add('selected'));\n});\ndocument.querySelector('#select-red-face-cards').addEventListener('click', () => {\n  clearSelection();\n  deckEl.querySelectorAll('.heart[data-face-card], .diamond[data-face-card]').forEach((card) => card.classList.add('selected'));\n});\ndocument.querySelector('#select-not-spades').addEventListener('click', () => {\n  clearSelection();\n  deckEl.querySelectorAll(':not(.spade)').forEach((card) => card.classList.add('selected'));\n});", "attendu": "echec", "diagnostic": "contenu" },
+        { "code": "const deckEl = document.querySelector('.deck');\nfunction clearSelection() {\n  deckEl.querySelectorAll('playing-card').forEach((card) => card.classList.remove('selected'));\n}\ndocument.querySelector('#select-face-cards').addEventListener('click', () => {\n  clearSelection();\n  deckEl.querySelectorAll('data-face-card').forEach((card) => card.classList.add('selected'));\n});\ndocument.querySelector('#select-red-face-cards').addEventListener('click', () => {\n  clearSelection();\n  deckEl.querySelectorAll('.heart[data-face-card], .diamond[data-face-card]').forEach((card) => card.classList.add('selected'));\n});\ndocument.querySelector('#select-not-spades').addEventListener('click', () => {\n  clearSelection();\n  deckEl.querySelectorAll('playing-card:not(.spade)').forEach((card) => card.classList.add('selected'));\n});", "attendu": "echec", "diagnostic": "contenu" },
+        { "code": "const deckEl = document.querySelector('.deck');\nfunction clearSelection() {\n  deckEl.querySelectorAll('playing-card').forEach((card) => card.classList.remove('selected'));\n}\ndocument.querySelector('#select-face-cards').addEventListener('click', clearSelection());", "attendu": "echec" }
+      ],
+      "explication": "Exercices 2 et 3 du TP DOM (boutons D à F). Avec A, B et C de l'exercice précédent, les six boutons sélectionnent bien 1, 13, 26, 12, 6 et 39 cartes. Le grand final (unité suivante) réunit tout dans un seul fichier cards.js, avec le tirage d'une main."
+    }
+  ]
+}

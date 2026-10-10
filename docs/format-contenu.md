@@ -103,6 +103,7 @@ Un exemple qui doit planter exprès : `"titre"` contenant « erreur » (ex. « �
   "executable": false,           // facultatif : pas de bouton Exécuter
   "erreurVoulue": true,          // facultatif : le code plante exprès (le testeur ne le signale pas)
   "donnees": { "numbers": [3, 14] },   // facultatif : variables déjà déclarées pour l'exemple
+  "dom": { "page": "cards" },          // facultatif : l'exemple tourne sur une page web (TP DOM), affichée sous le code (voir § 6, DOM)
   "apres": "texte sous le code",
   "analogie": "…",               // encadré jaune « L'image à retenir »
   "astuce": "…",                 // encadré « Bon à savoir »
@@ -152,6 +153,7 @@ Champs communs : `id` (**obligatoire**, unique, stable), `type`, `question` (tex
 | `types-chaine` | `depart` (expression), `maillons[]`, `choix?` | indique le type après chaque maillon (calculé) |
 | `objet` | `cles[]`, `etiquettes[]`, `bonnes{ cle: [étiquettes acceptées] }`, `nom?`, `code?` | remplit un objet `{ … }` avec les bonnes étiquettes |
 | `fisher-yates` | `tableau`, `tirages[]` (j pour i = n-1, n-2, …, 1) | touche les deux cases à échanger à chaque tour |
+| `selecteur` | `dom` (la page, voir plus bas), `attendu` (sélecteur de référence), `nombre?` (vérifié par le testeur) | écrit un sélecteur CSS ; la page surligne en direct les éléments trouvés et les compte. Comparé par **éléments** sélectionnés, pas par le texte : tout sélecteur équivalent est juste |
 
 ### Avec du code (exécuté et testé dans le bac à sable)
 
@@ -167,6 +169,9 @@ Champs communs aux exercices de code :
 ```jsonc
 {
   "donnees": { "numbers": [3, 14, 15] },   // variables déclarées AVANT le code de l'élève (affichées grisées, gelées par Object.freeze)
+  "prelude": ["const ACE = 14;", "function displayRank(rank) { … }"],   // code placé avant celui de l'élève (affiché grisé) :
+                                           // constantes du TP, fonctions des boss précédents. Les lignes d'erreur restent justes
+  "dom": { "page": "cards" },              // exercice sur une page web (TP DOM) : voir « Exercices sur une page web » plus bas
   "tests": { … },                          // voir ci-dessous
   "indices": [                             // 1 à 3 indices, débloqués un par un ; JAMAIS la solution complète
     "Léger : une question qui oriente",
@@ -190,7 +195,8 @@ Champs communs aux exercices de code :
     { "titre": "Tableau vide",     "args": [[]],          "attendu": [] }
   ],
   "interdit": ["push", "sort", "for"],    // méthodes ou mots interdits (cherchés hors commentaires et chaînes)
-  "obligatoire": ["map"],                 // méthodes ou mots obligatoires ("=>" : fonctions fléchées)
+  "obligatoire": ["map"],                 // méthodes ou mots obligatoires ("=>" : fonctions fléchées ; "drawCards()" : appel
+                                          // d'une fonction, pas d'une méthode ; "classList", "length" : propriétés)
   "sansConseil": ["egal-souple"]          // conseils automatiques à taire pour cet exercice
 }
 ```
@@ -210,9 +216,44 @@ Chaque **cas** peut contenir :
 | `variables` | mode script : valeurs attendues de variables du programme `{ "total": 7 }` |
 | `donnees` | autres valeurs des `donnees` pour ce cas (mode script : tester avec d'autres données) |
 | `repetitions`, `entier`, `min`, `max`, `tous` | fonction au hasard : appelée N fois ; chaque résultat entier dans [min, max] ; `tous` : chaque valeur doit sortir au moins une fois. En mode script : avec `"variable": "nom"` |
+| `verifie`, `messageVerifie` | propriété du résultat, en JavaScript sur `r` (le résultat) et `args` : `"typeof r === 'number' && r < 0"`. Pour les résultats sans valeur unique (comparateur, paquet de 52 cartes dans n'importe quel ordre, tirage au hasard avec `repetitions`) |
+| `modifiable` | `true` : les arguments ne sont **pas** gelés (fonction qui modifie son argument, comme `shuffleInPlace`) ; `verifie` peut alors regarder `args` après l'appel |
+| `melange` | `{ "tableau": ["A", "B", "C"], "essais": 24000, "tolerance": 0.06 }` : la fonction doit mélanger **sur place** et **équitablement**. Elle est appelée `essais` fois ; chaque ordre possible doit sortir, à `tolerance` près de la moyenne. 3 éléments × 24 000 (défaut) ou 4 éléments × 96 000 : en dessous, le hasard seul fait échouer une bonne solution |
 | `siEchec` | message affiché si ce cas échoue et qu'aucun diagnostic automatique ne s'applique |
 
 **Toujours tester avec d'autres données que celles du cours**, dont un tableau vide, comme l'exige le cours.
+
+**Couleurs du terminal** : la console comprend les codes ANSI (`\x1b[31;47m` rouge sur blanc, `\x1b[30;47m` noir sur blanc, `\x1b[0m` retour à la normale ; 30-37 texte, 40-47 fond, 1 gras). Dans `sortie`, les écrire en JSON : `"\u001b[31;47mA♥\u001b[0m"`.
+
+### Exercices sur une page web (TP DOM)
+
+Le Web Worker n'a pas de DOM. Avec un champ `dom`, le code de l'élève tourne dans une `<iframe sandbox="allow-scripts">` (sans accès à l'appli ni à la sauvegarde) qui contient la page, chargé comme un **module** (comme `<script type="module">` dans le TP). Fichiers : `js/dom.js` (côté appli) et `js/dom-harnais.js` (dans l'iframe).
+
+- `"dom": { "page": "cards" }` : `content/pages/cards.html` (le contenu du `<body>`) et `content/pages/cards.css`.
+- `"dom": { "html": ["<button id=\"plus\">+1</button>"], "css": ["…"] }` : une petite page écrite dans l'exercice.
+
+« Exécuter » affiche la page sous le code : l'élève clique lui-même, la console se remplit au fil des clics. « Vérifier » rejoue les **étapes** dans une page cachée :
+
+```jsonc
+"tests": {
+  "exposer": ["clearSelection"],          // fonctions du module rendues visibles aux scripts des tests : window.__pw.clearSelection()
+                                          // (absente : « Je ne trouve pas de fonction nommée … »)
+  "etapes": [
+    { "titre": "B · Hearts : 13 cartes",
+      "actions": [ { "clic": "#select-hearts" }, { "script": "__pw.clearSelection()" } ],   // dans l'ordre ; après le chargement du code
+      "verifier": [
+        { "compter": ".deck .selected", "egal": 13, "libelle": "Cartes sélectionnées" },      // nombre d'éléments
+        { "identique": [".deck .selected", ".deck .heart"], "message": "…" },                 // exactement les mêmes éléments
+        { "vrai": "window.__mains.size > 1", "message": "…" },                                // expression JavaScript dans la page
+        { "sortie": ["52", "DIAMOND-KING"], "message": "…" }                                  // tout ce que la console a affiché
+      ],
+      "siEchec": "Si tu en as 14, appelle clearSelection() au début de chaque clic." }
+  ],
+  "obligatoire": ["addEventListener"], "interdit": ["filter"]     // analyse statique, comme pour le JavaScript pur
+}
+```
+
+Les étapes s'enchaînent **dans la même page** (l'état d'une étape reste pour la suivante). Une étape sans `actions` vérifie l'état courant (la première : juste après le chargement du code). Le message affiché est le `siEchec` de la première étape ratée qui en a un. Pour un test « au hasard » (main tirée), répéter les clics dans un `script` et ranger les résultats dans `window` (voir le boss `u15-b1`).
 
 ### Les erreurs typiques (vérifiées par `tools/tester-exercices.py`)
 
@@ -242,6 +283,7 @@ Chaque **cas** peut contenir :
 | `depart-zero` / `depart-texte` | mauvaise valeur de départ de reduce (0 pour un maximum, 0 pour du texte) |
 | `donnees-en-dur` | marche avec les données du cours, pas avec d'autres (variable du cours utilisée au lieu du paramètre) |
 | `boite-entiere` / `rien-affiche` | tout le tableau affiché d'un coup / rien n'est affiché |
+| `log-vs-return` | il fallait afficher (`sortie`), la fonction retourne le texte sans rien afficher |
 | `fonction-affichee` | `console.log(maFonction)` sans parenthèses |
 | `param-nom-tableau` | le paramètre de la fléchée porte le nom d'un tableau (`fruits.forEach((fruits) => …)`) |
 | `accolades-sans-return`, `objet-sans-parentheses`, `reduce-un-param`, `tosorted-imbrique`, `egalite-tableaux`, `egal-souple` | conseils de l'analyse du code |

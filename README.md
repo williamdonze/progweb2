@@ -2,9 +2,10 @@
 
 Apprendre le JavaScript en jouant, de zéro jusqu'aux exercices du cours *Prog. Web* : leçons courtes, analogies (la boîte d'œufs, le porte-monnaie, le cuisinier), exercices interactifs, **code exécuté et testé dans le navigateur**, erreurs expliquées en français, défi du jour et répétition espacée. Sur le modèle de [Pampre](https://github.com/williamdonze/pampre).
 
-- **22 types d'exercices** : pointer dans le code, pointer dans un tableau, trouver le bug, prédire l'affichage, choisir la méthode, classer, reconstituer un programme, reduce pas à pas, filtre et map visuels, traducteur d'erreurs, construire un objet, Fisher–Yates, suivre les types… et du vrai code : à trous, à corriger, à écrire.
+- **23 types d'exercices** : pointer dans le code, pointer dans un tableau, trouver le bug, prédire l'affichage, choisir la méthode, classer, reconstituer un programme, reduce pas à pas, filtre et map visuels, traducteur d'erreurs, construire un objet, Fisher–Yates, suivre les types, écrire un sélecteur CSS (la page surligne ce qu'il trouve)… et du vrai code : à trous, à corriger, à écrire.
 - **Les boss** sont les exercices du cours, testés avec d'autres données (tableau vide, nombres négatifs…), avec 3 indices progressifs et **jamais la solution**.
-- Ton code tourne dans un bac à sable isolé (Web Worker), avec une console, un délai maximum contre les boucles infinies, et des messages qui expliquent l'erreur : « Ta fonction montre le plat par la fenêtre (console.log) au lieu de le tendre (return) ».
+- Tout le cours est couvert : **TP Fonctions, TP Tableaux (nombres, chaînes, jeu de cartes) et TP DOM**, en 15 unités.
+- Ton code tourne dans un bac à sable isolé (Web Worker, ou la vraie page du TP DOM dans une iframe isolée), avec une console qui comprend les couleurs du terminal, un délai maximum contre les boucles infinies, et des messages qui expliquent l'erreur : « Ta fonction montre le plat par la fenêtre (console.log) au lieu de le tendre (return) ».
 
 Programme et correspondance avec les TP (Fonctions, Tableaux, DOM) : [docs/programme.md](docs/programme.md).
 

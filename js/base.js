@@ -256,7 +256,17 @@ function executer(payload){
 function blocExecutable(code, opts = {}){
   const el = h(`<div>${codeHTML(code, opts)}<div class="code-run"><button type="button" class="btn small ghost" data-run>${I.play}Exécuter</button></div><div class="sortie"></div></div>`);
   el.querySelector("[data-run]").onclick = async (e) => {
-    const b = e.currentTarget; b.disabled = true;
+    const b = e.currentTarget;
+    if (opts.dom) {   // exemple sur une page web (TP DOM) : la page s'affiche, la console se remplit au fil des clics
+      const s = el.querySelector(".sortie");
+      s.innerHTML = `<div class="apercu-zone"></div>${consoleHTML([], { vide:"Rien n'a été affiché (pas de console.log)." })}`;
+      const cons = s.querySelector(".console") || s.lastElementChild;
+      const ajouter = (t, err) => { cons.querySelector(".vide")?.remove(); const l = h(`<div class="cl ${err ? "err" : ""}"></div>`); l.innerHTML = ansiHTML(t); cons.appendChild(l); };
+      const r = await apercuDom(s.querySelector(".apercu-zone"), { code, dom: opts.dom, surLog: (t, g) => ajouter(t, g === "error") });
+      if (r.erreur) ajouter(`✖ ${r.erreur.titre} : ${r.erreur.message}`, true);
+      return;
+    }
+    b.disabled = true;
     const r = await executer({ code, donnees: opts.donnees || null });
     b.disabled = false;
     const s = el.querySelector(".sortie");
@@ -298,7 +308,7 @@ function ficheHTML(f){
   if (f.texte) el.appendChild(h(`<div class="rich" style="margin-top:14px">${rich(f.texte)}</div>`));
   for (const ex of f.exemples || []) {
     if (ex.titre) el.appendChild(h(`<h3>${richInline(ex.titre)}</h3>`));
-    el.appendChild(blocExecutable(lignes(ex.code)));
+    el.appendChild(blocExecutable(lignes(ex.code), { dom: ex.dom }));
     if (ex.note) el.appendChild(h(`<div class="rich" style="font-size:15px">${rich(ex.note)}</div>`));
   }
   if (f.pieges?.length) el.appendChild(h(`<div class="aside piege">${I.warn.replace("<svg", '<svg style="color:var(--ko)"')}<div><b class="t">Pièges classiques</b><div class="rich">${rich(f.pieges.map(p => "- " + p).join("\n"))}</div></div></div>`));
