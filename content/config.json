@@ -1,0 +1,173 @@
+{
+  "seuilValidation": 0.8,
+  "unites": [
+    "content/unites/u01-bases.json",
+    "content/unites/u02-operateurs.json"
+  ],
+  "aVenir": [
+    {
+      "titre": "Tester : some, every",
+      "resume": "TP Tableaux : multiple de 9, que des positifs, tous les mots font 5 lettres",
+      "icone": "?"
+    },
+    {
+      "titre": "Extraire et assembler : slice, spread, with",
+      "resume": "TP Tableaux : sans le premier, sans le dernier, pairs puis impairs, le mot du milieu",
+      "icone": "..."
+    },
+    {
+      "titre": "Trier : toSorted, localeCompare",
+      "resume": "TP Tableaux : le premier mot dans l'ordre alphabétique",
+      "icone": "a-z"
+    },
+    {
+      "titre": "Chaînes : split, join, toReversed",
+      "resume": "TP Tableaux : les mots avec un r, le palindrome",
+      "icone": "\"\""
+    },
+    {
+      "titre": "Objets",
+      "resume": "TP Tableaux : les cercles (aires, rouges, centres, translation)",
+      "icone": "{:}"
+    },
+    {
+      "titre": "Combiner, boucles et hasard",
+      "resume": "map imbriqués, flatMap, for, Math.random, Fisher–Yates : le jeu de cartes",
+      "icone": "♠"
+    }
+  ],
+  "rangs": [
+    {
+      "xp": 0,
+      "nom": "Débutant"
+    },
+    {
+      "xp": 100,
+      "nom": "Apprenti"
+    },
+    {
+      "xp": 300,
+      "nom": "Codeur"
+    },
+    {
+      "xp": 700,
+      "nom": "Développeur junior"
+    },
+    {
+      "xp": 1500,
+      "nom": "Développeur"
+    },
+    {
+      "xp": 3000,
+      "nom": "Développeur confirmé"
+    },
+    {
+      "xp": 6000,
+      "nom": "Maître du JavaScript"
+    }
+  ],
+  "badges": [
+    {
+      "id": "premier-pas",
+      "nom": "Hello, world",
+      "desc": "Terminer ta première leçon",
+      "icone": "terminal"
+    },
+    {
+      "id": "premier-coup",
+      "nom": "Du premier coup",
+      "desc": "Réussir 10 exercices de code au premier essai",
+      "icone": "cible"
+    },
+    {
+      "id": "codeur",
+      "nom": "Ça compile",
+      "desc": "Réussir 25 exercices de code",
+      "icone": "accolades"
+    },
+    {
+      "id": "chasseur-bugs",
+      "nom": "Chasseur de bugs",
+      "desc": "Trouver 10 bugs (ligne et explication)",
+      "icone": "bug"
+    },
+    {
+      "id": "sans-indice",
+      "nom": "Sans filet",
+      "desc": "Vaincre un boss sans aucun indice",
+      "icone": "boss"
+    },
+    {
+      "id": "theoricien",
+      "nom": "Théoricien",
+      "desc": "Ouvrir 10 fiches de théorie",
+      "icone": "livre"
+    },
+    {
+      "id": "sans-faute",
+      "nom": "Sans faute",
+      "desc": "100 % à un quiz de validation",
+      "icone": "etoile"
+    },
+    {
+      "id": "defi",
+      "nom": "Défi relevé",
+      "desc": "Terminer un défi du jour",
+      "icone": "etoile"
+    },
+    {
+      "id": "serie-3",
+      "nom": "Trois jours de suite",
+      "desc": "Une série de 3 jours",
+      "icone": "flamme"
+    },
+    {
+      "id": "serie-7",
+      "nom": "Une semaine de code",
+      "desc": "Une série de 7 jours",
+      "icone": "flamme"
+    },
+    {
+      "id": "serie-30",
+      "nom": "Un mois de code",
+      "desc": "Une série de 30 jours",
+      "icone": "flamme"
+    },
+    {
+      "id": "lecteur",
+      "nom": "Lecteur de code",
+      "desc": "8/10 ou plus au jeu « Quel type ? »",
+      "icone": "oeuf"
+    },
+    {
+      "id": "logicien",
+      "nom": "Logicien",
+      "desc": "8/10 ou plus au jeu « Vrai ou faux en JavaScript »",
+      "icone": "accolades"
+    },
+    {
+      "id": "traducteur",
+      "nom": "Traducteur d'erreurs",
+      "desc": "6/8 ou plus au jeu « Le traducteur d'erreurs »",
+      "icone": "bug"
+    },
+    {
+      "id": "indices-pro",
+      "nom": "As des indices",
+      "desc": "8/10 ou plus au jeu « Indices et cases »",
+      "icone": "oeuf"
+    },
+    {
+      "id": "aiguilleur",
+      "nom": "Aiguilleur",
+      "desc": "8/10 ou plus au jeu « map, filter ou forEach ? »",
+      "icone": "melange"
+    },
+    {
+      "id": "tresorier",
+      "nom": "Trésorier",
+      "desc": "6/8 ou plus au jeu « Le porte-monnaie »",
+      "icone": "porte"
+    }
+  ]
+}

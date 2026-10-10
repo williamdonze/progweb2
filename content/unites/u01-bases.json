@@ -1,0 +1,430 @@
+{
+  "id": "u01",
+  "titre": "Les bases",
+  "sousTitre": "Premiers pas",
+  "objectif": "Afficher, ranger des valeurs dans des variables, reconnaître les types.",
+  "icone": "let",
+  "fiches": [
+    {
+      "id": "console-log",
+      "titre": "console.log : afficher",
+      "icone": "log",
+      "resume": "Écrit une valeur dans la console. Sert à **regarder**, pas à calculer.",
+      "analogie": "La console, c'est le **carnet de bord** du programme : chaque `console.log` y écrit une ligne. Toi, tu peux lire ce carnet ; le programme, lui, ne s'en sert jamais pour calculer.",
+      "texte": "On écrit `console.log(valeur);` : la valeur entre les parenthèses s'affiche dans la console.\n\n- Un texte entre guillemets s'affiche tel quel, **sans** les guillemets.\n- Un calcul est d'abord fait, puis son résultat s'affiche.\n- Plusieurs valeurs séparées par des virgules s'affichent sur la même ligne, séparées par un espace.\n\nDans le navigateur, la console s'ouvre avec F12 (onglet « Console »). Ici, elle s'affiche sous ton code quand tu touches « Exécuter ».",
+      "exemples": [
+        { "code": ["console.log(\"Bonjour !\");", "console.log(2 + 3);", "console.log(\"2 + 3\");", "console.log(\"Total :\", 12, \"€\");"] }
+      ],
+      "pieges": ["`console.log(Bonjour)` sans guillemets : JavaScript cherche une variable nommée `Bonjour`.", "Afficher n'est pas retourner : une fonction qui fait `console.log` montre le résultat mais ne le donne à personne (on le verra à l'unité 3)."]
+    },
+    {
+      "id": "variables",
+      "titre": "const et let : nommer une valeur",
+      "icone": "let",
+      "resume": "Une variable est un **nom** collé sur une valeur. `const` : l'étiquette ne bouge plus. `let` : on peut la recoller ailleurs.",
+      "analogie": "Une variable, c'est une **étiquette** collée sur une boîte. Le nom est écrit sur l'étiquette, la valeur est dans la boîte. Avec `const`, l'étiquette est collée pour de bon ; avec `let`, on peut la décoller pour la coller sur une autre valeur.",
+      "texte": "On **déclare** une variable une seule fois, avec `const` ou `let`, puis on l'utilise par son nom (sans `const`).\n\n- Par défaut, utilise `const`.\n- `let` seulement si la valeur doit changer plus tard (un compteur, un total qui grandit).\n- Un nom commence par une lettre, sans espace ni accent conseillé. Convention : `camelCase` (`prixTotal`, `nombreDeFruits`).\n- Les majuscules comptent : `prix` et `Prix` sont deux variables différentes.",
+      "exemples": [
+        { "code": ["const prenom = \"Léa\";", "let score = 0;", "score = score + 10;", "console.log(prenom, score);"] },
+        { "titre": "Recoller une étiquette `const` : erreur", "code": ["const ville = \"Lausanne\";", "ville = \"Yverdon\";"], "note": "`Assignment to constant variable` : une `const` ne change jamais." }
+      ],
+      "pieges": ["Utiliser une variable avant la ligne qui la crée.", "Redéclarer : `const x = 1;` puis `const x = 2;` → erreur. Pour changer une valeur, `let` puis `x = 2;` (sans `let`)."]
+    },
+    {
+      "id": "types",
+      "titre": "Les types : nombre, chaîne, booléen",
+      "icone": "42",
+      "resume": "`42` est un nombre, `\"42\"` est du texte (une chaîne), `true` / `false` sont des booléens.",
+      "analogie": "Le type, c'est la **matière** de ce qu'il y a dans la boîte : `42` est un nombre avec lequel on calcule, `\"42\"` est une étiquette imprimée qu'on peut seulement lire ou coller à d'autres textes.",
+      "texte": "**Nombre** : `13`, `3.5`, `-2` (point pour la virgule).\n**Chaîne** (texte) : toujours entre guillemets, `\"13\"`, `\"Léa\"`.\n**Booléen** : `true` ou `false`, sans guillemets.\n\nLes guillemets changent tout : `13 + 1` vaut `14`, mais `\"13\" + 1` vaut `\"131\"` (le texte est collé).\n\nDeux autres valeurs reviennent souvent : `undefined` (« pas de valeur ») et `null` (« vide exprès »).",
+      "exemples": [
+        { "code": ["console.log(13 + 1);", "console.log(\"13\" + 1);", "console.log(typeof 13, typeof \"13\", typeof true);"] }
+      ],
+      "pieges": ["`\"13\"` (texte) au lieu de `13` (nombre) : les tests comparent aussi le type.", "`\"true\"` est un texte, pas un booléen."]
+    },
+    {
+      "id": "constantes",
+      "titre": "Les constantes en MAJUSCULES",
+      "icone": "KING",
+      "resume": "`const KING = 13;` donne un nom lisible à un nombre. `KING` (le nom) ≠ `\"KING\"` (un texte).",
+      "analogie": "C'est un **surnom** : `KING` est le surnom du nombre 13. Écrire `\"KING\"` entre guillemets, c'est écrire le mot sur un papier : ce n'est plus le nombre.",
+      "texte": "Pour des valeurs fixes qui ont un sens, on utilise des constantes nommées en MAJUSCULES : `const JACK = 11;`, `const QUEEN = 12;`, `const KING = 13;`.\n\nEnsuite on écrit `KING` (sans guillemets) partout où on veut le nombre 13 : c'est plus lisible et on ne se trompe pas de nombre.\n\n- `KING` vaut `13` (un nombre).\n- `\"KING\"` vaut le texte `\"KING\"`, qui n'a rien à voir avec 13.",
+      "exemples": [
+        { "code": ["const KING = 13;", "console.log(KING);", "console.log(\"KING\");", "console.log(KING + 1);"] }
+      ],
+      "pieges": ["Mettre des guillemets autour d'une constante : `\"KING\"` n'est plus le nombre."]
+    },
+    {
+      "id": "chaines",
+      "titre": "Les chaînes de caractères",
+      "icone": "\"\"",
+      "resume": "Du texte entre `\"…\"`, `'…'` ou `` `…` ``. On les colle avec `+`, ou on insère des valeurs avec `${…}`.",
+      "texte": "Trois façons d'écrire un texte :\n- `\"guillemets doubles\"` (le style du cours) ;\n- `'guillemets simples'` ;\n- `` `accents graves` `` : on peut y insérer des valeurs avec `${…}`.\n\nOn colle des textes avec `+` (on dit **concaténer**) : `\"Bon\" + \"jour\"` vaut `\"Bonjour\"`. Un nombre collé à un texte devient du texte.\n\n`texte.length` donne le nombre de caractères.",
+      "exemples": [
+        { "code": ["const prenom = \"Léa\";", "const age = 19;", "console.log(prenom + \" a \" + age + \" ans\");", "console.log(`${prenom} a ${age} ans`);", "console.log(prenom.length);"] }
+      ],
+      "pieges": ["Oublier les espaces : `\"a\" + \"b\"` donne `\"ab\"`.", "Les guillemets typographiques « » ou ’ n'existent pas en JavaScript."]
+    },
+    {
+      "id": "typeof",
+      "titre": "typeof : demander le type",
+      "icone": "?",
+      "resume": "`typeof valeur` donne le type en texte : `\"number\"`, `\"string\"`, `\"boolean\"`…",
+      "texte": "Quand on doute, on demande : `console.log(typeof x);`.\n\n- `typeof 42` → `\"number\"`\n- `typeof \"42\"` → `\"string\"`\n- `typeof true` → `\"boolean\"`\n- `typeof undefined` → `\"undefined\"`\n- `typeof [1, 2]` → `\"object\"` (un tableau est un objet ; on verra `Array.isArray` plus tard)\n- `typeof console.log` → `\"function\"`",
+      "exemples": [
+        { "code": ["const a = 42;", "const b = \"42\";", "console.log(typeof a);", "console.log(typeof b);"] }
+      ]
+    },
+    {
+      "id": "ordre-execution",
+      "titre": "De haut en bas : l'ordre d'exécution",
+      "icone": "↓",
+      "resume": "JavaScript lit et exécute les lignes **dans l'ordre**. Une variable doit être créée avant d'être utilisée.",
+      "texte": "Le programme est une recette : on fait l'étape 1, puis l'étape 2… Si l'étape 2 parle d'un ingrédient qui n'est préparé qu'à l'étape 5, ça casse.\n\nUtiliser une variable `const` ou `let` avant sa ligne de création donne : `Cannot access 'x' before initialization`.\n\nLes commentaires `// …` sont ignorés : ils servent aux humains.",
+      "exemples": [
+        { "code": ["// l'ordre compte", "let total = 10;", "console.log(total);", "total = total + 5;", "console.log(total);"] }
+      ]
+    }
+  ],
+  "lecons": [
+    {
+      "id": "u01-l1",
+      "titre": "console.log : afficher",
+      "duree": 4,
+      "notions": ["console-log", "ordre-execution"],
+      "cartes": [
+        {
+          "titre": "Le carnet de bord",
+          "texte": "Un programme travaille en silence. Pour voir ce qu'il fait, on lui demande d'écrire dans son **carnet de bord** : la console.\n\nL'instruction s'appelle `console.log`. Ce qu'on met entre les parenthèses s'affiche. Touche « Exécuter » pour essayer.",
+          "code": ["console.log(\"Bonjour !\");"],
+          "analogie": "La console est un carnet que **toi** tu lis. Le programme y écrit, mais il ne relit jamais ce carnet pour calculer.",
+          "fiche": "console-log"
+        },
+        {
+          "titre": "Du texte ou un calcul ?",
+          "texte": "Entre guillemets, c'est du **texte** : il s'affiche tel quel, sans les guillemets.\n\nSans guillemets, c'est un **calcul** (ou un nom de variable) : JavaScript le fait d'abord, puis affiche le résultat.",
+          "code": ["console.log(\"2 + 3\");", "console.log(2 + 3);"],
+          "astuce": "C'est la première grande règle du JavaScript : **les guillemets changent tout**."
+        },
+        {
+          "titre": "Plusieurs valeurs d'un coup",
+          "texte": "On peut donner plusieurs valeurs à `console.log`, séparées par des virgules. Elles s'affichent sur une seule ligne, séparées par un espace.",
+          "code": ["console.log(\"Total :\", 12, \"francs\");"]
+        },
+        {
+          "titre": "Les commentaires",
+          "texte": "Tout ce qui suit `//` sur une ligne est un **commentaire** : JavaScript l'ignore. C'est un mot pour les humains (toi dans une semaine, ton prof…).",
+          "code": ["// ceci n'est pas exécuté", "console.log(\"ceci l'est\"); // et ceci est ignoré"]
+        },
+        {
+          "titre": "De haut en bas",
+          "texte": "Les lignes s'exécutent **dans l'ordre**, de haut en bas. Chaque `console.log` ajoute une ligne à la console.",
+          "code": ["console.log(\"un\");", "console.log(\"deux\");", "console.log(\"trois\");"],
+          "fiche": "ordre-execution"
+        }
+      ],
+      "exercices": [
+        { "id": "u01-l1-e1", "type": "predire", "notions": ["console-log"], "question": "Que va afficher ce code ?", "code": ["console.log(\"Salut\");"], "explication": "Le texte entre guillemets s'affiche tel quel, **sans** les guillemets." },
+        { "id": "u01-l1-e2", "type": "qcm", "notions": ["console-log"], "question": "À quoi sert `console.log(…)` ?", "choix": ["À afficher une valeur dans la console", "À ranger une valeur dans une variable", "À ouvrir une fenêtre avec un message", "À calculer un résultat et le garder pour plus tard"], "bonne": 0, "explication": "`console.log` **montre** une valeur dans le carnet de bord. Il ne garde rien et ne donne rien au reste du programme." },
+        { "id": "u01-l1-e3", "type": "predire", "notions": ["console-log", "types"], "question": "Que va afficher ce code ? (deux lignes)", "code": ["console.log(2 + 3);", "console.log(\"2 + 3\");"], "explication": "Sans guillemets, `2 + 3` est calculé : `5`. Avec guillemets, c'est un texte affiché tel quel : `2 + 3`." },
+        { "id": "u01-l1-e4", "type": "pointer-code", "notions": ["console-log"], "question": "Touche ce qui va s'afficher dans la console.", "code": ["console.log(⟦\"Bienvenue\"⟧);"], "explication": "Ce qui est **entre les parenthèses** de `console.log` s'affiche. `console.log` lui-même est le nom de l'instruction." },
+        { "id": "u01-l1-e5", "type": "qcm", "notions": ["console-log", "ordre-execution"], "question": "Combien de lignes s'affichent dans la console ?", "code": ["console.log(\"A\");", "// console.log(\"B\");", "console.log(\"C\");"], "choix": ["1", "2", "3", "Aucune : il y a une erreur"], "bonne": 1, "explication": "La ligne qui commence par `//` est un commentaire : elle est ignorée. Il reste deux `console.log`." },
+        {
+          "id": "u01-l1-e6", "type": "ecrire", "notions": ["console-log"],
+          "question": "Affiche exactement `Bonjour ProgWeb` dans la console.",
+          "depart": [""],
+          "tests": { "cas": [ { "titre": "Affichage", "sortie": ["Bonjour ProgWeb"] } ] },
+          "indices": ["Pour afficher, c'est `console.log( … );`.", "Un texte s'écrit entre guillemets. Respecte les majuscules et l'espace.", { "texte": "Complète :", "code": "console.log(\"___\");" }],
+          "solution": ["console.log(\"Bonjour ProgWeb\");"],
+          "erreursTypiques": [
+            { "code": "console.log(Bonjour ProgWeb);", "attendu": "erreur" },
+            { "code": "console.log(\"bonjour progweb\");", "attendu": "echec" },
+            { "code": "Console.log(\"Bonjour ProgWeb\");", "attendu": "erreur" }
+          ],
+          "explication": "Le texte est entre guillemets, donc il s'affiche tel quel. Les majuscules comptent : `Console.log` n'existe pas."
+        },
+        {
+          "id": "u01-l1-e7", "type": "parsons", "notions": ["ordre-execution", "console-log"],
+          "question": "Remets les lignes dans l'ordre pour que la console affiche : `Prêt ?` puis `3` puis `Partez !`",
+          "lignes": ["console.log(\"Prêt ?\");", "console.log(3);", "console.log(\"Partez !\");"],
+          "explication": "Les lignes s'exécutent de haut en bas : l'ordre du code est l'ordre de l'affichage."
+        }
+      ]
+    },
+    {
+      "id": "u01-l2",
+      "titre": "Les variables : des étiquettes",
+      "duree": 5,
+      "notions": ["variables", "ordre-execution"],
+      "cartes": [
+        {
+          "titre": "Une étiquette sur une boîte",
+          "illu": "variables",
+          "variables": [["prenom", "\"Léa\""], ["age", "19"]],
+          "texte": "Une **variable** donne un nom à une valeur, pour la retrouver plus tard. On la crée avec `const` :",
+          "code": ["const prenom = \"Léa\";", "const age = 19;", "console.log(prenom);", "console.log(age);"],
+          "analogie": "Le nom (`prenom`) est l'**étiquette**, la valeur (`\"Léa\"`) est dans la **boîte**. Pour lire la valeur, on appelle l'étiquette par son nom, sans guillemets.",
+          "fiche": "variables"
+        },
+        {
+          "titre": "Nom de variable ou texte ?",
+          "texte": "`console.log(prenom)` affiche **la valeur** rangée sous l'étiquette `prenom`.\n\n`console.log(\"prenom\")` affiche le **mot** prenom, tel quel.",
+          "code": ["const prenom = \"Léa\";", "console.log(prenom);", "console.log(\"prenom\");"],
+          "piege": "Sans guillemets = un nom de variable. Avec guillemets = du texte. Les confondre est l'erreur numéro un des débutants."
+        },
+        {
+          "titre": "let : une étiquette qu'on peut recoller",
+          "texte": "Avec `let`, on peut changer la valeur plus tard. On écrit alors le nom, `=`, et la nouvelle valeur, **sans** remettre `let`.",
+          "code": ["let score = 0;", "score = score + 10;", "score = score + 5;", "console.log(score);"],
+          "astuce": "`score = score + 10` se lit de droite à gauche : on calcule `score + 10` (avec l'ancienne valeur), puis on recolle l'étiquette `score` sur le résultat."
+        },
+        {
+          "titre": "const ne change jamais",
+          "texte": "Une `const` ne peut pas recevoir une autre valeur. Essaie : JavaScript proteste.",
+          "code": ["const ville = \"Lausanne\";", "ville = \"Yverdon\";"],
+          "erreurVoulue": true,
+          "apres": "Le message `Assignment to constant variable` veut dire : « tu modifies une constante ». Règle simple : **`const` par défaut**, `let` seulement pour ce qui doit changer (compteur, total)."
+        },
+        {
+          "titre": "Bien nommer",
+          "texte": "- Un nom parle de ce qu'il contient : `prixTotal`, pas `x`.\n- Pas d'espace : on colle les mots avec une majuscule (`nombreDeFruits`), c'est le **camelCase**.\n- Les majuscules comptent : `prix` et `Prix` sont deux variables différentes.\n- Une variable se crée **une seule fois**, et **avant** d'être utilisée.",
+          "code": ["const nombreDeFruits = 3;", "console.log(nombreDeFruits);"],
+          "fiche": "ordre-execution"
+        }
+      ],
+      "exercices": [
+        { "id": "u01-l2-e1", "type": "predire", "notions": ["variables"], "question": "Que va afficher ce code ?", "code": ["const fruit = \"kiwi\";", "console.log(fruit);"], "explication": "`fruit` sans guillemets : on lit la valeur rangée sous cette étiquette, `kiwi`." },
+        { "id": "u01-l2-e2", "type": "predire", "notions": ["variables", "chaines"], "question": "Et celui-ci ?", "code": ["const fruit = \"kiwi\";", "console.log(\"fruit\");"], "explication": "Avec des guillemets, c'est le **mot** `fruit` qui s'affiche, pas la valeur de la variable." },
+        { "id": "u01-l2-e3", "type": "predire", "notions": ["variables"], "question": "Que vaut `total` à la fin ?", "code": ["let total = 5;", "total = total + 3;", "total = total * 2;", "console.log(total);"], "explication": "5, puis 5 + 3 = 8, puis 8 × 2 = 16. À chaque ligne, on part de la valeur **actuelle**." },
+        { "id": "u01-l2-e4", "type": "bug", "notions": ["variables"], "question": "Ce programme plante. Trouve la ligne fautive et la raison.", "code": ["const prix = 20;", "const rabais = 5;", "prix = prix - rabais;", "console.log(prix);"], "ligne": 3, "choix": ["On modifie une `const` : il fallait `let prix = 20;`", "Il manque des guillemets autour de 20", "On ne peut pas soustraire deux variables", "`console.log` doit être en premier"], "bonne": 0, "explication": "`prix` est une `const` : on ne peut pas lui donner une nouvelle valeur. Avec `let prix = 20;`, ça marche. (Ou mieux : `const prixFinal = prix - rabais;`.)" },
+        { "id": "u01-l2-e5", "type": "bug", "notions": ["ordre-execution", "variables"], "question": "Trouve la ligne fautive.", "code": ["console.log(message);", "const message = \"Salut\";"], "ligne": 1, "choix": ["On utilise `message` avant de l'avoir créée", "Il faut des guillemets autour de message", "`const` est interdit pour du texte", "Il manque un point-virgule ligne 2"], "bonne": 0, "explication": "Le code s'exécute de haut en bas : à la ligne 1, `message` n'existe pas encore (`Cannot access 'message' before initialization`). On déclare d'abord, on utilise ensuite." },
+        {
+          "id": "u01-l2-e6", "type": "trous", "notions": ["variables"],
+          "question": "Complète pour créer une variable `ville` qui vaut `\"Lausanne\"`, puis l'afficher.",
+          "code": ["___ ville = \"Lausanne\";", "console.log(___);"],
+          "tests": { "cas": [ { "sortie": ["Lausanne"], "variables": { "ville": "Lausanne" } } ] },
+          "indices": ["Quel mot crée une variable qui ne changera pas ?", "Pour afficher la valeur, on donne le **nom** de la variable, sans guillemets."],
+          "solution": ["const", "ville"],
+          "erreursTypiques": [ { "trous": ["const", "\"ville\""], "attendu": "echec" }, { "trous": ["var", "Ville"], "attendu": "erreur" } ],
+          "explication": "`const ville = …` crée l'étiquette ; `console.log(ville)` lit la valeur."
+        },
+        {
+          "id": "u01-l2-e7", "type": "ecrire", "notions": ["variables", "console-log"],
+          "question": "Crée une variable `compteur` qui vaut `0`, ajoute-lui `1` deux fois (en changeant sa valeur), puis affiche-la.",
+          "depart": [""],
+          "tests": { "cas": [ { "sortie": ["2"], "variables": { "compteur": 2 } } ], "obligatoire": [] },
+          "indices": ["La valeur va changer : `const` ou `let` ?", "Pour ajouter 1 : `compteur = compteur + 1;`", { "code": "let compteur = ___;\ncompteur = compteur + 1;\ncompteur = ___;\nconsole.log(___);" }],
+          "solution": ["let compteur = 0;", "compteur = compteur + 1;", "compteur = compteur + 1;", "console.log(compteur);"],
+          "erreursTypiques": [
+            { "code": "const compteur = 0;\ncompteur = compteur + 1;\ncompteur = compteur + 1;\nconsole.log(compteur);", "attendu": "erreur" },
+            { "code": "let compteur = 0;\nlet compteur = compteur + 1;\nconsole.log(compteur);", "attendu": "erreur" }
+          ],
+          "explication": "`let` permet de recoller l'étiquette. On n'écrit `let` qu'une fois : ensuite, `compteur = …` suffit."
+        }
+      ]
+    },
+    {
+      "id": "u01-l3",
+      "titre": "Les types : 13 ou \"13\" ?",
+      "duree": 5,
+      "notions": ["types", "typeof", "constantes"],
+      "cartes": [
+        {
+          "titre": "Trois types pour commencer",
+          "illu": "types",
+          "texte": "Chaque valeur a un **type** :\n- **nombre** : `42`, `3.5`, `-2` ;\n- **chaîne** (du texte) : `\"42\"`, `\"Léa\"`, toujours entre guillemets ;\n- **booléen** : `true` (vrai) ou `false` (faux), sans guillemets.",
+          "fiche": "types"
+        },
+        {
+          "titre": "Les guillemets changent le type",
+          "texte": "`13` est un nombre : on peut calculer avec. `\"13\"` est un texte : `+` le **colle** au lieu d'additionner.",
+          "code": ["console.log(13 + 1);", "console.log(\"13\" + 1);"],
+          "piege": "Dans les exercices du cours, `\"13\"` à la place de `13` fait échouer les tests : le résultat s'affiche pareil dans la console, mais ce n'est pas le même type."
+        },
+        {
+          "titre": "typeof : demander le type",
+          "texte": "Quand tu doutes, demande à JavaScript avec `typeof` :",
+          "code": ["console.log(typeof 13);", "console.log(typeof \"13\");", "console.log(typeof false);"],
+          "fiche": "typeof"
+        },
+        {
+          "titre": "Des noms pour les nombres : KING",
+          "texte": "Dans le jeu de cartes du cours, le roi vaut 13. Plutôt que d'écrire 13 partout, on donne un **nom** à ce nombre, en MAJUSCULES :",
+          "code": ["const KING = 13;", "console.log(KING);", "console.log(\"KING\");", "console.log(KING + 1);"],
+          "analogie": "`KING` est un **surnom** du nombre 13. `\"KING\"` entre guillemets, c'est juste le mot écrit sur un papier : ce n'est plus 13.",
+          "fiche": "constantes"
+        },
+        {
+          "titre": "undefined : la boîte vide",
+          "texte": "Une variable créée sans valeur vaut `undefined` (« pas de valeur »). Tu croiseras souvent `undefined` : c'est presque toujours le signe qu'une valeur manque quelque part.",
+          "code": ["let resultat;", "console.log(resultat);"]
+        }
+      ],
+      "exercices": [
+        { "id": "u01-l3-e1", "type": "tri", "notions": ["types"], "mono": true, "question": "Range chaque valeur selon son type.", "categories": ["nombre", "chaîne", "booléen"], "items": [["42", 0], ["\"42\"", 1], ["true", 2], ["-3.5", 0], ["\"false\"", 1], ["false", 2], ["\"Léa\"", 1], ["0", 0]], "explication": "Les guillemets font une chaîne, même autour de `42` ou de `false`. `true` et `false` sans guillemets sont des booléens." },
+        { "id": "u01-l3-e2", "type": "predire", "notions": ["types", "chaines"], "question": "Que va afficher ce code ?", "code": ["console.log(\"5\" + 5);"], "explication": "Un texte `+` un nombre : le nombre est collé au texte. Résultat : le texte `55`." },
+        { "id": "u01-l3-e3", "type": "qcm", "notions": ["typeof", "types"], "question": "Que affiche `console.log(typeof \"true\");` ?", "choix": ["string", "boolean", "true", "undefined"], "bonne": 0, "mono": true, "explication": "`\"true\"` est entre guillemets : c'est une chaîne (`string`), pas un booléen." },
+        { "id": "u01-l3-e4", "type": "pointer-code", "notions": ["constantes", "types"], "question": "Une seule de ces valeurs vaut le nombre 13. Touche-la.", "code": ["const KING = 13;", "const a = \"13\";", "const b = \"KING\";", "const c = ⟦KING⟧;"], "consigne": "Regarde les valeurs à droite des `=` des lignes 2 à 4.", "explication": "`KING` sans guillemets est le nom de la constante : il vaut 13. `\"13\"` et `\"KING\"` sont des textes." },
+        { "id": "u01-l3-e5", "type": "vf", "notions": ["types"], "question": "`\"13\"` et `13` sont deux valeurs différentes en JavaScript.", "bonne": true, "explication": "L'une est un texte, l'autre un nombre. Elles s'affichent pareil dans la console, mais elles ne se comportent pas pareil (`+` colle le texte)." },
+        {
+          "id": "u01-l3-e6", "type": "corriger", "notions": ["types", "constantes"],
+          "question": "Ce code doit créer `prochainRang`, qui vaut le rang suivant le roi (14). Il affiche `131`. Corrige-le.",
+          "depart": ["const KING = \"13\";", "const prochainRang = KING + 1;", "console.log(prochainRang);"],
+          "tests": { "cas": [ { "sortie": ["14"], "variables": { "prochainRang": 14 } } ] },
+          "indices": ["`131`, c'est `\"13\"` collé à `1`. Quel est le type de `KING` ?", "Un nombre s'écrit **sans** guillemets."],
+          "solution": ["const KING = 13;", "const prochainRang = KING + 1;", "console.log(prochainRang);"],
+          "erreursTypiques": [ { "code": "const KING = \"13\";\nconst prochainRang = \"KING\" + 1;\nconsole.log(prochainRang);", "attendu": "echec" } ],
+          "explication": "Avec `const KING = 13;` (sans guillemets), `KING + 1` est une vraie addition."
+        },
+        {
+          "id": "u01-l3-e7", "type": "ecrire", "notions": ["types", "typeof"],
+          "question": "Crée trois constantes : `taille` (le nombre `1.75`), `nom` (le texte `\"Sami\"`) et `inscrit` (le booléen vrai). Puis affiche le type de `inscrit` avec `typeof`.",
+          "depart": [""],
+          "tests": { "cas": [ { "sortie": ["boolean"], "variables": { "taille": 1.75, "nom": "Sami", "inscrit": true } } ] },
+          "indices": ["Un nombre à virgule s'écrit avec un **point** : `1.75`.", "Vrai se dit `true`, sans guillemets.", { "code": "const taille = ___;\nconst nom = ___;\nconst inscrit = ___;\nconsole.log(typeof ___);" }],
+          "solution": ["const taille = 1.75;", "const nom = \"Sami\";", "const inscrit = true;", "console.log(typeof inscrit);"],
+          "erreursTypiques": [
+            { "code": "const taille = \"1.75\";\nconst nom = \"Sami\";\nconst inscrit = true;\nconsole.log(typeof inscrit);", "attendu": "echec", "diagnostic": "texte-vs-nombre" },
+            { "code": "const taille = 1.75;\nconst nom = \"Sami\";\nconst inscrit = \"true\";\nconsole.log(typeof inscrit);", "attendu": "echec" },
+            { "code": "const taille = 1,75;\nconst nom = \"Sami\";\nconst inscrit = true;\nconsole.log(typeof inscrit);", "attendu": "erreur" }
+          ],
+          "explication": "`1.75` (point), `\"Sami\"` (guillemets), `true` (sans guillemets) : trois types différents."
+        }
+      ]
+    },
+    {
+      "id": "u01-l4",
+      "titre": "Coller des textes",
+      "duree": 5,
+      "notions": ["chaines", "variables", "types"],
+      "cartes": [
+        {
+          "titre": "Les trois guillemets",
+          "texte": "Un texte s'écrit entre `\"…\"` (le style du cours), `'…'` ou `` `…` `` (accents graves, on y revient juste après). Les trois donnent le même genre de valeur : une **chaîne**.",
+          "code": ["console.log(\"double\");", "console.log('simple');", "console.log(`accents graves`);"],
+          "fiche": "chaines"
+        },
+        {
+          "titre": "Coller avec +",
+          "texte": "`+` entre deux textes les **colle** (on dit *concaténer*). Attention aux espaces : il faut les mettre soi-même.",
+          "code": ["const prenom = \"Léa\";", "console.log(\"Bonjour\" + prenom);", "console.log(\"Bonjour \" + prenom + \" !\");"]
+        },
+        {
+          "titre": "Insérer avec ${…}",
+          "texte": "Entre accents graves, `${…}` insère une valeur directement dans le texte. C'est plus lisible quand il y a plusieurs morceaux.",
+          "code": ["const fruit = \"mangue\";", "const prix = 3;", "console.log(`Une ${fruit} coûte ${prix} francs`);"],
+          "astuce": "Les deux écritures donnent le même texte. Choisis celle que tu lis le plus facilement."
+        },
+        {
+          "titre": "La longueur d'un texte",
+          "texte": "`.length` après un texte donne son nombre de caractères (espaces compris). On le retrouvera avec les tableaux.",
+          "code": ["const mot = \"Tenet\";", "console.log(mot.length);", "console.log(\"a b\".length);"]
+        }
+      ],
+      "exercices": [
+        { "id": "u01-l4-e1", "type": "predire", "notions": ["chaines"], "question": "Que va afficher ce code ?", "code": ["const a = \"Java\";", "const b = \"Script\";", "console.log(a + b);"], "explication": "`+` colle les deux textes sans rien ajouter entre eux." },
+        { "id": "u01-l4-e2", "type": "predire", "notions": ["chaines", "variables"], "question": "Que va afficher ce code ?", "code": ["const article = \"t-shirt\";", "const taille = \"M\";", "console.log(`Un ${article} taille ${taille}`);"], "explication": "Chaque `${…}` est remplacé par la valeur de la variable." },
+        { "id": "u01-l4-e3", "type": "qcm", "notions": ["chaines"], "question": "Que vaut `\"Arepo\".length` ?", "choix": ["5", "4", "6", "\"Arepo\""], "bonne": 0, "mono": true, "explication": "A, r, e, p, o : cinq caractères." },
+        { "id": "u01-l4-e4", "type": "bug", "notions": ["chaines"], "question": "Ce code doit afficher `Bonjour Léa`. Il affiche `BonjourLéa`. Quelle ligne corriger ?", "code": ["const prenom = \"Léa\";", "const message = \"Bonjour\" + prenom;", "console.log(message);"], "ligne": 2, "choix": ["Il manque un espace : `\"Bonjour \" + prenom`", "Il faut écrire `prenom` entre guillemets", "Il faut `let` au lieu de `const`", "Il faut une virgule à la place du +"], "bonne": 0, "explication": "`+` colle exactement ce qu'on lui donne. L'espace doit faire partie d'un des textes." },
+        {
+          "id": "u01-l4-e5", "type": "trous", "notions": ["chaines"],
+          "question": "Complète pour afficher `Panier : 3 pommes` en utilisant les variables.",
+          "code": ["const nombre = 3;", "const fruit = \"pommes\";", "console.log(`Panier : ${___} ${___}`);"],
+          "tests": { "cas": [ { "sortie": ["Panier : 3 pommes"] } ] },
+          "indices": ["Dans `${…}`, on met le **nom** de la variable."],
+          "solution": ["nombre", "fruit"],
+          "erreursTypiques": [ { "trous": ["\"nombre\"", "\"fruit\""], "attendu": "echec" } ],
+          "explication": "`${nombre}` est remplacé par 3, `${fruit}` par pommes."
+        },
+        {
+          "id": "u01-l4-e6", "type": "ecrire", "notions": ["chaines", "variables"],
+          "question": "Les variables `prenom` et `ville` sont déjà créées. Affiche la phrase `Léa habite à Lausanne` en utilisant ces variables (pas en écrivant le texte à la main).",
+          "donnees": { "prenom": "Léa", "ville": "Lausanne" },
+          "depart": [""],
+          "tests": { "cas": [
+            { "titre": "Données de l'exercice", "sortie": ["Léa habite à Lausanne"] },
+            { "titre": "Autres données", "donnees": { "prenom": "Noé", "ville": "Genève" }, "sortie": ["Noé habite à Genève"], "siEchec": "Avec d'autres valeurs, ton texte ne change pas : tu l'as écrit à la main ? Utilise `prenom` et `ville`." }
+          ] },
+          "indices": ["Deux façons : coller avec `+`, ou insérer avec `` `…${…}…` ``.", "N'oublie pas les espaces autour de « habite à ».", { "code": "console.log(prenom + \" habite à \" + ___);" }],
+          "solution": ["console.log(`${prenom} habite à ${ville}`);"],
+          "erreursTypiques": [ { "code": "console.log(\"Léa habite à Lausanne\");", "attendu": "echec" }, { "code": "console.log(prenom + \"habite à\" + ville);", "attendu": "echec" } ],
+          "explication": "En utilisant les variables, ton code marche pour n'importe quel prénom et n'importe quelle ville : c'est exactement ce que demande le cours (« vos solutions doivent rester fonctionnelles même si les données changent »)."
+        }
+      ]
+    }
+  ],
+  "jeux": [
+    {
+      "id": "u01-types",
+      "titre": "Quel type ?",
+      "description": "Nombre, chaîne ou booléen : repère le type au premier coup d'œil.",
+      "tours": 10,
+      "badge": "lecteur",
+      "seuilBadge": 8,
+      "questions": [
+        { "id": "u01-j1-1", "type": "qcm", "notions": ["types"], "question": "Quel est le type de `\"3.14\"` ?", "choix": ["chaîne", "nombre", "booléen"], "bonne": 0, "explication": "Les guillemets en font un texte." },
+        { "id": "u01-j1-2", "type": "qcm", "notions": ["types"], "question": "Quel est le type de `3.14` ?", "choix": ["nombre", "chaîne", "booléen"], "bonne": 0, "explication": "Un nombre à virgule s'écrit avec un point, sans guillemets." },
+        { "id": "u01-j1-3", "type": "qcm", "notions": ["types"], "question": "Quel est le type de `false` ?", "choix": ["booléen", "chaîne", "undefined"], "bonne": 0, "explication": "`true` et `false` sans guillemets sont les deux booléens." },
+        { "id": "u01-j1-4", "type": "predire", "notions": ["typeof"], "question": "Que va afficher ce code ?", "code": ["console.log(typeof 100);"], "explication": "100 est un nombre : `number`." },
+        { "id": "u01-j1-5", "type": "predire", "notions": ["types", "chaines"], "question": "Que va afficher ce code ?", "code": ["console.log(\"10\" + 10);"], "explication": "Texte + nombre : on colle. `1010`." },
+        { "id": "u01-j1-6", "type": "predire", "notions": ["types"], "question": "Que va afficher ce code ?", "code": ["console.log(10 + 10);"], "explication": "Deux nombres : on additionne." },
+        { "id": "u01-j1-7", "type": "vf", "notions": ["constantes"], "question": "Avec `const QUEEN = 12;`, l'expression `\"QUEEN\"` vaut 12.", "bonne": false, "explication": "`\"QUEEN\"` est le mot QUEEN écrit en texte. C'est `QUEEN` sans guillemets qui vaut 12." },
+        { "id": "u01-j1-8", "type": "tri", "notions": ["types"], "mono": true, "question": "Classe ces valeurs.", "categories": ["nombre", "chaîne"], "items": [["7", 0], ["\"7\"", 1], ["\"sept\"", 1], ["0.5", 0], ["\"\"", 1], ["-1", 0]], "explication": "`\"\"` est une chaîne vide : elle contient zéro caractère, mais c'est bien un texte." },
+        { "id": "u01-j1-9", "type": "qcm", "notions": ["typeof"], "question": "Que donne `typeof prenom` si `const prenom = \"Ana\";` ?", "choix": ["\"string\"", "\"Ana\"", "\"prenom\"", "\"text\""], "bonne": 0, "mono": true, "explication": "`typeof` décrit la valeur rangée dans la variable : un texte, donc `\"string\"`." },
+        { "id": "u01-j1-10", "type": "vf", "notions": ["types"], "question": "`\"false\"` (avec guillemets) est un booléen.", "bonne": false, "explication": "Avec des guillemets, c'est un texte de 5 lettres." },
+        { "id": "u01-j1-11", "type": "predire", "notions": ["variables", "types"], "question": "Que va afficher ce code ?", "code": ["let x;", "console.log(x);"], "explication": "Une variable sans valeur vaut `undefined`." },
+        { "id": "u01-j1-12", "type": "assoc", "notions": ["typeof"], "mono": true, "question": "Associe chaque valeur au résultat de `typeof`.", "paires": [["12", "\"number\""], ["\"12\"", "\"string\""], ["true", "\"boolean\""], ["undefined", "\"undefined\""]], "explication": "`typeof` renvoie toujours un texte qui nomme le type." }
+      ]
+    }
+  ],
+  "quiz": {
+    "titre": "Quiz : les bases",
+    "questions": [
+      { "id": "u01-q1", "type": "predire", "notions": ["console-log"], "question": "Que va afficher ce code ?", "code": ["console.log(\"7 * 6\");"], "explication": "Entre guillemets : affiché tel quel, sans calcul." },
+      { "id": "u01-q2", "type": "predire", "notions": ["console-log"], "question": "Que va afficher ce code ?", "code": ["console.log(7 * 6);"], "explication": "Sans guillemets, le calcul est fait : 42." },
+      { "id": "u01-q3", "type": "qcm", "notions": ["variables"], "question": "Laquelle de ces lignes crée correctement une variable ?", "choix": ["const age = 19;", "const \"age\" = 19;", "age const = 19;", "const age 19;"], "bonne": 0, "mono": true, "explication": "`const`, puis le nom (sans guillemets), puis `=`, puis la valeur." },
+      { "id": "u01-q4", "type": "predire", "notions": ["variables"], "question": "Que va afficher ce code ?", "code": ["let points = 10;", "points = points - 4;", "console.log(points);"], "explication": "10 - 4 = 6 : `points` reçoit la nouvelle valeur." },
+      { "id": "u01-q5", "type": "bug", "notions": ["variables"], "question": "Trouve la ligne qui provoque une erreur.", "code": ["const total = 0;", "total = total + 5;", "console.log(total);"], "ligne": 2, "choix": ["On modifie une `const`", "On additionne un texte et un nombre", "On affiche une variable inexistante", "Il manque des guillemets"], "bonne": 0, "explication": "`total` doit changer : il faut `let total = 0;`." },
+      { "id": "u01-q6", "type": "tri", "notions": ["types"], "mono": true, "question": "Classe ces valeurs.", "categories": ["nombre", "chaîne", "booléen"], "items": [["13", 0], ["\"13\"", 1], ["true", 2], ["\"KING\"", 1], ["0.25", 0], ["false", 2]], "explication": "Les guillemets font les chaînes ; `true` et `false` nus sont des booléens." },
+      { "id": "u01-q7", "type": "predire", "notions": ["types", "chaines"], "question": "Que va afficher ce code ?", "code": ["console.log(\"2\" + 2);"], "explication": "Texte + nombre : on colle, `22`." },
+      { "id": "u01-q8", "type": "vf", "notions": ["constantes"], "question": "Après `const KING = 13;`, la ligne `console.log(KING + 1);` affiche `14`.", "bonne": true, "explication": "`KING` vaut le nombre 13 : l'addition donne 14." },
+      { "id": "u01-q9", "type": "qcm", "notions": ["typeof"], "question": "Que affiche `console.log(typeof 3.5);` ?", "choix": ["number", "string", "float", "decimal"], "bonne": 0, "mono": true, "explication": "En JavaScript, tous les nombres (entiers ou à virgule) ont le type `number`." },
+      { "id": "u01-q10", "type": "predire", "notions": ["chaines", "variables"], "question": "Que va afficher ce code ?", "code": ["const fruit = \"poire\";", "console.log(`J'aime la ${fruit}`);"], "explication": "`${fruit}` est remplacé par la valeur `poire`." },
+      { "id": "u01-q11", "type": "bug", "notions": ["ordre-execution"], "question": "Trouve la ligne fautive.", "code": ["const a = 2;", "console.log(a + b);", "const b = 3;"], "ligne": 2, "choix": ["`b` est utilisée avant d'être créée", "`a + b` doit être entre guillemets", "On ne peut pas avoir deux `const`", "Il faut `let` pour les nombres"], "bonne": 0, "explication": "De haut en bas : à la ligne 2, `b` n'existe pas encore." },
+      { "id": "u01-q12", "type": "pointer-code", "notions": ["variables"], "question": "Touche le **nom** de la variable.", "code": ["const ⟦prixTotal⟧ = 42;"], "explication": "Le nom (l'étiquette) est entre `const` et `=`. La valeur est après le `=`." },
+      { "id": "u01-q13", "type": "qcm", "notions": ["chaines"], "question": "Que vaut `\"Rotas\".length` ?", "choix": ["5", "4", "6", "\"5\""], "bonne": 0, "mono": true, "explication": "`.length` compte les caractères : cinq lettres, et c'est un nombre (pas un texte)." },
+      { "id": "u01-q14", "type": "vf", "notions": ["variables"], "question": "`Prix` et `prix` sont la même variable.", "bonne": false, "explication": "Les majuscules comptent : ce sont deux noms différents." },
+      { "id": "u01-q15", "type": "predire", "notions": ["console-log", "chaines"], "question": "Que va afficher ce code ?", "code": ["const n = 3;", "console.log(\"n vaut\", n);"], "explication": "Deux valeurs séparées par une virgule : elles s'affichent sur la même ligne, séparées par un espace." }
+    ]
+  },
+  "boss": [
+    {
+      "id": "u01-b1",
+      "titre": "La carte d'étudiant",
+      "source": "Préparation au TP 1",
+      "notions": ["variables", "chaines", "types"],
+      "enonce": "Les variables `prenom` et `age` sont déjà créées (en haut, grisées). Sans écrire le prénom ni l'âge à la main :\n\n1. Crée une constante `ageDansDixAns` qui vaut l'âge dans dix ans (un **nombre**).\n2. Affiche exactement : `Léa a 19 ans`\n3. Puis affiche exactement : `Dans 10 ans : 29`",
+      "regles": ["Ton code doit marcher pour n'importe quel prénom et n'importe quel âge : il sera testé avec d'autres valeurs.", "Pas de texte écrit à la main pour le prénom ou l'âge."],
+      "donnees": { "prenom": "Léa", "age": 19 },
+      "depart": [""],
+      "tests": { "cas": [
+        { "titre": "Données du cours", "sortie": ["Léa a 19 ans", "Dans 10 ans : 29"], "variables": { "ageDansDixAns": 29 } },
+        { "titre": "Autres données", "donnees": { "prenom": "Sami", "age": 21 }, "sortie": ["Sami a 21 ans", "Dans 10 ans : 31"], "variables": { "ageDansDixAns": 31 }, "siEchec": "Avec Sami, 21 ans, ton affichage ne suit pas : utilise les variables `prenom` et `age` au lieu d'écrire les valeurs à la main." },
+        { "titre": "Encore d'autres données", "donnees": { "prenom": "Ana", "age": 8 }, "sortie": ["Ana a 8 ans", "Dans 10 ans : 18"], "variables": { "ageDansDixAns": 18 } }
+      ] },
+      "indices": [
+        "Commence par l'étape 1 seule : `ageDansDixAns` se calcule à partir de `age`.",
+        "Pour la phrase, colle des morceaux avec `+` ou utilise `` `${…}` ``. Attention aux espaces.",
+        { "texte": "La structure (à compléter) :", "code": "const ageDansDixAns = ___ + ___;\nconsole.log(`${___} a ${___} ans`);\nconsole.log(\"Dans 10 ans : \" + ___);" }
+      ],
+      "solution": ["const ageDansDixAns = age + 10;", "console.log(`${prenom} a ${age} ans`);", "console.log(\"Dans 10 ans : \" + ageDansDixAns);"],
+      "erreursTypiques": [
+        { "code": "const ageDansDixAns = 29;\nconsole.log(\"Léa a 19 ans\");\nconsole.log(\"Dans 10 ans : 29\");", "attendu": "echec" },
+        { "code": "const ageDansDixAns = \"age + 10\";\nconsole.log(`${prenom} a ${age} ans`);\nconsole.log(\"Dans 10 ans : \" + ageDansDixAns);", "attendu": "echec" },
+        { "code": "const ageDansDixAns = age + \"10\";\nconsole.log(`${prenom} a ${age} ans`);\nconsole.log(\"Dans 10 ans : \" + ageDansDixAns);", "attendu": "echec" },
+        { "code": "const prenom = \"Léa\";\nconst ageDansDixAns = age + 10;\nconsole.log(`${prenom} a ${age} ans`);\nconsole.log(\"Dans 10 ans : \" + ageDansDixAns);", "attendu": "erreur" }
+      ],
+      "explication": "Tu as écrit un programme qui marche pour **n'importe quelles données** : c'est la règle d'or des exercices du cours."
+    }
+  ]
+}

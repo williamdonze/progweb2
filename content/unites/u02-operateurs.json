@@ -1,0 +1,492 @@
+{
+  "id": "u02",
+  "titre": "Les opérateurs",
+  "sousTitre": "Calculer et comparer",
+  "objectif": "Calculer, tester pair / impair, comparer avec ===, combiner avec && et ||, choisir avec le ternaire.",
+  "icone": "%",
+  "fiches": [
+    {
+      "id": "arithmetique",
+      "titre": "Calculer : + - * / ** et Math",
+      "icone": "+",
+      "resume": "Les opérations de base, les parenthèses, et `Math.floor` (arrondi vers le bas).",
+      "texte": "`+` addition, `-` soustraction, `*` multiplication, `/` division, `**` puissance (`2 ** 3` vaut 8).\n\nComme en maths, `*` et `/` passent avant `+` et `-` : `2 + 3 * 4` vaut 14. Les parenthèses décident : `(2 + 3) * 4` vaut 20.\n\n**Arrondir** :\n- `Math.floor(x)` : vers le bas (`Math.floor(4.9)` → 4) ;\n- `Math.round(x)` : au plus proche (`Math.round(4.5)` → 5) ;\n- `Math.ceil(x)` : vers le haut.\n\n`Math.max(a, b, c)` et `Math.min(…)` donnent le plus grand et le plus petit.",
+      "exemples": [
+        { "code": ["console.log(2 + 3 * 4);", "console.log((2 + 3) * 4);", "console.log(7 / 2);", "console.log(Math.floor(7 / 2));", "console.log(Math.max(3, 92, 14));"] }
+      ],
+      "pieges": ["`Math.floor` et pas `math.floor` : les majuscules comptent.", "`7 / 2` vaut `3.5`, pas 3 : la division ne coupe pas les décimales toute seule."]
+    },
+    {
+      "id": "math-random",
+      "titre": "Math.random : le hasard",
+      "icone": "🎲",
+      "resume": "`Math.random()` donne un nombre au hasard entre 0 (compris) et 1 (**non** compris).",
+      "analogie": "`Math.random()` est une roue de loterie graduée de 0 à 1, qui ne s'arrête **jamais pile sur 1**. Pour un dé, on agrandit la roue (`* 6`), on coupe les décimales (`Math.floor`), puis on décale (`+ 1`).",
+      "texte": "`Math.random()` peut donner `0`, `0.5`, `0.9999…`, mais jamais `1`.\n\n**Entier au hasard entre 0 et n-1** : `Math.floor(Math.random() * n)`.\n**Dé à 6 faces** (1 à 6) : `Math.floor(Math.random() * 6) + 1`.\n**Entier entre min et max compris** : `Math.floor(Math.random() * (max - min + 1)) + min`.\n\nPourquoi `+ 1` dans `max - min + 1` ? Entre 3 et 7 compris, il y a **5** valeurs (3, 4, 5, 6, 7), pas 4.",
+      "exemples": [
+        { "code": ["const de = Math.floor(Math.random() * 6) + 1;", "console.log(de);"], "note": "Exécute plusieurs fois : le résultat change." }
+      ],
+      "pieges": ["Oublier `Math.floor` : on obtient des nombres à virgule.", "`* (max - min)` au lieu de `* (max - min + 1)` : la borne max ne sort jamais."]
+    },
+    {
+      "id": "modulo",
+      "titre": "Le modulo % : le reste",
+      "icone": "%",
+      "resume": "`a % b` donne le **reste** de la division de a par b. `n % 2 === 0` : n est pair.",
+      "analogie": "Tu ranges des œufs dans des boîtes de 6. `14 % 6` est le nombre d'œufs qui restent hors des boîtes : 2.",
+      "texte": "- `14 % 6` vaut 2 (14 = 2 × 6 + **2**).\n- `n % 2 === 0` : n est **pair** (aucun reste quand on divise par 2).\n- `n % 2 !== 0` : n est **impair**.\n- `n % 9 === 0` : n est un **multiple de 9**.\n\nAvec un nombre négatif, le reste est négatif : `-3 % 2` vaut `-1`, pas `1`. C'est pourquoi on teste « impair » avec `!== 0`, qui marche dans tous les cas.",
+      "exemples": [
+        { "code": ["console.log(14 % 6);", "console.log(15 % 2);", "console.log(92 % 2 === 0);", "console.log(27 % 9 === 0);", "console.log(-3 % 2);"] }
+      ],
+      "pieges": ["Tester impair avec `n % 2 === 1` : faux pour les nombres négatifs (`-3 % 2` vaut `-1`)."]
+    },
+    {
+      "id": "comparaisons",
+      "titre": "Comparer : === !== < > <= >=",
+      "icone": "<",
+      "resume": "Une comparaison **donne déjà** `true` ou `false`. Pas besoin de if pour obtenir un booléen.",
+      "texte": "`a === b` (égal), `a !== b` (différent), `a < b`, `a > b`, `a <= b`, `a >= b`.\n\nLe résultat d'une comparaison est un **booléen** : on peut l'afficher, le ranger dans une variable, le retourner.\n\n`const estMajeur = age >= 18;` suffit. Inutile d'écrire `if (age >= 18) { estMajeur = true } else { estMajeur = false }`.",
+      "exemples": [
+        { "code": ["const age = 17;", "const estMajeur = age >= 18;", "console.log(estMajeur);", "console.log(5 !== 3);"] }
+      ],
+      "pieges": ["Un seul `=` sert à **ranger** une valeur ; `===` sert à **comparer**.", "`10 <= n <= 99` ne fait pas ce qu'on croit : il faut `n >= 10 && n <= 99`."]
+    },
+    {
+      "id": "egalite-stricte",
+      "titre": "=== et pas == (ni != à la place de !==)",
+      "icone": "===",
+      "resume": "`==` convertit les types avant de comparer (`4 == \"4\"` vaut true). `===` compare aussi le type. Utilise toujours `===` et `!==`.",
+      "texte": "`==` et `!=` sont des comparaisons « souples » : JavaScript essaie de convertir les valeurs pour les rendre comparables. Résultat : des surprises (`0 == \"\"` vaut true !).\n\n`===` et `!==` sont **strictes** : même valeur **et** même type. C'est ce que veut ton prof, et c'est ce que vérifient les tests.\n\nL'exercice 3 du TP sur les fonctions (`compareA` / `compareB`) montre exactement cette différence.",
+      "exemples": [
+        { "code": ["console.log(4 == \"4\");", "console.log(4 === \"4\");", "console.log(8 != \"8\");", "console.log(8 !== \"8\");"] }
+      ]
+    },
+    {
+      "id": "logique",
+      "titre": "&& (et), || (ou), ! (non)",
+      "icone": "&&",
+      "resume": "`&&` : les deux conditions doivent être vraies. `||` : au moins une. `!` inverse.",
+      "analogie": "Pour entrer au cinéma, il faut un billet **ET** être assez grand : `aBillet && taille >= 120`. Pour avoir une réduction, il suffit d'être étudiant **OU** retraité : `etudiant || retraite`.",
+      "texte": "- `a && b` : vrai seulement si a **et** b sont vrais.\n- `a || b` : vrai si **au moins un** des deux est vrai.\n- `!a` : l'inverse de a.\n\n**Entre deux bornes** : `n >= 10 && n <= 99`.\n**L'un ou l'autre** : `jour === \"samedi\" || jour === \"dimanche\"` (on répète la comparaison des deux côtés).",
+      "exemples": [
+        { "code": ["const n = 42;", "console.log(n >= 10 && n <= 99);", "const jour = \"lundi\";", "console.log(jour === \"samedi\" || jour === \"dimanche\");", "console.log(!true);"] }
+      ],
+      "pieges": ["`jour === \"samedi\" || \"dimanche\"` : la partie droite n'est pas une comparaison, elle vaut toujours « vrai ».", "Confondre `&&` (et) et `||` (ou) : demande-toi « faut-il les deux, ou un seul suffit ? »"]
+    },
+    {
+      "id": "ternaire",
+      "titre": "if / else et le ternaire ? :",
+      "icone": "?:",
+      "resume": "`condition ? siVrai : siFaux` choisit une valeur en une ligne.",
+      "texte": "**if / else** exécute un bloc ou l'autre :\n`if (n % 2 === 0) { console.log(\"pair\"); } else { console.log(\"impair\"); }`\n\nLe **ternaire** choisit une **valeur** :\n`const parite = n % 2 === 0 ? \"pair\" : \"impair\";`\nSe lit : « n est pair ? si oui \"pair\", sinon \"impair\" ».\n\nOn s'en servira souvent dans les fonctions fléchées courtes, où il n'y a pas de place pour un if.",
+      "exemples": [
+        { "code": ["const n = 7;", "if (n % 2 === 0) {", "  console.log(\"pair\");", "} else {", "  console.log(\"impair\");", "}", "const parite = n % 2 === 0 ? \"pair\" : \"impair\";", "console.log(parite);"] }
+      ],
+      "pieges": ["Écrire `condition ? true : false` : la condition est déjà un booléen, le ternaire est inutile."]
+    }
+  ],
+  "lecons": [
+    {
+      "id": "u02-l1",
+      "titre": "Calculer et arrondir",
+      "duree": 5,
+      "notions": ["arithmetique", "math-random"],
+      "cartes": [
+        {
+          "titre": "La calculatrice",
+          "texte": "`+ - * /` comme en maths, et `**` pour les puissances. `*` et `/` passent avant `+` et `-`, sauf si des parenthèses en décident autrement.",
+          "code": ["console.log(10 - 2 * 3);", "console.log((10 - 2) * 3);", "console.log(2 ** 10);"],
+          "fiche": "arithmetique"
+        },
+        {
+          "titre": "La division ne coupe pas",
+          "texte": "`7 / 2` vaut `3.5`. Pour garder la partie entière, on arrondit vers le bas avec `Math.floor`.",
+          "code": ["console.log(7 / 2);", "console.log(Math.floor(7 / 2));", "console.log(Math.round(3.5));"],
+          "astuce": "On s'en servira pour trouver **l'indice du milieu** d'un tableau (unité 4) : `Math.floor((longueur - 1) / 2)`."
+        },
+        {
+          "titre": "Le plus grand, le plus petit",
+          "texte": "`Math.max` et `Math.min` prennent autant de nombres qu'on veut.",
+          "code": ["console.log(Math.max(3, 14, 15));", "console.log(Math.min(3, 14, 15));"]
+        },
+        {
+          "titre": "Le hasard : Math.random",
+          "texte": "`Math.random()` donne un nombre entre 0 (compris) et 1 (jamais atteint). Pour un dé à 6 faces : on multiplie par 6 (de 0 à 5,999…), on coupe les décimales (0 à 5), on ajoute 1 (1 à 6).",
+          "code": ["console.log(Math.random());", "const de = Math.floor(Math.random() * 6) + 1;", "console.log(de);"],
+          "analogie": "Une roue de loterie graduée de 0 à 1 qui ne s'arrête jamais pile sur 1. `* 6` agrandit la roue, `Math.floor` coupe, `+ 1` décale.",
+          "fiche": "math-random"
+        }
+      ],
+      "exercices": [
+        { "id": "u02-l1-e1", "type": "predire", "notions": ["arithmetique"], "question": "Que va afficher ce code ?", "code": ["console.log(4 + 2 * 5);"], "explication": "`2 * 5` d'abord (10), puis `4 + 10`." },
+        { "id": "u02-l1-e2", "type": "predire", "notions": ["arithmetique"], "question": "Que va afficher ce code ?", "code": ["console.log(Math.floor(9 / 4));"], "explication": "9 / 4 = 2.25, arrondi vers le bas : 2." },
+        { "id": "u02-l1-e3", "type": "qcm", "notions": ["math-random"], "question": "Quelles valeurs peut donner `Math.floor(Math.random() * 6)` ?", "choix": ["0, 1, 2, 3, 4 ou 5", "1, 2, 3, 4, 5 ou 6", "0, 1, 2, 3, 4, 5 ou 6", "N'importe quel nombre à virgule entre 0 et 6"], "bonne": 0, "explication": "`Math.random() * 6` va de 0 à 5,999… ; `Math.floor` donne donc 0 à 5. Pour 1 à 6, il faut ajouter 1." },
+        { "id": "u02-l1-e4", "type": "pointer-code", "notions": ["math-random"], "question": "Dans ce dé à 6 faces, touche le morceau qui **décale** les résultats de 0–5 vers 1–6.", "code": ["const de = Math.floor(Math.random() * 6) ⟦+ 1⟧;"], "explication": "Sans `+ 1`, le dé donnerait 0 à 5." },
+        { "id": "u02-l1-e5", "type": "qcm", "notions": ["math-random"], "question": "Pour un entier au hasard entre 3 et 7 **compris**, par combien faut-il multiplier `Math.random()` ?", "choix": ["5 (c'est 7 - 3 + 1)", "4 (c'est 7 - 3)", "7", "10"], "bonne": 0, "explication": "Il y a cinq valeurs possibles : 3, 4, 5, 6, 7. Le nombre de valeurs, c'est `max - min + 1`. On écrit `Math.floor(Math.random() * 5) + 3`." },
+        {
+          "id": "u02-l1-e6", "type": "ecrire", "notions": ["arithmetique"],
+          "question": "Les variables `prix` (un prix en francs) et `quantite` sont déjà créées. Crée `total` = prix × quantité, puis `totalArrondi` = total arrondi vers le bas. Affiche `totalArrondi`.",
+          "donnees": { "prix": 2.75, "quantite": 3 },
+          "depart": [""],
+          "tests": { "cas": [
+            { "sortie": ["8"], "variables": { "total": 8.25, "totalArrondi": 8 } },
+            { "titre": "Autres données", "donnees": { "prix": 4.5, "quantite": 5 }, "sortie": ["22"], "variables": { "total": 22.5, "totalArrondi": 22 }, "siEchec": "Avec d'autres prix, ton résultat ne suit pas : calcule à partir de `prix` et `quantite`." }
+          ] },
+          "indices": ["Multiplier, c'est `*`.", "Arrondir vers le bas : `Math.floor(…)` avec un M majuscule.", { "code": "const total = ___ * ___;\nconst totalArrondi = Math.floor(___);\nconsole.log(totalArrondi);" }],
+          "solution": ["const total = prix * quantite;", "const totalArrondi = Math.floor(total);", "console.log(totalArrondi);"],
+          "erreursTypiques": [
+            { "code": "const total = prix * quantite;\nconst totalArrondi = math.floor(total);\nconsole.log(totalArrondi);", "attendu": "erreur" },
+            { "code": "const total = prix * quantite;\nconst totalArrondi = Math.round(total);\nconsole.log(totalArrondi);", "attendu": "echec" }
+          ],
+          "explication": "`Math.floor(8.25)` donne 8 ; `Math.round` aurait arrondi au plus proche."
+        },
+        {
+          "id": "u02-l1-e7", "type": "trous", "notions": ["math-random"],
+          "question": "Complète pour obtenir `tirage`, un entier au hasard entre 1 et 10 **compris**.",
+          "code": ["const tirage = Math.floor(Math.random() * ___) + ___;", "console.log(tirage);"],
+          "tests": { "cas": [ { "titre": "1 000 tirages entre 1 et 10", "variable": "tirage", "repetitions": 1000, "entier": true, "min": 1, "max": 10, "tous": true } ] },
+          "indices": ["Combien de valeurs différentes entre 1 et 10 ?", "`Math.floor(Math.random() * n)` donne 0 à n-1. Que faut-il ajouter pour commencer à 1 ?"],
+          "solution": ["10", "1"],
+          "erreursTypiques": [ { "trous": ["9", "1"], "attendu": "echec" }, { "trous": ["10", "0"], "attendu": "echec" }, { "trous": ["11", "0"], "attendu": "echec" } ],
+          "explication": "`Math.random() * 10` → 0 à 9,99… ; `Math.floor` → 0 à 9 ; `+ 1` → 1 à 10."
+        }
+      ]
+    },
+    {
+      "id": "u02-l2",
+      "titre": "Le modulo : pair ou impair ?",
+      "duree": 5,
+      "notions": ["modulo", "comparaisons"],
+      "cartes": [
+        {
+          "titre": "Le reste de la division",
+          "texte": "`%` (modulo) donne le **reste** d'une division entière.",
+          "code": ["console.log(14 % 6);", "console.log(20 % 5);", "console.log(7 % 2);"],
+          "analogie": "Tu ranges des œufs dans des boîtes de 6. Avec 14 œufs, tu remplis 2 boîtes et il en **reste** 2 : `14 % 6` vaut 2.",
+          "fiche": "modulo"
+        },
+        {
+          "titre": "Pair ou impair",
+          "texte": "Un nombre est **pair** si le reste de sa division par 2 est 0 : `n % 2 === 0`. Ce test donne déjà `true` ou `false`.",
+          "code": ["console.log(92 % 2 === 0);", "console.log(15 % 2 === 0);"]
+        },
+        {
+          "titre": "Multiple de 9 (et de n'importe quoi)",
+          "texte": "Même idée : `n % 9 === 0` teste si n est un multiple de 9. Ça servira dans le TP sur les tableaux (« au moins un multiple de 9 »).",
+          "code": ["console.log(27 % 9 === 0);", "console.log(35 % 9 === 0);"]
+        },
+        {
+          "titre": "Le piège des négatifs",
+          "texte": "Avec un nombre négatif, le reste est négatif : `-3 % 2` vaut `-1`. Donc `n % 2 === 1` rate les impairs négatifs.\n\nPour **impair**, écris `n % 2 !== 0` : « le reste n'est pas zéro ». Ça marche toujours.",
+          "code": ["console.log(-3 % 2);", "console.log(-3 % 2 === 1);", "console.log(-3 % 2 !== 0);"],
+          "piege": "Les tests de ton cours essaient d'autres données que celles de l'énoncé. Un nombre négatif peut en faire partie."
+        }
+      ],
+      "exercices": [
+        { "id": "u02-l2-e1", "type": "predire", "notions": ["modulo"], "question": "Que va afficher ce code ?", "code": ["console.log(17 % 5);"], "explication": "17 = 3 × 5 + **2**." },
+        { "id": "u02-l2-e2", "type": "pointer-tableau", "notions": ["modulo"], "question": "Touche les nombres **pairs** (ceux pour lesquels `n % 2 === 0`).", "tableau": [3, 14, 15, 92, 65, 35, 89, 79, 32, 38], "nom": "numbers", "bonnes": [1, 3, 8, 9], "sansIndices": true, "explication": "14, 92, 32 et 38 : leur reste par 2 est 0." },
+        { "id": "u02-l2-e3", "type": "pointer-tableau", "notions": ["modulo"], "question": "Touche les **multiples de 9**.", "tableau": [18, 20, 27, 35, 81, 99, 100], "bonnes": [0, 2, 4, 5], "sansIndices": true, "explication": "18, 27, 81 et 99 : `n % 9 === 0`." },
+        { "id": "u02-l2-e4", "type": "vf", "notions": ["modulo"], "question": "`n % 2 === 1` détecte correctement tous les nombres impairs, même négatifs.", "bonne": false, "explication": "`-3 % 2` vaut `-1`. Pour impair, `n % 2 !== 0` est sûr." },
+        { "id": "u02-l2-e5", "type": "predire", "notions": ["modulo", "comparaisons"], "question": "Que va afficher ce code ?", "code": ["const n = 35;", "console.log(n % 2 === 0);"], "explication": "35 % 2 vaut 1, donc la comparaison avec 0 est fausse." },
+        {
+          "id": "u02-l2-e6", "type": "ecrire", "notions": ["modulo", "comparaisons"],
+          "question": "La variable `n` est déjà créée. Crée deux constantes booléennes : `estPair` (n est pair) et `estMultipleDe5` (n est un multiple de 5).",
+          "donnees": { "n": 35 },
+          "depart": [""],
+          "tests": { "cas": [
+            { "variables": { "estPair": false, "estMultipleDe5": true } },
+            { "titre": "n = 40", "donnees": { "n": 40 }, "variables": { "estPair": true, "estMultipleDe5": true } },
+            { "titre": "n = -7", "donnees": { "n": -7 }, "variables": { "estPair": false, "estMultipleDe5": false } },
+            { "titre": "n = 12", "donnees": { "n": 12 }, "variables": { "estPair": true, "estMultipleDe5": false } }
+          ] },
+          "indices": ["Une comparaison donne déjà true ou false : pas besoin de if.", { "code": "const estPair = n % ___ === ___;\nconst estMultipleDe5 = ___;" }],
+          "solution": ["const estPair = n % 2 === 0;", "const estMultipleDe5 = n % 5 === 0;"],
+          "erreursTypiques": [
+            { "code": "const estPair = n % 2;\nconst estMultipleDe5 = n % 5;", "attendu": "echec" },
+            { "code": "const estPair = n / 2 === 0;\nconst estMultipleDe5 = n / 5 === 0;", "attendu": "echec" },
+            { "code": "const estPair = n % 2 == 0;\nconst estMultipleDe5 = n % 5 == 0;", "attendu": "conseil", "diagnostic": "egal-souple" }
+          ],
+          "explication": "`n % 2 === 0` est déjà un booléen : on le range directement dans la variable."
+        }
+      ]
+    },
+    {
+      "id": "u02-l3",
+      "titre": "Comparer : toujours ===",
+      "duree": 5,
+      "notions": ["comparaisons", "egalite-stricte"],
+      "cartes": [
+        {
+          "titre": "Une comparaison est une question",
+          "texte": "`a > b`, `a === b`… posent une question à laquelle JavaScript répond `true` ou `false`. Cette réponse est une valeur comme une autre : on peut la ranger dans une variable.",
+          "code": ["const note = 4.5;", "const reussi = note >= 4;", "console.log(reussi);"],
+          "fiche": "comparaisons"
+        },
+        {
+          "titre": "= range, === compare",
+          "texte": "- `x = 5` : **range** 5 dans x.\n- `x === 5` : **demande** si x vaut 5.\n\nUn seul signe égal dans une condition est un bug classique.",
+          "code": ["const x = 5;", "console.log(x === 5);", "console.log(x !== 5);"]
+        },
+        {
+          "titre": "Le piège de ==",
+          "texte": "`==` (deux signes) convertit les types avant de comparer : le nombre 4 et le texte \"4\" deviennent « égaux ». `===` (trois signes) compare aussi le type.",
+          "code": ["console.log(4 == \"4\");", "console.log(4 === \"4\");"],
+          "piege": "Dans ce cours, utilise **toujours** `===` et `!==`. Le TP sur les fonctions te fait justement comparer les deux (`compareA` et `compareB`).",
+          "fiche": "egalite-stricte"
+        },
+        {
+          "titre": "Pas besoin de if pour un booléen",
+          "texte": "Ces deux codes font la même chose. Le second est plus court et plus clair : la comparaison **est** déjà le booléen.",
+          "code": ["const age = 20;", "let majeur1;", "if (age >= 18) {", "  majeur1 = true;", "} else {", "  majeur1 = false;", "}", "const majeur2 = age >= 18;", "console.log(majeur1, majeur2);"]
+        }
+      ],
+      "exercices": [
+        { "id": "u02-l3-e1", "type": "predire", "notions": ["egalite-stricte"], "question": "Que va afficher ce code ? (deux lignes)", "code": ["console.log(8 == \"8\");", "console.log(8 === \"8\");"], "explication": "`==` convertit le texte en nombre : true. `===` voit un nombre et un texte : false." },
+        { "id": "u02-l3-e2", "type": "qcm", "notions": ["comparaisons"], "question": "Que vaut `const ok = 3 > 5;` ?", "choix": ["false", "true", "\"3 > 5\"", "Erreur : il faut un if"], "bonne": 0, "mono": true, "explication": "La comparaison répond directement `false`, rangé dans `ok`." },
+        { "id": "u02-l3-e3", "type": "bug", "notions": ["comparaisons"], "question": "Ce code devrait afficher `false`, mais il plante. Pourquoi ?", "code": ["const age = 15;", "if (age = 18) {", "  console.log(true);", "} else {", "  console.log(false);", "}"], "ligne": 2, "choix": ["Un seul `=` range une valeur au lieu de comparer : il faut `===`", "Il manque des guillemets autour de 18", "`if` ne peut pas contenir de nombre", "Il faut `const` dans la parenthèse"], "bonne": 0, "explication": "`age = 18` essaie de ranger 18 dans `age` (une const, d'où l'erreur). Pour comparer : `age === 18`." },
+        { "id": "u02-l3-e4", "type": "tri", "notions": ["comparaisons", "egalite-stricte"], "mono": true, "question": "Chaque expression vaut-elle true ou false ?", "categories": ["true", "false"], "items": [["5 === 5", 0], ["5 === \"5\"", 1], ["5 == \"5\"", 0], ["3 !== 4", 0], ["10 <= 9", 1], ["\"a\" === \"A\"", 1]], "explication": "Seuls `===` et `!==` sont fiables. `\"a\"` et `\"A\"` sont différents : les majuscules comptent." },
+        {
+          "id": "u02-l3-e5", "type": "corriger", "notions": ["comparaisons", "egalite-stricte"],
+          "question": "`aLaMoyenne` doit être true si `note` vaut au moins 4. Ce code est trop long, utilise `==` et range un **texte**. Corrige-le : une seule ligne suffit.",
+          "donnees": { "note": 4.5 },
+          "depart": ["let aLaMoyenne;", "if (note >= 4 == true) {", "  aLaMoyenne = \"true\";", "} else {", "  aLaMoyenne = \"false\";", "}"],
+          "tests": { "cas": [
+            { "variables": { "aLaMoyenne": true } },
+            { "titre": "note = 3.5", "donnees": { "note": 3.5 }, "variables": { "aLaMoyenne": false } },
+            { "titre": "note = 4", "donnees": { "note": 4 }, "variables": { "aLaMoyenne": true } }
+          ], "interdit": ["if"] },
+          "indices": ["`\"true\"` avec des guillemets est un texte, pas un booléen.", "Une comparaison est déjà un booléen.", { "code": "const aLaMoyenne = note ___ 4;" }],
+          "solution": ["const aLaMoyenne = note >= 4;"],
+          "erreursTypiques": [
+            { "code": "const aLaMoyenne = note > 4;", "attendu": "echec" },
+            { "code": "let aLaMoyenne;\nif (note >= 4) {\n  aLaMoyenne = true;\n} else {\n  aLaMoyenne = false;\n}", "attendu": "echec" }
+          ],
+          "explication": "« Au moins 4 », c'est `>= 4`. Et la comparaison donne directement le booléen."
+        }
+      ]
+    },
+    {
+      "id": "u02-l4",
+      "titre": "Combiner : && et ||",
+      "duree": 5,
+      "notions": ["logique", "comparaisons"],
+      "cartes": [
+        {
+          "titre": "ET : les deux à la fois",
+          "texte": "`a && b` est vrai seulement si **a et b** sont vrais tous les deux.",
+          "code": ["const aBillet = true;", "const taille = 115;", "console.log(aBillet && taille >= 120);"],
+          "analogie": "Au manège : il faut un billet **ET** mesurer au moins 120 cm. Si l'un manque, c'est non.",
+          "fiche": "logique"
+        },
+        {
+          "titre": "OU : au moins un",
+          "texte": "`a || b` est vrai dès qu'**au moins un** des deux est vrai.",
+          "code": ["const etudiant = false;", "const retraite = true;", "console.log(etudiant || retraite);"],
+          "analogie": "Réduction si tu es étudiant **OU** retraité : un seul suffit."
+        },
+        {
+          "titre": "Entre deux bornes",
+          "texte": "Pour « n est entre 10 et 99 compris », on combine deux comparaisons avec `&&`. Chaque côté est une comparaison **complète**.",
+          "code": ["const n = 42;", "console.log(n >= 10 && n <= 99);"],
+          "piege": "`10 <= n <= 99` ne marche pas en JavaScript : il compare d'abord `10 <= n` (true), puis `true <= 99`… qui vaut toujours true."
+        },
+        {
+          "titre": "Répète la comparaison",
+          "texte": "« jour vaut samedi ou dimanche » s'écrit avec **deux** comparaisons complètes.",
+          "code": ["const jour = \"lundi\";", "console.log(jour === \"samedi\" || jour === \"dimanche\");"],
+          "piege": "`jour === \"samedi\" || \"dimanche\"` ne compare pas jour à dimanche : la partie droite est juste un texte, considéré comme « vrai »."
+        },
+        {
+          "titre": "NON : !",
+          "texte": "`!` inverse un booléen : `!true` vaut false. Pratique pour « pas encore » : `!estConnecte`.",
+          "code": ["const estConnecte = false;", "console.log(!estConnecte);"]
+        }
+      ],
+      "exercices": [
+        { "id": "u02-l4-e1", "type": "qcm", "notions": ["logique"], "question": "Pour « n est positif ET pair », on écrit :", "choix": ["n > 0 && n % 2 === 0", "n > 0 || n % 2 === 0", "n > 0 && % 2 === 0", "n > 0 && n % 2"], "bonne": 0, "mono": true, "explication": "Les deux conditions doivent être vraies : `&&`, et chaque côté est une comparaison complète." },
+        { "id": "u02-l4-e2", "type": "predire", "notions": ["logique"], "question": "Que va afficher ce code ?", "code": ["const n = 5;", "console.log(n > 3 && n < 4);"], "explication": "5 > 3 est vrai, mais 5 < 4 est faux. Avec `&&`, un seul faux suffit à tout rendre faux." },
+        { "id": "u02-l4-e3", "type": "predire", "notions": ["logique"], "question": "Et avec `||` ?", "code": ["const n = 5;", "console.log(n > 3 || n < 4);"], "explication": "Avec `||`, un seul vrai suffit." },
+        { "id": "u02-l4-e4", "type": "bug", "notions": ["logique"], "question": "Ce code affiche `true` pour \"lundi\". Où est le bug ?", "code": ["const jour = \"lundi\";", "const weekend = jour === \"samedi\" || \"dimanche\";", "console.log(weekend);"], "ligne": 2, "choix": ["Il faut répéter la comparaison : `|| jour === \"dimanche\"`", "Il faut `&&` au lieu de `||`", "Il faut `==` au lieu de `===`", "Les jours doivent être en majuscules"], "bonne": 0, "explication": "Sans `jour ===` à droite, `\"dimanche\"` seul est un texte non vide, considéré comme vrai." },
+        { "id": "u02-l4-e5", "type": "assoc", "notions": ["logique"], "question": "Associe chaque phrase à son code.", "paires": [["entre 1 et 6 compris", "n >= 1 && n <= 6"], ["plus petit que 1 ou plus grand que 6", "n < 1 || n > 6"], ["pas égal à 3", "n !== 3"], ["pair et positif", "n % 2 === 0 && n > 0"]], "mono": true, "explication": "`&&` : toutes les conditions. `||` : au moins une. `!==` : différent." },
+        {
+          "id": "u02-l4-e6", "type": "ecrire", "notions": ["logique", "comparaisons"],
+          "question": "La variable `age` est déjà créée. Crée `tarifReduit` : true si l'âge est **inférieur à 16** ou **au moins 65**.",
+          "donnees": { "age": 12 },
+          "depart": [""],
+          "tests": { "cas": [
+            { "variables": { "tarifReduit": true } },
+            { "titre": "age = 30", "donnees": { "age": 30 }, "variables": { "tarifReduit": false } },
+            { "titre": "age = 65", "donnees": { "age": 65 }, "variables": { "tarifReduit": true } },
+            { "titre": "age = 16", "donnees": { "age": 16 }, "variables": { "tarifReduit": false } }
+          ] },
+          "indices": ["Une des deux conditions suffit : `&&` ou `||` ?", "« au moins 65 » s'écrit `>= 65`.", { "code": "const tarifReduit = age ___ 16 ___ age ___ 65;" }],
+          "solution": ["const tarifReduit = age < 16 || age >= 65;"],
+          "erreursTypiques": [
+            { "code": "const tarifReduit = age < 16 && age >= 65;", "attendu": "echec" },
+            { "code": "const tarifReduit = age <= 16 || age > 65;", "attendu": "echec" },
+            { "code": "const tarifReduit = age < 16 || >= 65;", "attendu": "erreur" }
+          ],
+          "explication": "Il suffit d'une des deux conditions : `||`. Et chaque côté est une comparaison complète."
+        },
+        {
+          "id": "u02-l4-e7", "type": "corriger", "notions": ["logique"],
+          "question": "`valide` doit être true si `n` est entre 10 et 99 **compris**. Ce code dit toujours true. Corrige-le.",
+          "donnees": { "n": 150 },
+          "depart": ["const valide = 10 <= n <= 99;"],
+          "tests": { "cas": [
+            { "variables": { "valide": false } },
+            { "titre": "n = 42", "donnees": { "n": 42 }, "variables": { "valide": true } },
+            { "titre": "n = 10", "donnees": { "n": 10 }, "variables": { "valide": true } },
+            { "titre": "n = 5", "donnees": { "n": 5 }, "variables": { "valide": false } }
+          ] },
+          "indices": ["JavaScript ne sait pas lire `a <= n <= b` comme en maths.", "Il faut deux comparaisons complètes reliées par « et »."],
+          "solution": ["const valide = n >= 10 && n <= 99;"],
+          "erreursTypiques": [ { "code": "const valide = n >= 10 || n <= 99;", "attendu": "echec" } ],
+          "explication": "Deux comparaisons, et les deux doivent être vraies : `&&`."
+        }
+      ]
+    },
+    {
+      "id": "u02-l5",
+      "titre": "Choisir : if et le ternaire",
+      "duree": 5,
+      "notions": ["ternaire", "modulo", "logique"],
+      "cartes": [
+        {
+          "titre": "if / else : un chemin ou l'autre",
+          "texte": "`if (condition) { … } else { … }` exécute le premier bloc si la condition est vraie, sinon le second.",
+          "code": ["const temperature = 28;", "if (temperature > 25) {", "  console.log(\"t-shirt\");", "} else {", "  console.log(\"pull\");", "}"],
+          "fiche": "ternaire"
+        },
+        {
+          "titre": "Le ternaire : choisir une valeur",
+          "texte": "Quand on veut juste **choisir une valeur**, le ternaire tient en une ligne : `condition ? siVrai : siFaux`.",
+          "code": ["const temperature = 28;", "const habit = temperature > 25 ? \"t-shirt\" : \"pull\";", "console.log(habit);"],
+          "astuce": "Lis-le comme une question : « il fait plus de 25 ? si oui t-shirt, sinon pull »."
+        },
+        {
+          "titre": "Le plus grand de deux",
+          "texte": "Un grand classique, qui reviendra avec `reduce` (unité 6) :",
+          "code": ["const a = 14;", "const b = 92;", "const plusGrand = a > b ? a : b;", "console.log(plusGrand);"]
+        },
+        {
+          "titre": "Le ternaire inutile",
+          "texte": "`condition ? true : false` ne sert à rien : la condition **est déjà** true ou false.",
+          "code": ["const n = 8;", "const estPair1 = n % 2 === 0 ? true : false;", "const estPair2 = n % 2 === 0;", "console.log(estPair1, estPair2);"],
+          "piege": "Si le ternaire choisit entre `true` et `false`, enlève-le."
+        }
+      ],
+      "exercices": [
+        { "id": "u02-l5-e1", "type": "predire", "notions": ["ternaire"], "question": "Que va afficher ce code ?", "code": ["const n = 15;", "console.log(n % 2 === 0 ? \"pair\" : \"impair\");"], "explication": "15 % 2 vaut 1 : la condition est fausse, on prend la valeur après `:`." },
+        { "id": "u02-l5-e2", "type": "pointer-code", "notions": ["ternaire"], "question": "Touche la valeur choisie quand la condition est **fausse**.", "code": ["const accueil = heure < 12 ? \"Bonjour\" : ⟦\"Bon après-midi\"⟧;"], "explication": "Après `?` : la valeur si vrai. Après `:` : la valeur si faux." },
+        { "id": "u02-l5-e3", "type": "predire", "notions": ["ternaire", "comparaisons"], "question": "Que va afficher ce code ?", "code": ["const a = 3;", "const b = -8;", "console.log(a > b ? a : b);"], "explication": "3 > -8 est vrai : on garde `a`." },
+        {
+          "id": "u02-l5-e4", "type": "trous", "notions": ["ternaire", "modulo"],
+          "question": "Complète pour que `parite` vaille `\"pair\"` ou `\"impair\"` selon `n`.",
+          "donnees": { "n": 7 },
+          "code": ["const parite = n % 2 === 0 ___ \"pair\" ___ \"impair\";"],
+          "tests": { "cas": [ { "variables": { "parite": "impair" } }, { "titre": "n = 10", "donnees": { "n": 10 }, "variables": { "parite": "pair" } } ] },
+          "indices": ["Le ternaire : `condition ? siVrai : siFaux`."],
+          "solution": ["?", ":"],
+          "erreursTypiques": [ { "trous": [":", "?"], "attendu": "erreur" } ],
+          "explication": "Le `?` sépare la condition de la valeur « si vrai », le `:` sépare les deux valeurs."
+        },
+        {
+          "id": "u02-l5-e5", "type": "ecrire", "notions": ["ternaire", "comparaisons"],
+          "question": "Les variables `a` et `b` sont déjà créées. Crée `plusPetit`, qui vaut le plus petit des deux, avec un ternaire (sans `Math.min`).",
+          "donnees": { "a": 14, "b": 3 },
+          "depart": [""],
+          "tests": { "cas": [
+            { "variables": { "plusPetit": 3 } },
+            { "titre": "a = -5, b = 2", "donnees": { "a": -5, "b": 2 }, "variables": { "plusPetit": -5 } },
+            { "titre": "a = 7, b = 7", "donnees": { "a": 7, "b": 7 }, "variables": { "plusPetit": 7 } }
+          ], "interdit": ["Math.min"] },
+          "indices": [{ "code": "const plusPetit = a < b ? ___ : ___;" }],
+          "solution": ["const plusPetit = a < b ? a : b;"],
+          "erreursTypiques": [ { "code": "const plusPetit = a < b ? b : a;", "attendu": "echec" }, { "code": "const plusPetit = Math.min(a, b);", "attendu": "echec" } ],
+          "explication": "« a est plus petit que b ? si oui a, sinon b »."
+        }
+      ]
+    }
+  ],
+  "jeux": [
+    {
+      "id": "u02-vrai-faux",
+      "titre": "Vrai ou faux en JavaScript",
+      "description": "Chaque expression vaut true ou false : sois plus rapide que le moteur JavaScript.",
+      "tours": 10,
+      "badge": "logicien",
+      "seuilBadge": 8,
+      "questions": [
+        { "id": "u02-j1-1", "type": "predire", "notions": ["comparaisons"], "question": "Que va afficher ce code ?", "code": ["console.log(7 >= 7);"], "explication": "« plus grand ou égal » : 7 est égal à 7." },
+        { "id": "u02-j1-2", "type": "predire", "notions": ["egalite-stricte"], "question": "Que va afficher ce code ?", "code": ["console.log(\"7\" === 7);"], "explication": "Un texte et un nombre ne sont jamais `===`." },
+        { "id": "u02-j1-3", "type": "predire", "notions": ["modulo"], "question": "Que va afficher ce code ?", "code": ["console.log(81 % 9 === 0);"], "explication": "81 = 9 × 9, le reste est 0." },
+        { "id": "u02-j1-4", "type": "predire", "notions": ["logique"], "question": "Que va afficher ce code ?", "code": ["console.log(true && false);"], "explication": "`&&` veut les deux vrais." },
+        { "id": "u02-j1-5", "type": "predire", "notions": ["logique"], "question": "Que va afficher ce code ?", "code": ["console.log(false || true);"], "explication": "`||` : un seul vrai suffit." },
+        { "id": "u02-j1-6", "type": "predire", "notions": ["logique"], "question": "Que va afficher ce code ?", "code": ["console.log(!(3 > 2));"], "explication": "3 > 2 vaut true, `!` l'inverse." },
+        { "id": "u02-j1-7", "type": "predire", "notions": ["modulo", "logique"], "question": "Que va afficher ce code ?", "code": ["const n = 30;", "console.log(n % 2 === 0 && n % 3 === 0);"], "explication": "30 est pair et multiple de 3." },
+        { "id": "u02-j1-8", "type": "predire", "notions": ["egalite-stricte"], "question": "Que va afficher ce code ?", "code": ["console.log(4 != \"4\");"], "explication": "`!=` (souple) convertit : 4 et \"4\" sont « égaux », donc « différents » est faux. Avec `!==`, ce serait true." },
+        { "id": "u02-j1-9", "type": "predire", "notions": ["comparaisons"], "question": "Que va afficher ce code ?", "code": ["const x = 12;", "console.log(x > 10 && x < 20 ? \"ado\" : \"autre\");"], "explication": "12 est entre 10 et 20 : la condition est vraie." },
+        { "id": "u02-j1-10", "type": "predire", "notions": ["modulo"], "question": "Que va afficher ce code ?", "code": ["console.log(-5 % 2 !== 0);"], "explication": "-5 % 2 vaut -1, qui n'est pas 0 : -5 est bien impair." },
+        { "id": "u02-j1-11", "type": "predire", "notions": ["arithmetique"], "question": "Que va afficher ce code ?", "code": ["console.log(Math.floor(5.99) === 5);"], "explication": "`Math.floor` arrondit vers le bas : 5." },
+        { "id": "u02-j1-12", "type": "predire", "notions": ["logique"], "question": "Que va afficher ce code ?", "code": ["const fruit = \"kiwi\";", "console.log(fruit === \"pomme\" || fruit === \"kiwi\");"], "explication": "La deuxième comparaison est vraie." }
+      ]
+    }
+  ],
+  "quiz": {
+    "titre": "Quiz : les opérateurs",
+    "questions": [
+      { "id": "u02-q1", "type": "predire", "notions": ["arithmetique"], "question": "Que va afficher ce code ?", "code": ["console.log((1 + 2) * 3);"], "explication": "Les parenthèses d'abord : 3 × 3." },
+      { "id": "u02-q2", "type": "predire", "notions": ["modulo"], "question": "Que va afficher ce code ?", "code": ["console.log(22 % 4);"], "explication": "22 = 5 × 4 + 2." },
+      { "id": "u02-q3", "type": "qcm", "notions": ["modulo"], "question": "Quel test dit si `n` est impair, **même négatif** ?", "choix": ["n % 2 !== 0", "n % 2 === 1", "n / 2 !== 0", "n % 2"], "bonne": 0, "mono": true, "explication": "`-3 % 2` vaut `-1` : seul `!== 0` marche dans tous les cas." },
+      { "id": "u02-q4", "type": "predire", "notions": ["egalite-stricte"], "question": "Que va afficher ce code ?", "code": ["console.log(10 === \"10\");"], "explication": "Types différents : false." },
+      { "id": "u02-q5", "type": "vf", "notions": ["comparaisons"], "question": "Pour ranger un booléen, il faut obligatoirement un `if`.", "bonne": false, "explication": "Une comparaison donne déjà le booléen : `const ok = n > 0;`." },
+      { "id": "u02-q6", "type": "qcm", "notions": ["logique"], "question": "« n est entre 1 et 6 compris » s'écrit :", "choix": ["n >= 1 && n <= 6", "1 <= n <= 6", "n >= 1 || n <= 6", "n > 1 && n < 6"], "bonne": 0, "mono": true, "explication": "Deux comparaisons complètes, reliées par `&&`, avec `>=` et `<=` pour « compris »." },
+      { "id": "u02-q7", "type": "bug", "notions": ["logique"], "question": "Trouve le bug.", "code": ["const couleur = \"bleu\";", "const primaire = couleur === \"rouge\" || \"bleu\" || \"jaune\";", "console.log(primaire);"], "ligne": 2, "choix": ["Il faut répéter `couleur ===` devant chaque couleur", "Il faut `&&` au lieu de `||`", "Il faut des majuscules", "Il manque un ternaire"], "bonne": 0, "explication": "Chaque morceau de `||` doit être une comparaison complète." },
+      { "id": "u02-q8", "type": "predire", "notions": ["ternaire"], "question": "Que va afficher ce code ?", "code": ["const stock = 0;", "console.log(stock > 0 ? \"disponible\" : \"épuisé\");"], "explication": "0 > 0 est faux : valeur après `:`." },
+      { "id": "u02-q9", "type": "qcm", "notions": ["math-random"], "question": "Que donne `Math.floor(Math.random() * 10) + 1` ?", "choix": ["Un entier de 1 à 10", "Un entier de 0 à 9", "Un entier de 1 à 11", "Un nombre à virgule de 1 à 10"], "bonne": 0, "explication": "0 à 9 après `Math.floor`, puis + 1." },
+      { "id": "u02-q10", "type": "pointer-code", "notions": ["comparaisons"], "question": "Touche l'opérateur qui **compare** (et ne range pas).", "code": ["const egal = a ⟦===⟧ b;"], "explication": "`=` range le résultat dans `egal` ; `===` compare a et b." },
+      { "id": "u02-q11", "type": "predire", "notions": ["logique", "modulo"], "question": "Que va afficher ce code ?", "code": ["const n = 9;", "console.log(n % 2 === 0 || n % 9 === 0);"], "explication": "9 n'est pas pair, mais c'est un multiple de 9 : avec `||`, ça suffit." },
+      { "id": "u02-q12", "type": "tri", "notions": ["egalite-stricte", "comparaisons"], "mono": true, "question": "true ou false ?", "categories": ["true", "false"], "items": [["0 === 0", 0], ["0 === \"0\"", 1], ["\"Sator\" === \"sator\"", 1], ["2 ** 3 === 8", 0], ["5 % 5 === 0", 0], ["!(1 < 2)", 1]], "explication": "Majuscules et types comptent avec `===`." },
+      { "id": "u02-q13", "type": "predire", "notions": ["arithmetique"], "question": "Que va afficher ce code ?", "code": ["console.log(Math.max(3, -1, 8));"], "explication": "Le plus grand des trois." },
+      { "id": "u02-q14", "type": "vf", "notions": ["ternaire"], "question": "`const ok = x > 0 ? true : false;` peut s'écrire `const ok = x > 0;`.", "bonne": true, "explication": "La condition est déjà le booléen voulu." },
+      { "id": "u02-q15", "type": "predire", "notions": ["arithmetique", "math-random"], "question": "Que va afficher ce code ?", "code": ["console.log(Math.floor(0.999 * 6));"], "explication": "0.999 × 6 = 5.994, arrondi vers le bas : 5. Même le plus grand tirage possible de `Math.random()` ne donne jamais 6 après `Math.floor`." }
+    ]
+  },
+  "boss": [
+    {
+      "id": "u02-b1",
+      "titre": "Le contrôleur de nombres",
+      "source": "Préparation au TP 2",
+      "notions": ["modulo", "logique", "ternaire", "comparaisons"],
+      "enonce": "La variable `n` est déjà créée. Sans `if` ni `==`, crée quatre constantes :\n\n1. `estPair` : true si n est pair ;\n2. `estMultipleDe9` : true si n est un multiple de 9 ;\n3. `aDeuxChiffres` : true si n est entre 10 et 99 **compris** ;\n4. `parite` : le texte `\"pair\"` ou `\"impair\"`.",
+      "regles": ["Ton code sera testé avec d'autres valeurs de n, y compris des nombres négatifs.", "Utilise `===` et `!==`, jamais `==` ni `!=`."],
+      "donnees": { "n": 27 },
+      "depart": [""],
+      "tests": {
+        "cas": [
+          { "titre": "n = 27", "variables": { "estPair": false, "estMultipleDe9": true, "aDeuxChiffres": true, "parite": "impair" } },
+          { "titre": "n = 18", "donnees": { "n": 18 }, "variables": { "estPair": true, "estMultipleDe9": true, "aDeuxChiffres": true, "parite": "pair" } },
+          { "titre": "n = 100", "donnees": { "n": 100 }, "variables": { "estPair": true, "estMultipleDe9": false, "aDeuxChiffres": false, "parite": "pair" }, "siEchec": "100 a trois chiffres : vérifie les deux bornes de `aDeuxChiffres`." },
+          { "titre": "n = -9", "donnees": { "n": -9 }, "variables": { "estPair": false, "estMultipleDe9": true, "aDeuxChiffres": false, "parite": "impair" }, "siEchec": "Avec un nombre négatif, `-9 % 2` vaut `-1` (pas 1). Teste « pair » avec `=== 0`, ou « impair » avec `!== 0`." },
+          { "titre": "n = 10", "donnees": { "n": 10 }, "variables": { "estPair": true, "estMultipleDe9": false, "aDeuxChiffres": true, "parite": "pair" }, "siEchec": "10 a deux chiffres : « compris » veut dire `>=` et `<=`." }
+        ],
+        "interdit": ["if"]
+      },
+      "indices": [
+        "Chaque constante est une comparaison (ou une combinaison de comparaisons) : elles donnent déjà true ou false.",
+        "Pour « entre 10 et 99 », il faut deux comparaisons et `&&`. Pour `parite`, un ternaire.",
+        { "texte": "La structure :", "code": "const estPair = n % 2 ___ 0;\nconst estMultipleDe9 = ___;\nconst aDeuxChiffres = n >= ___ && n ___ 99;\nconst parite = ___ ? \"pair\" : \"impair\";" }
+      ],
+      "solution": ["const estPair = n % 2 === 0;", "const estMultipleDe9 = n % 9 === 0;", "const aDeuxChiffres = n >= 10 && n <= 99;", "const parite = estPair ? \"pair\" : \"impair\";"],
+      "erreursTypiques": [
+        { "code": "const estPair = n % 2 === 0;\nconst estMultipleDe9 = n % 9 === 0;\nconst aDeuxChiffres = 10 <= n <= 99;\nconst parite = estPair ? \"pair\" : \"impair\";", "attendu": "echec" },
+        { "code": "const estPair = n % 2 === 0;\nconst estMultipleDe9 = n % 9 === 0;\nconst aDeuxChiffres = n >= 10 && n <= 99;\nconst parite = n % 2 === 1 ? \"impair\" : \"pair\";", "attendu": "echec", "diagnostic": "contenu" },
+        { "code": "const estPair = n % 2;\nconst estMultipleDe9 = n % 9;\nconst aDeuxChiffres = n >= 10 && n <= 99;\nconst parite = estPair ? \"pair\" : \"impair\";", "attendu": "echec" },
+        { "code": "const estPair = n % 2 === 0;\nconst estMultipleDe9 = n % 9 === 0;\nconst aDeuxChiffres = n > 10 && n < 99;\nconst parite = estPair ? \"pair\" : \"impair\";", "attendu": "echec", "diagnostic": "contenu" },
+        { "code": "const estPair = n % 2 === 0;\nconst estMultipleDe9 = n % 9 === 0;\nconst aDeuxChiffres = n >= 10 || n <= 99;\nconst parite = estPair ? \"pair\" : \"impair\";", "attendu": "echec" }
+      ],
+      "explication": "Tu sais maintenant écrire les conditions du TP sur les tableaux : impairs (`n % 2 !== 0`), multiples de 9 (`n % 9 === 0`), positifs (`n >= 0`)."
+    }
+  ]
+}
