@@ -1,6 +1,6 @@
-# Plan : « Accolade », le Pampre du JavaScript
+# Plan : ProgWeb 2, le Pampre du JavaScript
 
-Statut : **proposition, à valider avant le développement.**
+Statut : **validé par l'élève le 10 octobre 2026, version 1 réalisée** (unités 1 à 6). Décisions : nom **ProgWeb 2** (au lieu d'« Accolade »), pas de vies, comme Pampre. L'état à jour est dans `CLAUDE.md` et `docs/programme.md`.
 
 ## 1. Ce que je reprends de Pampre
 

@@ -128,7 +128,7 @@ function runSession(steps, opts){
   show();
   return { ses };
 }
-function closeSession(){ nettoyerSession?.(); nettoyerSession = null; document.querySelectorAll(".session,.sheet,.drag-ghost").forEach(x => x.remove()); document.body.style.overflow = ""; document.body.classList.remove("en-session"); majCalques(); }
+function closeSession(){ nettoyerSession?.(); nettoyerSession = null; document.querySelectorAll(".session,.sheet,.drag-ghost,.confetti").forEach(x => x.remove()); document.body.style.overflow = ""; document.body.classList.remove("en-session"); majCalques(); }
 
 /* ---------------- lancement des activités ---------------- */
 const uniteDe = id => D.unites.find(u => u.id === id);

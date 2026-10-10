@@ -120,6 +120,26 @@ try:
         nq = jouer_session(pg, "défi du jour")
         if nq < 4: problemes.append(f"défi du jour trop court ({nq} questions)")
 
+        # 3 bis. types d'exercices pas encore utilisés par le contenu : Fisher–Yates, en vrais clics
+        pg.evaluate("""() => runSession([{ kind:'q', q:{ type:'fisher-yates', id:'demo-fy', question:'Mélange le paquet', tableau:['A','B','C','D'], tirages:[1, 1, 0], explication:'demo' } },
+                                            { kind:'q', q:{ type:'ordre', id:'demo-ordre', question:'Ordre', items:['un','deux','trois'], explication:'demo' } }],
+                                           { title:'démo', onEnd:() => ({}) })""")
+        for i, j in [(3, 1), (2, 1), (1, 0)]:
+            pg.click(f'.fy-boite .case[data-i="{i}"] .oeuf'); pg.click(f'.fy-boite .case[data-i="{j}"] .oeuf')
+        pg.wait_for_selector("[data-check]:not([disabled])")
+        if args.captures:
+            pg.screenshot(path=str(CAP / "q-fisher-yates.png"))
+        pg.click("[data-check]"); pg.wait_for_selector(".sheet")
+        if not pg.query_selector(".sheet.ok"): problemes.append("Fisher–Yates : les bons échanges sont comptés faux")
+        ordre = pg.evaluate("() => [...document.querySelectorAll('.fy-boite .oeuf')].map(e => e.textContent).join('')").replace('"', '')
+        if ordre != "CADB": problemes.append(f"Fisher–Yates : ordre final {ordre} au lieu de CADB")
+        pg.click("[data-cont]")
+        for t in ["un", "deux", "trois"]:
+            pg.click(f'.pool .chip:text-is("{t}")')
+        pg.click("[data-check]"); pg.wait_for_selector(".sheet")
+        if not pg.query_selector(".sheet.ok"): problemes.append("Ordre : la bonne réponse est comptée fausse")
+        pg.click("[data-cont]"); pg.click("[data-done]")
+
         # 4. les autres vues
         for vue in ["theorie", "console", "profil", "defi"]:
             pg.click(f'.tab[data-go="{vue}"]')

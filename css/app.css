@@ -226,7 +226,8 @@ main{padding-block:20px 110px}
 /* ---------- code ---------- */
 .code{position:relative;font-family:var(--f-code);font-size:14.5px;line-height:1.6;background:var(--code-bg);border:2px solid var(--code-line);border-radius:14px;padding:10px 0;margin:12px 0;overflow-x:auto;tab-size:2}
 .code .l{display:flex;min-height:1.6em;white-space:pre;padding-right:14px}
-.code .n{flex:none;width:2.6em;padding-right:.8em;text-align:right;color:var(--muted);opacity:.7;user-select:none;position:sticky;left:0;background:var(--code-bg)}
+.code .l>span:last-child{white-space:pre-wrap;overflow-wrap:anywhere;min-width:0}   /* sur téléphone, une ligne longue revient à la ligne au lieu de défiler */
+.code .n{flex:none;width:2.6em;padding-right:.8em;text-align:right;color:color-mix(in srgb,var(--muted) 75%,var(--code-bg));user-select:none;position:sticky;left:0;background:var(--code-bg)}
 .code.sans-n .l{padding-left:14px}
 .code .l.lu{background:color-mix(in srgb,var(--gold) 22%,transparent)}
 .code .l.bad{background:color-mix(in srgb,var(--ko) 18%,transparent)}
@@ -251,7 +252,7 @@ main{padding-block:20px 110px}
 .editeur:focus-within{border-color:var(--prim)}
 .ed-scroll{position:relative;overflow:auto;max-height:52vh;min-height:120px}
 .ed-inner{position:relative;display:flex;min-width:100%;width:max-content}
-.ed-n{flex:none;font-family:var(--f-code);line-height:1.6;padding:10px .7em 10px 0;width:2.8em;text-align:right;color:var(--muted);opacity:.7;user-select:none;background:var(--code-bg);position:sticky;left:0;z-index:2;white-space:pre}
+.ed-n{flex:none;font-family:var(--f-code);line-height:1.6;padding:10px .7em 10px 0;width:2.8em;text-align:right;color:color-mix(in srgb,var(--muted) 75%,var(--code-bg));user-select:none;background:var(--code-bg);position:sticky;left:0;z-index:2;white-space:pre}
 .ed-zone{position:relative;flex:1;min-width:0}
 .ed-zone pre,.ed-zone textarea{margin:0;border:0;font-family:var(--f-code);line-height:1.6;padding:10px 16px 10px 4px;white-space:pre;tab-size:2;letter-spacing:0;font-variant-ligatures:none;word-wrap:normal;overflow:hidden}
 .ed-zone pre{pointer-events:none;color:var(--ink)}
@@ -511,3 +512,4 @@ textarea.save{width:100%;min-height:110px;border:2px solid var(--line);border-ra
 .code,.console,.symboles button,code,.chip.c,.choice.c,.objet,.saisie,.ed-entete,.ed-zone pre,.ed-zone textarea,.case,.reduce,.maillon,.parsons,.indice pre,.fiche-lien .ic,.uico{font-variant-ligatures:none;font-feature-settings:"liga" 0,"calt" 0}
 .choice .ct{min-width:0;overflow-wrap:anywhere}
 .choice .ct code{background:var(--code-bg);border:1px solid var(--code-line);border-radius:6px;padding:0 4px}
+@media (max-width:420px){.code{font-size:13.5px}.code .n{width:2.2em;padding-right:.6em}}
