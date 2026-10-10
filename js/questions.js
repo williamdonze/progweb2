@@ -444,7 +444,7 @@ function resultatHTML(r){
   if (r.cas?.length) {
     el.appendChild(h(`<div class="tests">${r.cas.map(c => `<div class="test ${c.ok ? "ok" : "ko"}">${c.ok ? I.check : I.cross}<div><b>${esc(c.titre)}</b>${c.appel ? ` · <code>${esc(c.appel)}</code>` : ""}</div>${
       c.erreur ? `<div class="det">${richInline(c.erreur.message)}</div>`
-      : !c.ok ? `<div class="det">${"attendu" in c && c.attendu !== c.obtenu ? `On attend <code>${esc(c.attendu)}</code>, tu retournes <code>${esc(c.obtenu)}</code>.` : ""}${c.sortieAttendue && !egal(c.sortieAttendue, c.sortieObtenue) ? ` Affichage attendu : <code>${esc(c.sortieAttendue.join(" ⏎ "))}</code>, obtenu : <code>${esc((c.sortieObtenue || []).join(" ⏎ ") || "rien")}</code>.` : ""}${(c.details || []).map(d => " " + richInline(d)).join("")}</div>` : ""}</div>`).join("")}</div>`));
+      : !c.ok ? `<div class="det">${"attendu" in c && c.attendu !== c.obtenu ? `On attend <code>${esc(c.attendu)}</code>, tu retournes <code>${esc(c.obtenu)}</code>.` : ""}${c.sortieAttendue && !egal(c.sortieAttendue, c.sortieObtenue) ? ` Affichage attendu : <code>${ansiHTML(c.sortieAttendue.join(" ⏎ "))}</code>, obtenu : <code>${(c.sortieObtenue || []).length ? ansiHTML(c.sortieObtenue.join(" ⏎ ")) : "rien"}</code>.` : ""}${(c.details || []).map(d => " " + richInline(d)).join("")}</div>` : ""}</div>`).join("")}</div>`));
   }
   return el;
 }

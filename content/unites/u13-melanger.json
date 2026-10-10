@@ -1,0 +1,387 @@
+{
+  "id": "u13",
+  "titre": "Mélanger et tirer",
+  "sousTitre": "TP Tableaux · jeu de cartes 3, 4, 5, 6, 7",
+  "objectif": "Échanger deux cases, tirer un indice au hasard, mélanger un paquet avec Fisher–Yates, tirer des cartes sans toucher au paquet d'origine, jouer une main complète.",
+  "icone": "🔀",
+  "fiches": [
+    {
+      "id": "echange",
+      "titre": "Échanger deux cases",
+      "icone": "⇄",
+      "resume": "`[t[i], t[j]] = [t[j], t[i]];` échange le contenu des cases i et j, en une ligne.",
+      "analogie": "Échanger deux œufs de place avec **deux mains** : on prend les deux en même temps, puis on les repose croisés. Avec une seule main, il faut un coquetier pour poser le premier œuf (une variable temporaire).",
+      "texte": "Le piège :\n\n```\nt[i] = t[j];\nt[j] = t[i];   // t[i] a déjà été écrasé !\n```\n\nLes deux cases finissent avec la même valeur. Deux solutions :\n\n- une variable temporaire : `const tmp = t[i]; t[i] = t[j]; t[j] = tmp;`\n- la **déstructuration** : `[t[i], t[j]] = [t[j], t[i]];` (à droite, on fabrique d'abord une petite boîte avec les deux valeurs ; à gauche, on les range croisées).\n\nÉchanger **modifie** le tableau : impossible sur un tableau gelé, c'est pourquoi on travaille sur une copie.",
+      "exemples": [
+        { "code": ["const t = [\"A\", \"B\", \"C\"];", "[t[0], t[2]] = [t[2], t[0]];", "console.log(t);"] },
+        { "titre": "Le piège", "code": ["const t = [\"A\", \"B\", \"C\"];", "t[0] = t[2];", "t[2] = t[0];", "console.log(t);"] }
+      ],
+      "pieges": ["Deux affectations à la suite : la première valeur est perdue."]
+    },
+    {
+      "id": "indice-hasard",
+      "titre": "Un indice au hasard entre 0 et i",
+      "icone": "🎲",
+      "resume": "`Math.floor(Math.random() * (i + 1))` donne un entier de **0 à i compris**.",
+      "texte": "- `Math.random()` : un nombre à virgule de 0 (compris) à 1 (**non** compris).\n- `* (i + 1)` : de 0 à i + 1 (non compris).\n- `Math.floor` : on coupe la virgule, il reste un entier de 0 à i.\n\nAvec `* i` seulement, on n'obtient **jamais** i : la case elle-même ne pourrait jamais rester à sa place. Relis [[math-random]].",
+      "exemples": [
+        { "code": ["const i = 3;", "for (let k = 0; k < 8; k++) {", "  console.log(Math.floor(Math.random() * (i + 1)));", "}"] }
+      ],
+      "pieges": ["`Math.random() * i` : i n'est jamais tiré.", "`Math.round` au lieu de `Math.floor` : les bornes sortent deux fois moins souvent."]
+    },
+    {
+      "id": "fisher-yates",
+      "titre": "Le mélange de Fisher–Yates",
+      "icone": "🔀",
+      "resume": "Pour chaque indice i, **du dernier jusqu'à 1** : tirer j entre 0 et i, puis échanger les cases i et j.",
+      "analogie": "Tirer les cartes d'un **chapeau** une par une : on pioche au hasard parmi celles qui restent (les cases 0 à i) et on pose la carte piochée à la fin. La zone de droite, déjà tirée, ne bouge plus.",
+      "texte": "```\nfor (let i = cards.length - 1; i >= 1; i--) {\n  const j = Math.floor(Math.random() * (i + 1));\n  [cards[i], cards[j]] = [cards[j], cards[i]];\n}\n```\n\n- La boucle part de la **fin** et descend (relis [[boucle-pas]]).\n- j peut valoir i : la carte reste alors à sa place (c'est permis, et nécessaire pour que tous les ordres soient possibles).\n- Le mélange est **équitable** : chacun des ordres possibles a exactement la même chance.\n\nLe piège classique : tirer j entre 0 et la **fin** du tableau à chaque tour. Ça mélange, mais certains ordres sortent plus souvent que d'autres. Et `toSorted(() => Math.random() - 0.5)` n'est pas équitable non plus.",
+      "exemples": [
+        { "code": ["const cards = [\"A\", \"B\", \"C\", \"D\"];", "for (let i = cards.length - 1; i >= 1; i--) {", "  const j = Math.floor(Math.random() * (i + 1));", "  console.log(\"i =\", i, \"j =\", j);", "  [cards[i], cards[j]] = [cards[j], cards[i]];", "}", "console.log(cards);"] }
+      ],
+      "pieges": ["`Math.random() * cards.length` à chaque tour : mélange inéquitable.", "`i > 1` : la case 1 n'est jamais échangée avec la case 0."]
+    },
+    {
+      "id": "sur-place",
+      "titre": "Sur place ou copie ?",
+      "icone": "⎘",
+      "resume": "Une fonction **sur place** modifie le tableau reçu (shuffleInPlace). Pour ne pas abîmer l'original, on lui donne une **copie** : `[...deck]`.",
+      "analogie": "On ne bat pas le jeu du voisin : on fait une **photocopie** du paquet, on bat la copie, puis on distribue les premières cartes de la copie.",
+      "texte": "- `shuffleInPlace(cards)` modifie `cards` : le TP le veut ainsi (« in place »).\n- `drawCards(deck, n)` ne doit **pas** modifier `deck` : elle copie d'abord (`const copy = [...deck];`), mélange la copie, puis retourne `copy.slice(0, n)`.\n\nLa copie est une **nouvelle boîte** : la mélanger ne touche pas l'originale. Les cartes (les objets) sont les mêmes, mais on ne les modifie pas : on change seulement leur **ordre** dans la boîte.",
+      "exemples": [
+        { "code": ["const deck = Object.freeze([\"A\", \"B\", \"C\"]);", "const copy = [...deck];", "copy.reverse();", "console.log(copy, deck);"] }
+      ],
+      "pieges": ["Mélanger `deck` directement : sur un paquet gelé, c'est une erreur ; sinon, le paquet de tout le monde est modifié."]
+    }
+  ],
+  "lecons": [
+    {
+      "id": "u13-l1",
+      "titre": "Échanger deux cases",
+      "duree": 5,
+      "notions": ["echange"],
+      "cartes": [
+        {
+          "titre": "Le piège des deux affectations",
+          "texte": "On veut échanger A et C. Si on écrit d'abord `t[0] = t[2]`, le A est **écrasé** : il n'existe plus nulle part.",
+          "code": ["const t = [\"A\", \"B\", \"C\"];", "t[0] = t[2];", "t[2] = t[0];", "console.log(t);"],
+          "analogie": "Échanger deux œufs avec une seule main : on pose le premier… sur l'autre. Il faut un coquetier (une variable) ou deux mains.",
+          "fiche": "echange"
+        },
+        {
+          "titre": "Avec un coquetier",
+          "texte": "On met d'abord une valeur de côté dans une variable temporaire.",
+          "code": ["const t = [\"A\", \"B\", \"C\"];", "const tmp = t[0];", "t[0] = t[2];", "t[2] = tmp;", "console.log(t);"]
+        },
+        {
+          "titre": "Avec deux mains : la déstructuration",
+          "texte": "À droite, une petite boîte avec les deux valeurs **dans l'ordre inverse** ; à gauche, les deux cases où les ranger. Tout se fait en même temps.",
+          "code": ["const t = [\"A\", \"B\", \"C\"];", "[t[0], t[2]] = [t[2], t[0]];", "console.log(t);"]
+        },
+        {
+          "titre": "Échanger, c'est modifier",
+          "texte": "Sur un tableau gelé, l'échange est une erreur : il faut d'abord une **copie**.",
+          "code": ["const deck = Object.freeze([\"A\", \"B\"]);", "[deck[0], deck[1]] = [deck[1], deck[0]];"],
+          "erreurVoulue": true
+        }
+      ],
+      "exercices": [
+        { "id": "u13-l1-e1", "type": "predire", "notions": ["echange"], "question": "Que va afficher ce code ?", "code": ["const t = [1, 2, 3, 4];", "[t[1], t[3]] = [t[3], t[1]];", "console.log(t);"], "explication": "Les cases 1 et 3 échangent leurs valeurs." },
+        { "id": "u13-l1-e2", "type": "predire", "notions": ["echange"], "question": "Que va afficher ce code ?", "code": ["const t = [\"x\", \"y\"];", "t[0] = t[1];", "t[1] = t[0];", "console.log(t);"], "explication": "Le \"x\" est écrasé à la première ligne : les deux cases finissent avec \"y\"." },
+        { "id": "u13-l1-e3", "type": "bug", "notions": ["echange"], "question": "Cet échange ne marche pas. Quelle ligne est en cause ?", "code": ["const cards = [\"A♥\", \"K♠\", \"7♣\"];", "cards[0] = cards[2];", "cards[2] = cards[0];", "console.log(cards);"], "ligne": 2, "choix": ["Elle écrase \"A♥\" avant qu'on l'ait mis de côté", "Il faut `let cards`", "Les indices commencent à 1", "Il manque un return"], "bonne": 0, "explication": "Il faut une variable temporaire, ou `[cards[0], cards[2]] = [cards[2], cards[0]];`." },
+        {
+          "id": "u13-l1-e4", "type": "trous", "notions": ["echange"],
+          "question": "Complète pour échanger la première et la dernière case.",
+          "code": ["const t = [\"A\", \"B\", \"C\", \"D\"];", "const last = t.length - 1;", "[t[0], t[last]] = [___, ___];", "console.log(t);"],
+          "tests": { "cas": [ { "sortie": ["[\"D\", \"B\", \"C\", \"A\"]"] } ] },
+          "indices": ["À droite : les deux valeurs dans l'ordre **inverse** de la gauche.", "La gauche est `t[0], t[last]`."],
+          "solution": ["t[last]", "t[0]"],
+          "erreursTypiques": [ { "trous": ["t[0]", "t[last]"], "attendu": "echec" } ],
+          "explication": "`[t[0], t[last]] = [t[last], t[0]]` : ce qui était à la fin va au début, et inversement."
+        },
+        {
+          "id": "u13-l1-e5", "type": "ecrire", "notions": ["echange"],
+          "question": "Écris `swapFirstLast(items)` qui échange **sur place** la première et la dernière case du tableau reçu (elle ne retourne rien).",
+          "depart": ["function swapFirstLast(items) {", "  ", "}", "", "const letters = [\"A\", \"B\", \"C\"];", "swapFirstLast(letters);", "console.log(letters);"],
+          "tests": { "fonction": "swapFirstLast", "cas": [
+            { "titre": "trois éléments", "args": [["A", "B", "C"]], "modifiable": true, "verifie": "args[0].join() === 'C,B,A'", "messageVerifie": "Après l'appel, le tableau reçu doit valoir [\"C\", \"B\", \"A\"]" },
+            { "titre": "deux éléments", "args": [[1, 2]], "modifiable": true, "verifie": "args[0].join() === '2,1'", "messageVerifie": "Après l'appel, le tableau reçu doit valoir [2, 1]" },
+            { "titre": "un seul élément", "args": [["solo"]], "modifiable": true, "verifie": "args[0].join() === 'solo'", "messageVerifie": "Avec un seul élément, rien ne change" }
+          ] },
+          "indices": ["Le dernier indice : `items.length - 1`.", { "code": "const last = items.length - 1;\n[items[0], items[last]] = [___, ___];" }],
+          "solution": ["function swapFirstLast(items) {", "  const last = items.length - 1;", "  [items[0], items[last]] = [items[last], items[0]];", "}", "", "const letters = [\"A\", \"B\", \"C\"];", "swapFirstLast(letters);", "console.log(letters);"],
+          "erreursTypiques": [
+            { "code": "function swapFirstLast(items) {\n  const last = items.length - 1;\n  items[0] = items[last];\n  items[last] = items[0];\n}", "attendu": "echec" },
+            { "code": "function swapFirstLast(items) {\n  const last = items.length;\n  [items[0], items[last]] = [items[last], items[0]];\n}", "attendu": "echec" },
+            { "code": "function swapFirstLast(items) {\n  return [items.at(-1), ...items.slice(1, -1), items[0]];\n}", "attendu": "echec" }
+          ],
+          "explication": "Ici, modifier le tableau reçu est **demandé** (comme shuffleInPlace). La 3e erreur typique fabrique une nouvelle boîte : correcte ailleurs, mais ici on veut changer la boîte reçue."
+        }
+      ]
+    },
+    {
+      "id": "u13-l2",
+      "titre": "Un indice au hasard",
+      "duree": 5,
+      "notions": ["indice-hasard", "math-random"],
+      "cartes": [
+        {
+          "titre": "De 0 à i, compris",
+          "texte": "`Math.random()` va de 0 à 1 (1 jamais atteint). Multiplié par `i + 1`, puis arrondi vers le bas : un entier de **0 à i**.",
+          "code": ["const i = 3;", "console.log(Math.floor(0 * (i + 1)));", "console.log(Math.floor(0.99 * (i + 1)));"],
+          "fiche": "indice-hasard"
+        },
+        {
+          "titre": "Pourquoi i + 1 ?",
+          "texte": "Avec `* i`, le plus grand résultat possible serait i - 1 : la case i ne serait jamais tirée.",
+          "code": ["const i = 3;", "console.log(Math.floor(0.99 * i));"],
+          "piege": "Oublier le `+ 1` : le mélange ne produit jamais certains ordres."
+        },
+        {
+          "titre": "Voir les tirages",
+          "texte": "Exécute plusieurs fois : les nombres changent, mais restent toujours entre 0 et 3.",
+          "code": ["const i = 3;", "for (let k = 0; k < 10; k++) {", "  console.log(Math.floor(Math.random() * (i + 1)));", "}"]
+        }
+      ],
+      "exercices": [
+        { "id": "u13-l2-e1", "type": "qcm", "notions": ["indice-hasard"], "question": "Quelles valeurs peut donner `Math.floor(Math.random() * (i + 1))` avec i = 4 ?", "choix": ["0, 1, 2, 3 ou 4", "1, 2, 3 ou 4", "0, 1, 2 ou 3", "n'importe quel nombre à virgule entre 0 et 5"], "bonne": 0, "explication": "De 0 à i compris." },
+        { "id": "u13-l2-e2", "type": "qcm", "notions": ["indice-hasard"], "question": "Avec `Math.floor(Math.random() * i)` et i = 4, quelle valeur n'est **jamais** tirée ?", "choix": ["4", "0", "2", "aucune, toutes sortent"], "bonne": 0, "explication": "Le résultat va de 0 à 3." },
+        { "id": "u13-l2-e3", "type": "vf", "notions": ["math-random"], "question": "`Math.random()` peut retourner exactement 1.", "bonne": false, "explication": "1 n'est jamais atteint : c'est ce qui garantit que `Math.floor(… * (i + 1))` ne dépasse pas i." },
+        {
+          "id": "u13-l2-e4", "type": "ecrire", "notions": ["indice-hasard"],
+          "question": "Écris `randomIndexUpTo(i)` qui retourne un entier au hasard de **0 à i compris**.",
+          "depart": ["function randomIndexUpTo(i) {", "  ", "}", "", "console.log(randomIndexUpTo(3));"],
+          "tests": { "fonction": "randomIndexUpTo", "cas": [
+            { "titre": "i = 3", "args": [3], "repetitions": 2000, "entier": true, "min": 0, "max": 3, "tous": true },
+            { "titre": "i = 1", "args": [1], "repetitions": 500, "entier": true, "min": 0, "max": 1, "tous": true },
+            { "titre": "i = 0", "args": [0], "repetitions": 50, "entier": true, "min": 0, "max": 0 }
+          ] },
+          "indices": ["Relis [[indice-hasard]].", { "code": "return Math.floor(Math.random() * ___);" }],
+          "solution": ["function randomIndexUpTo(i) {", "  return Math.floor(Math.random() * (i + 1));", "}", "", "console.log(randomIndexUpTo(3));"],
+          "erreursTypiques": [
+            { "code": "function randomIndexUpTo(i) {\n  return Math.floor(Math.random() * i);\n}", "attendu": "echec" },
+            { "code": "function randomIndexUpTo(i) {\n  return Math.random() * (i + 1);\n}", "attendu": "echec" }
+          ],
+          "explication": "C'est exactement le tirage de j dans Fisher–Yates."
+        }
+      ]
+    },
+    {
+      "id": "u13-l3",
+      "titre": "Fisher–Yates, pas à pas",
+      "duree": 8,
+      "notions": ["fisher-yates", "echange", "boucle-pas"],
+      "cartes": [
+        {
+          "titre": "Piocher dans un chapeau",
+          "texte": "On pioche une carte au hasard parmi les cases **0 à i**, et on la range à la place i (la fin de la zone qui reste). Puis i recule d'une case. La partie droite, déjà tirée, ne bouge plus.",
+          "code": ["const cards = [\"A\", \"B\", \"C\", \"D\"];", "for (let i = cards.length - 1; i >= 1; i--) {", "  const j = Math.floor(Math.random() * (i + 1));", "  [cards[i], cards[j]] = [cards[j], cards[i]];", "}", "console.log(cards);"],
+          "analogie": "Un **chapeau** : on tire une carte parmi celles qui restent et on la pose en bout de rangée.",
+          "fiche": "fisher-yates"
+        },
+        {
+          "titre": "La boucle descend",
+          "texte": "i part du **dernier indice** et descend jusqu'à **1** (pas 0 : quand il ne reste qu'une case, il n'y a plus rien à tirer).",
+          "code": ["const cards = [\"A\", \"B\", \"C\", \"D\"];", "for (let i = cards.length - 1; i >= 1; i--) {", "  console.log(\"i =\", i);", "}"]
+        },
+        {
+          "titre": "Regarder un mélange",
+          "texte": "Exécute plusieurs fois : à chaque tour, j est tiré entre 0 et i, puis les deux cases s'échangent.",
+          "code": ["const cards = [\"A\", \"B\", \"C\", \"D\"];", "for (let i = cards.length - 1; i >= 1; i--) {", "  const j = Math.floor(Math.random() * (i + 1));", "  [cards[i], cards[j]] = [cards[j], cards[i]];", "  console.log(\"i =\", i, \"j =\", j, cards.join(\" \"));", "}"]
+        },
+        {
+          "titre": "Équitable, vraiment",
+          "texte": "Avec 4 cartes, il y a 4 × 3 × 2 = **24** ordres possibles. Fisher–Yates les donne **tous**, avec la même chance. Si on tire j entre 0 et la fin à chaque tour, il y a 4 × 4 × 4 = 64 chemins pour 24 ordres : impossible de les répartir également.",
+          "piege": "Et `toSorted(() => Math.random() - 0.5)` n'est pas un vrai mélange : le tri n'est pas fait pour un arbitre qui change d'avis."
+        }
+      ],
+      "exercices": [
+        { "id": "u13-l3-e1", "type": "fisher-yates", "notions": ["fisher-yates", "echange"], "question": "Joue le mélange à la main : à chaque tour, échange les cases i et j.", "tableau": ["A", "B", "C", "D"], "tirages": [1, 2, 0], "explication": "i = 3, j = 1 ; puis i = 2, j = 2 (la carte reste) ; puis i = 1, j = 0." },
+        { "id": "u13-l3-e2", "type": "fisher-yates", "notions": ["fisher-yates", "echange"], "question": "Encore un mélange : suis les tirages.", "tableau": ["♠", "♥", "♣", "♦", "★"], "tirages": [0, 3, 1, 1], "explication": "Quand j = i, la carte reste à sa place : c'est permis." },
+        { "id": "u13-l3-e3", "type": "parsons", "notions": ["fisher-yates"], "question": "Reconstitue `shuffle(cards)`, le mélange de Fisher–Yates.", "lignes": ["function shuffle(cards) {", "  for (let i = cards.length - 1; i >= 1; i--) {", "    const j = Math.floor(Math.random() * (i + 1));", "    [cards[i], cards[j]] = [cards[j], cards[i]];", "  }", "}"], "distracteurs": ["    const j = Math.floor(Math.random() * cards.length);", "  for (let i = 0; i < cards.length; i++) {"], "explication": "La boucle descend du dernier indice à 1 ; j est tiré entre 0 et i." },
+        { "id": "u13-l3-e4", "type": "qcm", "notions": ["fisher-yates"], "question": "Pourquoi la boucle s'arrête-t-elle à `i >= 1` et pas à `i >= 0` ?", "choix": ["Quand i vaut 0, la seule case possible est 0 : l'échange ne changerait rien", "Parce que l'indice 0 n'existe pas", "Pour aller plus vite, mais i >= 0 serait plus juste", "Parce que Math.random ne donne jamais 0"], "bonne": 0, "explication": "j serait forcément 0 : on échangerait la case 0 avec elle-même." },
+        { "id": "u13-l3-e5", "type": "bug", "notions": ["fisher-yates", "indice-hasard"], "question": "Ce mélange n'est pas équitable. Quelle ligne corriger ?", "code": ["function shuffle(cards) {", "  for (let i = cards.length - 1; i >= 1; i--) {", "    const j = Math.floor(Math.random() * cards.length);", "    [cards[i], cards[j]] = [cards[j], cards[i]];", "  }", "}"], "ligne": 3, "choix": ["j doit être tiré entre 0 et i : `Math.random() * (i + 1)`", "La boucle doit monter", "Il faut `Math.round`", "Il faut une variable temporaire"], "bonne": 0, "explication": "On pioche seulement parmi les cartes qui restent (0 à i)." }
+      ]
+    },
+    {
+      "id": "u13-l4",
+      "titre": "Copier, mélanger, distribuer",
+      "duree": 6,
+      "notions": ["sur-place", "spread", "slice"],
+      "cartes": [
+        {
+          "titre": "Le paquet des autres",
+          "texte": "`shuffleInPlace` modifie le tableau qu'on lui donne. Si on lui donne le paquet d'origine, il est bouleversé pour tout le monde. On mélange donc une **copie**.",
+          "code": ["const deck = Object.freeze([\"A\", \"B\", \"C\", \"D\"]);", "const copy = [...deck];", "[copy[0], copy[3]] = [copy[3], copy[0]];", "console.log(copy);", "console.log(deck);"],
+          "analogie": "On photocopie le paquet, on bat la photocopie.",
+          "fiche": "sur-place"
+        },
+        {
+          "titre": "Prendre les n premières",
+          "texte": "Une fois la copie mélangée, on distribue les n premières cartes avec `slice(0, n)` (relis [[slice]]).",
+          "code": ["const mixed = [\"C\", \"A\", \"D\", \"B\"];", "console.log(mixed.slice(0, 2));"]
+        },
+        {
+          "titre": "Des cartes forcément différentes",
+          "texte": "Comme on prend des cases **différentes** d'un paquet où chaque carte n'apparaît qu'une fois, la main ne contient jamais deux fois la même carte. C'est ce que demande le TP : « une main de cinq cartes **distinctes** »."
+        }
+      ],
+      "exercices": [
+        { "id": "u13-l4-e1", "type": "predire", "notions": ["sur-place", "spread"], "question": "Que va afficher la dernière ligne ?", "code": ["const deck = [\"A\", \"B\", \"C\"];", "const copy = [...deck];", "copy.reverse();", "console.log(deck);"], "explication": "La copie est une autre boîte : reverse ne touche que la copie." },
+        { "id": "u13-l4-e2", "type": "predire", "notions": ["sur-place"], "question": "Que va afficher la dernière ligne ?", "code": ["const deck = [\"A\", \"B\", \"C\"];", "const same = deck;", "same.reverse();", "console.log(deck);"], "explication": "`same = deck` ne copie rien : c'est la même boîte avec deux étiquettes." },
+        { "id": "u13-l4-e3", "type": "ordre", "notions": ["sur-place", "fisher-yates"], "question": "Remets dans l'ordre les étapes de drawCards.", "items": ["Copier le paquet reçu", "Mélanger la copie (sur place)", "Garder les n premières cartes de la copie", "Retourner ces cartes"], "explication": "Copier d'abord : le paquet reçu ne doit pas être modifié." },
+        { "id": "u13-l4-e4", "type": "bug", "notions": ["sur-place"], "question": "Cette fonction plante sur le paquet gelé du TP. Quelle ligne corriger ?", "code": ["function drawTwo(deck) {", "  shuffleInPlace(deck);", "  return deck.slice(0, 2);", "}"], "ligne": 2, "choix": ["Il faut mélanger une copie : `const copy = [...deck];`", "slice modifie le paquet", "Il faut `return` avant shuffleInPlace", "Il faut `slice(1, 2)`"], "bonne": 0, "explication": "shuffleInPlace modifie ce qu'on lui donne : on lui donne une copie." },
+        {
+          "id": "u13-l4-e5", "type": "ecrire", "notions": ["slice", "immutabilite"],
+          "question": "Écris `getTopCards(deck, n)` qui retourne les **n premières** cartes du paquet, sans le modifier.",
+          "depart": ["function getTopCards(deck, n) {", "  ", "}", "", "console.log(getTopCards([\"A♥\", \"7♣\", \"K♠\", \"2♦\"], 2));"],
+          "tests": { "fonction": "getTopCards", "cas": [
+            { "args": [["A♥", "7♣", "K♠", "2♦"], 2], "attendu": ["A♥", "7♣"] },
+            { "args": [["A♥", "7♣"], 0], "attendu": [] },
+            { "args": [["A♥", "7♣", "K♠"], 3], "attendu": ["A♥", "7♣", "K♠"] }
+          ], "interdit": ["splice"] },
+          "indices": ["Une copie d'une partie du tableau : [[slice]].", { "code": "return deck.slice(___, ___);" }],
+          "solution": ["function getTopCards(deck, n) {", "  return deck.slice(0, n);", "}", "", "console.log(getTopCards([\"A♥\", \"7♣\", \"K♠\", \"2♦\"], 2));"],
+          "erreursTypiques": [
+            { "code": "function getTopCards(deck, n) {\n  return deck.slice(1, n);\n}", "attendu": "echec" },
+            { "code": "function getTopCards(deck, n) {\n  return deck.slice(n);\n}", "attendu": "echec" }
+          ],
+          "explication": "`slice(0, n)` : de la case 0 jusqu'à la case n **non comprise**, soit n cartes."
+        }
+      ]
+    }
+  ],
+  "jeux": [
+    {
+      "id": "u13-chapeau",
+      "titre": "Le chapeau",
+      "description": "Mélanges à la main et échanges : garde l'œil sur les cases.",
+      "tours": 6,
+      "questions": [
+        { "id": "u13-j1-1", "type": "fisher-yates", "notions": ["fisher-yates"], "question": "Mélange à la main.", "tableau": ["1", "2", "3"], "tirages": [0, 0], "explication": "i = 2, j = 0 ; puis i = 1, j = 0." },
+        { "id": "u13-j1-2", "type": "fisher-yates", "notions": ["fisher-yates"], "question": "Mélange à la main.", "tableau": ["A", "K", "Q", "J"], "tirages": [3, 0, 1], "explication": "j = i au premier tour : la carte reste." },
+        { "id": "u13-j1-3", "type": "predire", "notions": ["echange"], "question": "Que va afficher ce code ?", "code": ["const t = [\"a\", \"b\", \"c\"];", "[t[0], t[1]] = [t[1], t[0]];", "[t[1], t[2]] = [t[2], t[1]];", "console.log(t);"], "explication": "Deux échanges à la suite : b a c, puis b c a." },
+        { "id": "u13-j1-4", "type": "predire", "notions": ["boucle-pas", "fisher-yates"], "question": "Que va afficher ce code ?", "code": ["const cards = [\"A\", \"B\", \"C\", \"D\", \"E\"];", "let tours = 0;", "for (let i = cards.length - 1; i >= 1; i--) {", "  tours++;", "}", "console.log(tours);"], "explication": "i vaut 4, 3, 2, 1 : quatre tours." },
+        { "id": "u13-j1-5", "type": "predire", "notions": ["sur-place", "slice"], "question": "Que va afficher ce code ?", "code": ["const deck = [\"A\", \"B\", \"C\", \"D\"];", "const hand = [...deck].reverse().slice(0, 2);", "console.log(hand, deck.length);"], "explication": "On renverse une copie, on garde 2 cartes ; le paquet a toujours 4 cartes." },
+        { "id": "u13-j1-6", "type": "qcm", "notions": ["indice-hasard"], "question": "Au tour i = 2 de Fisher–Yates, quelles valeurs j peut-il prendre ?", "choix": ["0, 1 ou 2", "0 ou 1", "1 ou 2", "0 à la fin du tableau"], "bonne": 0, "explication": "De 0 à i compris." }
+      ]
+    }
+  ],
+  "quiz": {
+    "titre": "Quiz : mélanger et tirer",
+    "questions": [
+      { "id": "u13-q1", "type": "predire", "notions": ["echange"], "question": "Que va afficher ce code ?", "code": ["const t = [5, 6, 7];", "[t[0], t[2]] = [t[2], t[0]];", "console.log(t);"], "explication": "Échange des cases 0 et 2." },
+      { "id": "u13-q2", "type": "predire", "notions": ["echange"], "question": "Que va afficher ce code ?", "code": ["const t = [5, 6, 7];", "t[0] = t[2];", "t[2] = t[0];", "console.log(t);"], "explication": "Le 5 est écrasé : les deux bouts valent 7." },
+      { "id": "u13-q3", "type": "qcm", "notions": ["fisher-yates"], "question": "Dans Fisher–Yates (version moderne du TP), la boucle va…", "choix": ["du dernier indice jusqu'à 1", "de 0 jusqu'au dernier indice", "du dernier indice jusqu'à 0, en tirant j entre 0 et la fin", "de 1 jusqu'à la fin"], "bonne": 0, "explication": "« pour chaque indice i, du dernier jusqu'à 1 »." },
+      { "id": "u13-q4", "type": "qcm", "notions": ["indice-hasard"], "question": "Quel tirage donne j entre 0 et i compris ?", "choix": ["Math.floor(Math.random() * (i + 1))", "Math.floor(Math.random() * i)", "Math.round(Math.random() * i)", "Math.random() * (i + 1)"], "bonne": 0, "mono": true, "explication": "La 2e n'atteint jamais i, la 3e favorise le milieu, la 4e n'est pas entière." },
+      { "id": "u13-q5", "type": "fisher-yates", "notions": ["fisher-yates"], "question": "Mélange à la main.", "tableau": ["♥", "♠", "♣", "♦"], "tirages": [2, 0, 1], "explication": "i = 3 ↔ j = 2 ; i = 2 ↔ j = 0 ; i = 1 ↔ j = 1." },
+      { "id": "u13-q6", "type": "vf", "notions": ["sur-place"], "question": "`const copy = deck;` crée une copie du paquet.", "bonne": false, "explication": "C'est la même boîte avec un deuxième nom. Une copie : `[...deck]`." },
+      { "id": "u13-q7", "type": "predire", "notions": ["sur-place", "spread"], "question": "Que va afficher ce code ?", "code": ["const deck = [1, 2, 3];", "const copy = [...deck];", "copy[0] = 99;", "console.log(deck[0], copy[0]);"], "explication": "Deux boîtes différentes." },
+      { "id": "u13-q8", "type": "bug", "notions": ["fisher-yates", "boucle-pas"], "question": "La case 1 n'est jamais échangée avec la case 0. Quelle ligne corriger ?", "code": ["function shuffleInPlace(cards) {", "  for (let i = cards.length - 1; i > 1; i--) {", "    const j = Math.floor(Math.random() * (i + 1));", "    [cards[i], cards[j]] = [cards[j], cards[i]];", "  }", "}"], "ligne": 2, "choix": ["La condition doit être `i >= 1`", "Il faut `i++`", "Il faut `Math.random() * i`", "Il faut une copie"], "bonne": 0, "explication": "Avec `i > 1`, le tour i = 1 n'a jamais lieu." },
+      { "id": "u13-q9", "type": "ordre", "notions": ["fisher-yates"], "question": "Remets dans l'ordre un tour de boucle de Fisher–Yates.", "items": ["Tirer j entre 0 et i", "Échanger les cases i et j", "Reculer i d'une case"], "explication": "Tirer, échanger, reculer." },
+      { "id": "u13-q10", "type": "predire", "notions": ["slice"], "question": "Que va afficher ce code ?", "code": ["const mixed = [\"7♣\", \"A♥\", \"2♦\", \"K♠\", \"9♥\", \"Q♣\"];", "console.log(mixed.slice(0, 5).length);"], "explication": "Une main de cinq cartes." },
+      { "id": "u13-q11", "type": "qcm", "notions": ["fisher-yates"], "question": "Avec 3 cartes, combien d'ordres différents Fisher–Yates peut-il produire ?", "choix": ["6", "3", "9", "27"], "bonne": 0, "explication": "3 × 2 × 1 = 6, chacun avec la même chance." },
+      { "id": "u13-q12", "type": "tri", "notions": ["sur-place", "immutabilite"], "mono": true, "question": "Modifie le tableau reçu, ou non ?", "categories": ["le modifie", "ne le modifie pas"], "items": [["shuffleInPlace(cards)", 0], ["drawCards(deck, 5)", 1], ["cards.slice(0, 5)", 1], ["[cards[0], cards[1]] = [cards[1], cards[0]]", 0]], "explication": "Le TP : shuffleInPlace mélange sur place ; drawCards ne touche pas au paquet reçu." }
+    ]
+  },
+  "boss": [
+    {
+      "id": "u13-b1",
+      "titre": "Mélanger sur place",
+      "source": "TP Tableaux · jeu de cartes, exercice 3",
+      "notions": ["fisher-yates", "echange", "indice-hasard"],
+      "enonce": "Écrire une fonction `shuffleInPlace(cards)` qui **mélange le tableau de cartes reçu** selon la version moderne de l'algorithme de Fisher–Yates : pour chaque indice i, **du dernier jusqu'à 1**, échanger l'élément d'indice i avec un élément d'indice aléatoire **j compris entre 0 et i**.",
+      "regles": ["Ici, le tableau reçu est modifié : c'est voulu (« in place »).", "Le mélange doit être équitable : tous les ordres possibles, avec la même chance. Le test compte des dizaines de milliers de mélanges."],
+      "prelude": ["const JACK = 11;", "const QUEEN = 12;", "const KING = 13;", "const ACE = 14;"],
+      "depart": ["function shuffleInPlace(cards) {", "  ", "}", "", "const hand = [", "  { rank: ACE, suit: 'hearts' },", "  { rank: KING, suit: 'spades' },", "  { rank: 7, suit: 'clubs' },", "  { rank: 2, suit: 'diamonds' },", "];", "shuffleInPlace(hand);", "console.log(hand);"],
+      "tests": { "fonction": "shuffleInPlace", "cas": [
+        { "titre": "Mélange équitable de 3 cartes (24 000 essais)", "melange": { "tableau": ["A", "B", "C"] } },
+        { "titre": "Mélange équitable de 4 cartes (96 000 essais)", "melange": { "tableau": ["w", "x", "y", "z"], "essais": 96000 } },
+        { "titre": "Paquet d'une seule carte", "args": [["A♠"]], "modifiable": true, "verifie": "args[0].length === 1 && args[0][0] === 'A♠'", "messageVerifie": "Une seule carte : le tableau doit rester [\"A♠\"]" },
+        { "titre": "Paquet vide", "args": [[]], "modifiable": true, "verifie": "args[0].length === 0", "messageVerifie": "Un paquet vide doit rester vide" }
+      ], "interdit": ["sort", "toSorted"] },
+      "indices": ["La boucle descend : relis [[fisher-yates]] et [[boucle-pas]].", "Dans la boucle : tirer j entre 0 et i **compris** ([[indice-hasard]]), puis échanger les cases i et j ([[echange]]).", { "code": "for (let i = ___; i >= 1; i--) {\n  const j = Math.floor(Math.random() * ___);\n  [cards[i], cards[j]] = [___, ___];\n}" }],
+      "solution": ["function shuffleInPlace(cards) {", "  for (let i = cards.length - 1; i >= 1; i--) {", "    const j = Math.floor(Math.random() * (i + 1));", "    [cards[i], cards[j]] = [cards[j], cards[i]];", "  }", "}", "", "const hand = [", "  { rank: ACE, suit: 'hearts' },", "  { rank: KING, suit: 'spades' },", "  { rank: 7, suit: 'clubs' },", "  { rank: 2, suit: 'diamonds' },", "];", "shuffleInPlace(hand);", "console.log(hand);"],
+      "erreursTypiques": [
+        { "code": "function shuffleInPlace(cards) {\n  for (let i = cards.length - 1; i >= 1; i--) {\n    const j = Math.floor(Math.random() * cards.length);\n    [cards[i], cards[j]] = [cards[j], cards[i]];\n  }\n}", "attendu": "echec" },
+        { "code": "function shuffleInPlace(cards) {\n  for (let i = cards.length - 1; i >= 1; i--) {\n    const j = Math.floor(Math.random() * i);\n    [cards[i], cards[j]] = [cards[j], cards[i]];\n  }\n}", "attendu": "echec" },
+        { "code": "function shuffleInPlace(cards) {\n  for (let i = cards.length - 1; i > 1; i--) {\n    const j = Math.floor(Math.random() * (i + 1));\n    [cards[i], cards[j]] = [cards[j], cards[i]];\n  }\n}", "attendu": "echec" },
+        { "code": "function shuffleInPlace(cards) {\n  for (let i = cards.length - 1; i >= 1; i--) {\n    const j = Math.floor(Math.random() * (i + 1));\n    cards[i] = cards[j];\n    cards[j] = cards[i];\n  }\n}", "attendu": "echec" },
+        { "code": "function shuffleInPlace(cards) {\n  const copy = [...cards];\n  for (let i = copy.length - 1; i >= 1; i--) {\n    const j = Math.floor(Math.random() * (i + 1));\n    [copy[i], copy[j]] = [copy[j], copy[i]];\n  }\n  return copy;\n}", "attendu": "echec" },
+        { "code": "function shuffleInPlace(cards) {\n  cards.sort(() => Math.random() - 0.5);\n}", "attendu": "echec", "diagnostic": "interdit" }
+      ],
+      "explication": "Exercice 3 du jeu de cartes. Le test compte les ordres obtenus sur 24 000 mélanges de 3 cartes : avec Fisher–Yates, chacun des 6 ordres sort environ 4 000 fois. Avec j tiré entre 0 et la fin, certains sortent bien plus souvent ; avec `* i` (sans + 1), la moitié des ordres n'apparaît jamais."
+    },
+    {
+      "id": "u13-b2",
+      "titre": "Tirer des cartes",
+      "source": "TP Tableaux · jeu de cartes, exercice 4",
+      "notions": ["sur-place", "spread", "slice", "fisher-yates"],
+      "enonce": "Écrire une fonction `drawCards(deck, count)` qui reçoit un paquet et un nombre de cartes, **copie le paquet, mélange cette copie** (avec `shuffleInPlace`) **et retourne le nombre de cartes demandé**.\n\nLe paquet reçu par drawCards **ne doit pas être modifié**.",
+      "regles": ["Le paquet reçu ne doit pas être modifié (il est gelé dans les tests).", "Les cartes tirées sont toutes différentes et viennent du paquet."],
+      "prelude": ["const JACK = 11;", "const QUEEN = 12;", "const KING = 13;", "const ACE = 14;", "", "const RANKS = [2, 3, 4, 5, 6, 7, 8, 9, 10, JACK, QUEEN, KING, ACE];", "const SUITS = ['hearts', 'spades', 'clubs', 'diamonds'];", "", "// boss précédents", "function buildBaseDeck() {", "  return SUITS.flatMap((suit) => RANKS.map((rank) => ({ rank, suit })));", "}", "function shuffleInPlace(cards) {", "  for (let i = cards.length - 1; i >= 1; i--) {", "    const j = Math.floor(Math.random() * (i + 1));", "    [cards[i], cards[j]] = [cards[j], cards[i]];", "  }", "}"],
+      "depart": ["function drawCards(deck, count) {", "  ", "}", "", "const deck = Object.freeze(buildBaseDeck());", "const hand = drawCards(deck, 5);", "console.log(hand);", "console.log(deck.length);"],
+      "tests": { "fonction": "drawCards", "obligatoire": ["shuffleInPlace()"], "cas": [
+        { "titre": "Cinq cartes distinctes du paquet", "argsCode": "[Object.freeze([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].flatMap((rank) => ['hearts', 'spades', 'clubs', 'diamonds'].map((suit) => Object.freeze({ rank, suit })))), 5]", "repetitions": 60, "verifie": "Array.isArray(r) && r.length === 5 && new Set(r).size === 5 && r.every((c) => args[0].includes(c))", "messageVerifie": "Il faut 5 cartes différentes, prises dans le paquet reçu", "siEchec": "Copie le paquet (`[...deck]`), mélange la copie avec shuffleInPlace, puis retourne `copy.slice(0, count)`." },
+        { "titre": "Les cartes sont mélangées", "argsCode": "[Object.freeze([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].flatMap((rank) => ['hearts', 'spades', 'clubs', 'diamonds'].map((suit) => Object.freeze({ rank, suit })))), 5]", "repetitions": 30, "verifie": "Array.isArray(r) && !r.every((c, i) => c === args[0][i])", "messageVerifie": "Ce sont toujours les 5 premières cartes du paquet : la copie doit être mélangée AVANT de prendre les cartes" },
+        { "titre": "Le paquet complet", "args": [["A♥", "K♠", "7♣"], 3], "repetitions": 30, "verifie": "Array.isArray(r) && r.length === 3 && ['A♥', 'K♠', '7♣'].every((c) => r.includes(c))", "messageVerifie": "En tirant tout le paquet, on doit retrouver ses 3 cartes, dans un ordre quelconque" },
+        { "titre": "Zéro carte", "args": [["A♥", "K♠"], 0], "attendu": [] }
+      ] },
+      "indices": ["Trois étapes : copier, mélanger la copie, garder les premières. Relis [[sur-place]].", "La copie : le spread ([[spread]]). Les premières : [[slice]]. Attention : `shuffleInPlace` ne retourne rien, elle modifie ce qu'on lui donne.", { "code": "const copy = [...deck];\nshuffleInPlace(___);\nreturn copy.slice(___, ___);" }],
+      "solution": ["function drawCards(deck, count) {", "  const copy = [...deck];", "  shuffleInPlace(copy);", "  return copy.slice(0, count);", "}", "", "const deck = Object.freeze(buildBaseDeck());", "const hand = drawCards(deck, 5);", "console.log(hand);", "console.log(deck.length);"],
+      "erreursTypiques": [
+        { "code": "function drawCards(deck, count) {\n  shuffleInPlace(deck);\n  return deck.slice(0, count);\n}", "attendu": "erreur" },
+        { "code": "function drawCards(deck, count) {\n  const copy = [...deck];\n  return shuffleInPlace(copy).slice(0, count);\n}", "attendu": "erreur" },
+        { "code": "function drawCards(deck, count) {\n  const copy = [...deck];\n  shuffleInPlace(copy);\n  return deck.slice(0, count);\n}", "attendu": "echec" },
+        { "code": "function drawCards(deck, count) {\n  const copy = [...deck];\n  shuffleInPlace(copy);\n  return copy.slice(1, count);\n}", "attendu": "echec" },
+        { "code": "function drawCards(deck, count) {\n  return [...deck].slice(0, count);\n}", "attendu": "echec", "diagnostic": "obligatoire" }
+      ],
+      "explication": "Exercice 4 du jeu de cartes. `shuffleInPlace(copy)` ne retourne rien (undefined) : on ne peut pas enchaîner `.slice` dessus. On mélange, puis on prend les cartes de la copie."
+    },
+    {
+      "id": "u13-b3",
+      "titre": "Annoncer la plus forte",
+      "source": "TP Tableaux · jeu de cartes, exercice 5 (2e partie)",
+      "notions": ["comparateur", "ternaire"],
+      "enonce": "« Tirer deux cartes et utiliser `compareRank` pour **annoncer la plus forte, ou une égalité**. »\n\nÉcris une fonction `announce(cardA, cardB)` qui **retourne** le texte `\"La première carte gagne\"`, `\"La deuxième carte gagne\"` ou `\"Égalité\"`, en utilisant `compareRank`. Puis, en bas du script, tire deux cartes avec `drawCards` et affiche l'annonce.",
+      "regles": ["Utilise compareRank (dans l'entête) : ne recompare pas les rangs toi-même.", "Les textes doivent être exactement ceux de l'énoncé."],
+      "prelude": ["const JACK = 11;", "const QUEEN = 12;", "const KING = 13;", "const ACE = 14;", "", "const RANKS = [2, 3, 4, 5, 6, 7, 8, 9, 10, JACK, QUEEN, KING, ACE];", "const SUITS = ['hearts', 'spades', 'clubs', 'diamonds'];", "", "// boss précédents", "function buildBaseDeck() {", "  return SUITS.flatMap((suit) => RANKS.map((rank) => ({ rank, suit })));", "}", "function shuffleInPlace(cards) {", "  for (let i = cards.length - 1; i >= 1; i--) {", "    const j = Math.floor(Math.random() * (i + 1));", "    [cards[i], cards[j]] = [cards[j], cards[i]];", "  }", "}", "function drawCards(deck, count) {", "  const copy = [...deck];", "  shuffleInPlace(copy);", "  return copy.slice(0, count);", "}", "function compareRank(cardA, cardB) {", "  return cardA.rank - cardB.rank;", "}"],
+      "depart": ["function announce(cardA, cardB) {", "  ", "}", "", "const deck = Object.freeze(buildBaseDeck());", "const [first, second] = drawCards(deck, 2);", "console.log(first, second);", "console.log(announce(first, second));"],
+      "tests": { "fonction": "announce", "obligatoire": ["compareRank()", "drawCards()"], "cas": [
+        { "titre": "La première gagne", "args": [{ "rank": 14, "suit": "spades" }, { "rank": 9, "suit": "hearts" }], "attendu": "La première carte gagne" },
+        { "titre": "La deuxième gagne", "args": [{ "rank": 3, "suit": "clubs" }, { "rank": 12, "suit": "clubs" }], "attendu": "La deuxième carte gagne", "siEchec": "compareRank(cardA, cardB) est **négatif** quand la première carte est plus faible : c'est la deuxième qui gagne." },
+        { "titre": "Égalité", "args": [{ "rank": 10, "suit": "hearts" }, { "rank": 10, "suit": "diamonds" }], "attendu": "Égalité" }
+      ] },
+      "indices": ["Appelle compareRank une fois, garde le résultat dans une variable, puis regarde son **signe** (relis [[comparateur]]).", "Trois cas : `> 0`, `< 0`, sinon égalité. Des `if … return` font très bien l'affaire.", { "code": "const result = compareRank(cardA, cardB);\nif (result > 0) return ___;\nif (result < 0) return ___;\nreturn ___;" }],
+      "solution": ["function announce(cardA, cardB) {", "  const result = compareRank(cardA, cardB);", "  if (result > 0) return \"La première carte gagne\";", "  if (result < 0) return \"La deuxième carte gagne\";", "  return \"Égalité\";", "}", "", "const deck = Object.freeze(buildBaseDeck());", "const [first, second] = drawCards(deck, 2);", "console.log(first, second);", "console.log(announce(first, second));"],
+      "erreursTypiques": [
+        { "code": "function announce(cardA, cardB) {\n  const result = compareRank(cardA, cardB);\n  if (result < 0) return \"La première carte gagne\";\n  if (result > 0) return \"La deuxième carte gagne\";\n  return \"Égalité\";\n}\nconsole.log(announce(...drawCards(buildBaseDeck(), 2)));", "attendu": "echec", "diagnostic": "contenu" },
+        { "code": "function announce(cardA, cardB) {\n  const result = compareRank(cardA, cardB);\n  if (result > 0) return \"La première carte gagne\";\n  return \"La deuxième carte gagne\";\n}\nconsole.log(announce(...drawCards(buildBaseDeck(), 2)));", "attendu": "echec" },
+        { "code": "function announce(cardA, cardB) {\n  const result = compareRank(cardA, cardB);\n  if (result > 0) console.log(\"La première carte gagne\");\n  else if (result < 0) console.log(\"La deuxième carte gagne\");\n  else console.log(\"Égalité\");\n}\nannounce(...drawCards(buildBaseDeck(), 2));", "attendu": "echec", "diagnostic": "return-vs-log" }
+      ],
+      "explication": "Fin de l'exercice 5 du jeu de cartes. `const [first, second] = drawCards(deck, 2);` : la déstructuration range les deux cartes tirées dans deux variables (comme pour l'échange)."
+    },
+    {
+      "id": "u13-b4",
+      "titre": "La main de cinq cartes",
+      "source": "TP Tableaux · jeu de cartes, exercices 6 et 7 (fin)",
+      "notions": ["foreach", "reduce-max", "couleurs-terminal", "sur-place"],
+      "enonce": "Le grand final du TP Tableaux. « Utiliser drawCards pour obtenir **une main de cinq cartes distinctes**. » Puis « utiliser showCard pour **afficher les cartes de la main** ».\n\nÉcris une fonction `showHand(hand)` qui affiche chaque carte de la main avec `showCard` (une ligne par carte), puis une ligne `Plus forte :` et enfin la plus forte carte (avec `getHighestCard`, puis `showCard`). En bas du script, tire une main de cinq cartes et affiche-la.",
+      "regles": ["Toutes les fonctions des boss précédents sont dans l'entête : utilise-les.", "La main reçue ne doit pas être modifiée."],
+      "prelude": ["const JACK = 11;", "const QUEEN = 12;", "const KING = 13;", "const ACE = 14;", "", "const RANKS = [2, 3, 4, 5, 6, 7, 8, 9, 10, JACK, QUEEN, KING, ACE];", "const SUITS = ['hearts', 'spades', 'clubs', 'diamonds'];", "", "const red = '\\x1b[31;47m';", "const black = '\\x1b[30;47m';", "const defaultColor = '\\x1b[0m';", "", "// boss précédents", "function buildBaseDeck() {", "  return SUITS.flatMap((suit) => RANKS.map((rank) => ({ rank, suit })));", "}", "function shuffleInPlace(cards) {", "  for (let i = cards.length - 1; i >= 1; i--) {", "    const j = Math.floor(Math.random() * (i + 1));", "    [cards[i], cards[j]] = [cards[j], cards[i]];", "  }", "}", "function drawCards(deck, count) {", "  const copy = [...deck];", "  shuffleInPlace(copy);", "  return copy.slice(0, count);", "}", "function getHighestCard(hand) {", "  return hand.reduce((best, card) => (card.rank > best.rank ? card : best));", "}", "function displayRank(rank) {", "  const labels = { [JACK]: 'J', [QUEEN]: 'Q', [KING]: 'K', [ACE]: 'A' };", "  return labels[rank] ?? String(rank);", "}", "function showCard(card) {", "  const symbols = { hearts: '♥', spades: '♠', clubs: '♣', diamonds: '♦' };", "  const color = card.suit === 'hearts' || card.suit === 'diamonds' ? red : black;", "  console.log(color + displayRank(card.rank) + symbols[card.suit] + defaultColor);", "}"],
+      "depart": ["function showHand(hand) {", "  ", "}", "", "const deck = Object.freeze(buildBaseDeck());", "// tire une main de cinq cartes, puis affiche-la avec showHand", ""],
+      "tests": { "fonction": "showHand", "obligatoire": ["drawCards()", "getHighestCard()"], "cas": [
+        { "titre": "Une main de cinq cartes", "args": [[{ "rank": 9, "suit": "clubs" }, { "rank": 14, "suit": "hearts" }, { "rank": 4, "suit": "spades" }, { "rank": 12, "suit": "diamonds" }, { "rank": 11, "suit": "hearts" }]], "sortie": ["\u001b[30;47m9♣\u001b[0m", "\u001b[31;47mA♥\u001b[0m", "\u001b[30;47m4♠\u001b[0m", "\u001b[31;47mQ♦\u001b[0m", "\u001b[31;47mJ♥\u001b[0m", "Plus forte :", "\u001b[31;47mA♥\u001b[0m"], "siEchec": "D'abord chaque carte (`hand.forEach(showCard)`), puis la ligne `Plus forte :`, puis `showCard(getHighestCard(hand))`." },
+        { "titre": "Égalité de rang", "args": [[{ "rank": 13, "suit": "spades" }, { "rank": 13, "suit": "hearts" }]], "sortie": ["\u001b[30;47mK♠\u001b[0m", "\u001b[31;47mK♥\u001b[0m", "Plus forte :", "\u001b[30;47mK♠\u001b[0m"] }
+      ] },
+      "indices": ["Afficher chaque carte : [[foreach]] avec showCard. On peut même écrire `hand.forEach(showCard)` (on passe la fonction elle-même).", "Puis `console.log(\"Plus forte :\")` et la carte la plus forte, affichée elle aussi avec showCard. En bas : `const hand = drawCards(deck, 5);` puis `showHand(hand);`.", { "code": "function showHand(hand) {\n  hand.forEach(___);\n  console.log(\"Plus forte :\");\n  showCard(___);\n}" }],
+      "solution": ["function showHand(hand) {", "  hand.forEach((card) => showCard(card));", "  console.log(\"Plus forte :\");", "  showCard(getHighestCard(hand));", "}", "", "const deck = Object.freeze(buildBaseDeck());", "// tire une main de cinq cartes, puis affiche-la avec showHand", "const hand = drawCards(deck, 5);", "showHand(hand);"],
+      "erreursTypiques": [
+        { "code": "function showHand(hand) {\n  hand.forEach((card) => showCard(card));\n  console.log(\"Plus forte :\");\n  console.log(getHighestCard(hand));\n}\nshowHand(drawCards(buildBaseDeck(), 5));", "attendu": "echec" },
+        { "code": "function showHand(hand) {\n  console.log(hand);\n  console.log(\"Plus forte :\");\n  showCard(getHighestCard(hand));\n}\nshowHand(drawCards(buildBaseDeck(), 5));", "attendu": "echec" },
+        { "code": "function showHand(hand) {\n  hand.forEach((card) => showCard(card));\n  console.log(\"Plus forte :\");\n  showCard(hand.toSorted((a, b) => b.rank - a.rank)[0]);\n}\nconst hand = [{ rank: 2, suit: 'clubs' }];\nshowHand(hand);", "attendu": "echec", "diagnostic": "obligatoire" }
+      ],
+      "explication": "Fin du TP Tableaux : toutes les pièces s'emboîtent. `hand.forEach(showCard)` marche aussi : forEach appelle showCard avec chaque carte. Dans le terminal de Node.js, la main s'affiche en couleur exactement comme ici."
+    }
+  ]
+}

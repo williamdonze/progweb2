@@ -209,6 +209,7 @@ function chercherUsage(nu, nom){
   if (nom === "classList" || nom === "length") return new RegExp(`\\.\\s*${nom}\\b`).exec(nu);   // propriétés : pas de parenthèses
   if (nom === "function" || nom === "return" || nom === "if") return new RegExp(`\\b${nom}\\b`).exec(nu);
   if (nom === "for" || nom === "while") return new RegExp(`\\b${nom}\\s*\\(`).exec(nu);
+  if (nom.endsWith("()")) return new RegExp(`(?<![.\\w])${nom.slice(0, -2)}\\s*\\(`).exec(nu);   // appel d'une fonction (pas d'une méthode) : "drawCards()"
   if (nom.includes(".")) return new RegExp(nom.replace(".", "\\s*\\.\\s*") + "\\b").exec(nu);
   return new RegExp(`\\.\\s*${nom}\\s*\\(`).exec(nu);
 }
@@ -405,7 +406,7 @@ function executerTout({ code, donnees, prelude, tests, contexte = {} }){
       if (cas.argsCode) { try { args = run.lire(cas.argsCode); } catch(e) { r.ok = false; r.erreur = decrireErreur(e, code, don); res.cas.push(r); return; } }
       else { args = copieProfonde(cas.args || []); if (!cas.modifiable) gelProfond(args); }   // "modifiable": la fonction a le droit de modifier son argument (shuffleInPlace)
       if (cas.melange) {   // mélange équitable ? on compte les ordres obtenus sur de nombreux essais
-        const { tableau, essais = 24000, tolerance = 0.06 } = cas.melange;   // 24 000 essais : un mélange naïf (j entre 0 et la fin à chaque tour) s’écarte de 11 %, le hasard de moins de 4 %
+        const { tableau, essais = 24000, tolerance = 0.06 } = cas.melange;   // 3 éléments × 24 000 essais : un mélange naïf (j entre 0 et la fin) s’écarte de 11 %, le hasard de moins de 4 % ; pour 4 éléments, 96 000 essais
         const compte = new Map(); let faute = null;
         for (let k = 0; k < essais && !faute; k++) {
           const t = tableau.slice();
@@ -460,6 +461,7 @@ function executerTout({ code, donnees, prelude, tests, contexte = {} }){
           r.ok = false;
           if (logsAppel.length === 1 && cas.sortie.length > 1 && normaliserSaisie(logsAppel[0]) === normaliserSaisie(enCode(cas.args && cas.args[0])))
             r.diagnostic = { id:"boite-entiere", message: `Tu as affiché la boîte entière d'un coup. On veut chaque œuf sur sa propre ligne : parcours le tableau (forEach) et affiche chaque élément.` };
+          else if (!logsAppel.length && cas.sortie.length && obtenu !== undefined) r.diagnostic = { id:"log-vs-return", message: `Ta fonction retourne ${formater(obtenu, 1).length > 40 ? "un résultat" : formater(obtenu, 1)} mais n'affiche rien. Ici, on demande d'AFFICHER : console.log(…) à l'intérieur de la fonction, au lieu de return.` };
           else if (!logsAppel.length && cas.sortie.length) r.diagnostic = { id:"rien-affiche", message: `Ta fonction n'affiche rien. Pour afficher, c'est console.log(…).` };
         }
       }

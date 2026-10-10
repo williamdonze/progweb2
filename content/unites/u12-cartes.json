@@ -1,0 +1,472 @@
+{
+  "id": "u12",
+  "titre": "Objets : le jeu de cartes",
+  "sousTitre": "TP Tableaux · jeu de cartes 1, 2, 5, 6, 7",
+  "objectif": "Représenter une carte par un objet et le paquet par un tableau d'objets, construire les 52 cartes avec flatMap, comparer des cartes, les afficher en couleur dans le terminal.",
+  "icone": "♠",
+  "fiches": [
+    {
+      "id": "objet",
+      "titre": "Un objet : des propriétés nommées",
+      "icone": "{}",
+      "resume": "Un objet regroupe plusieurs valeurs, chacune avec un **nom** : `{ rank: 14, suit: \"spades\" }`. On lit une propriété avec un point : `card.rank`.",
+      "analogie": "Une **fiche d'identité** : chaque case a une étiquette (nom, âge…) et une valeur. Un tableau, lui, range ses œufs par **numéro** ; un objet range ses valeurs par **nom**.",
+      "texte": "- Créer : `const card = { rank: 14, suit: \"spades\" };`\n- Lire : `card.rank` vaut `14`, `card.suit` vaut `\"spades\"`.\n- Une propriété qui n'existe pas vaut `undefined` (pas d'erreur).\n\n**Raccourci** : si une variable porte déjà le nom de la propriété, `{ rank, suit }` veut dire `{ rank: rank, suit: suit }`.\n\nLes noms de propriétés s'écrivent **sans guillemets** ; les valeurs texte, elles, ont des guillemets.",
+      "exemples": [
+        { "code": ["const ACE = 14;", "const card = { rank: ACE, suit: \"spades\" };", "console.log(card.rank);", "console.log(card.suit);", "console.log(card.color);"] },
+        { "titre": "Le raccourci", "code": ["const rank = 12;", "const suit = \"hearts\";", "console.log({ rank, suit });"] }
+      ],
+      "pieges": ["`card.rank` et non `card[rank]` (sans guillemets, `rank` serait une variable).", "`{ rank: \"ACE\" }` : du texte, pas la constante. Il faut `{ rank: ACE }`."]
+    },
+    {
+      "id": "tableau-objets",
+      "titre": "Un tableau d'objets",
+      "icone": "[{}]",
+      "resume": "Le paquet est un **tableau** dont chaque case contient une carte (un **objet**). `deck[0].suit` : la couleur de la première carte.",
+      "analogie": "Une **boîte d'œufs** où chaque œuf est une petite fiche d'identité. On prend un œuf par son numéro (`deck[0]`), puis on lit une case de sa fiche (`.suit`).",
+      "texte": "- `deck.length` : le nombre de cartes.\n- `deck[0]` : la première carte (un objet).\n- `deck[0].rank` : son rang.\n\nToutes les méthodes de tableau marchent : `deck.map((card) => card.rank)`, `deck.filter((card) => card.suit === \"hearts\")`, `deck.some(…)`…\n\nDans une flèche qui **retourne un objet** sans accolades de bloc, il faut des **parenthèses** : `(rank) => ({ rank, suit })`. Sans elles, JavaScript croit que `{` ouvre le corps de la fonction (relis [[fleche-objet]]).",
+      "exemples": [
+        { "code": ["const hand = [", "  { rank: 14, suit: \"hearts\" },", "  { rank: 9, suit: \"clubs\" },", "];", "console.log(hand.length);", "console.log(hand[1].suit);", "console.log(hand.map((card) => card.rank));"] }
+      ],
+      "pieges": ["`deck.rank` : le tableau n'a pas de rang, ce sont ses cartes qui en ont.", "Oublier les parenthèses autour de l'objet retourné par une flèche."]
+    },
+    {
+      "id": "flatmap",
+      "titre": "Combiner deux tableaux : flatMap",
+      "icone": "⊞",
+      "resume": "Un `map` dans un `map` donne un tableau **de tableaux**. `flatMap` fait le même travail, puis **vide** les petites boîtes dans une seule grande.",
+      "analogie": "Quatre **boîtes de 13 œufs** (une par couleur). `map` te rend les 4 boîtes empilées ; `flatMap` sort les 52 œufs et les range dans **une** grande boîte, comme le spread.",
+      "texte": "Pour toutes les combinaisons de deux listes :\n\n```\nconst sizes = [\"S\", \"L\"];\nconst colors = [\"red\", \"blue\"];\nconst combos = sizes.flatMap((size) => colors.map((color) => size + \"-\" + color));\n```\n\n`combos` vaut `[\"S-red\", \"S-blue\", \"L-red\", \"L-blue\"]` : 2 × 2 = 4 éléments.\n\nAvec `map` à l'extérieur, on obtiendrait `[[\"S-red\", \"S-blue\"], [\"L-red\", \"L-blue\"]]` : 2 boîtes de 2.",
+      "exemples": [
+        { "code": ["const sizes = [\"S\", \"L\"];", "const colors = [\"red\", \"blue\"];", "console.log(sizes.map((size) => colors.map((color) => size + \"-\" + color)));", "console.log(sizes.flatMap((size) => colors.map((color) => size + \"-\" + color)));"] }
+      ],
+      "pieges": ["`map` dans `map` : on obtient des boîtes dans la boîte (longueur 4 au lieu de 52 pour le paquet)."]
+    },
+    {
+      "id": "objet-dictionnaire",
+      "titre": "Un objet comme dictionnaire",
+      "icone": "A→1",
+      "resume": "Un objet peut servir de **table de correspondance** : `symbols[card.suit]` va chercher la propriété dont le nom est **dans** la variable.",
+      "analogie": "Un **dictionnaire** : on cherche un mot (la clé), on lit sa traduction (la valeur).",
+      "texte": "- `obj.suit` : la propriété qui s'appelle littéralement **suit**.\n- `obj[suit]` : la propriété dont le nom est **la valeur** de la variable `suit`.\n\n```\nconst symbols = { hearts: \"♥\", spades: \"♠\" };\nconst suit = \"hearts\";\nsymbols[suit]   // \"♥\"\n```\n\nPratique pour éviter une longue suite de `if` : une clé, une valeur.\n\nSi la clé n'existe pas, on obtient `undefined` ; `??` permet de donner une valeur de secours : `labels[rank] ?? String(rank)`.",
+      "exemples": [
+        { "code": ["const symbols = { hearts: \"♥\", spades: \"♠\", clubs: \"♣\", diamonds: \"♦\" };", "const card = { rank: 9, suit: \"clubs\" };", "console.log(symbols[card.suit]);", "console.log(symbols.card);"] }
+      ],
+      "pieges": ["`symbols.card.suit` ou `symbols.suit` : on cherche alors une propriété nommée « card » ou « suit »."]
+    },
+    {
+      "id": "couleurs-terminal",
+      "titre": "Couleurs dans le terminal",
+      "icone": "🎨",
+      "resume": "Un texte spécial comme `'\\x1b[31;47m'` change la couleur de ce qui suit dans le terminal ; `'\\x1b[0m'` remet la couleur normale.",
+      "texte": "Ce sont des **codes ANSI** : `\\x1b[` puis des nombres séparés par `;`, puis `m`.\n\n- `31` : texte rouge ; `30` : texte noir.\n- `47` : fond blanc.\n- `0` : tout remettre par défaut.\n\nOn colle le code devant le texte, et la remise à zéro derrière :\n\n```\nconst red = '\\x1b[31;47m';\nconst defaultColor = '\\x1b[0m';\nconsole.log(red + 'A♥' + defaultColor);\n```\n\nSans `defaultColor` à la fin, la couleur « déborde » sur tout ce qui s'affiche ensuite. La console de ProgWeb 2 comprend ces codes, comme le terminal de Node.js.",
+      "exemples": [
+        { "code": ["const red = '\\x1b[31;47m';", "const black = '\\x1b[30;47m';", "const defaultColor = '\\x1b[0m';", "console.log(red + 'A♥' + defaultColor);", "console.log(black + 'A♠' + defaultColor);"] }
+      ],
+      "pieges": ["Oublier `defaultColor` à la fin : le texte suivant reste coloré."]
+    }
+  ],
+  "lecons": [
+    {
+      "id": "u12-l1",
+      "titre": "Une carte, c'est un objet",
+      "duree": 6,
+      "notions": ["objet"],
+      "cartes": [
+        {
+          "titre": "Deux informations, un seul paquet",
+          "texte": "Une carte à jouer a un **rang** (2 à 14) et une **couleur** (hearts, spades, clubs, diamonds). Un objet les regroupe, chacune avec son nom.",
+          "code": ["const card = { rank: 14, suit: \"spades\" };", "console.log(card);"],
+          "analogie": "Une **fiche d'identité** : chaque case a une étiquette (rank, suit) et une valeur.",
+          "fiche": "objet"
+        },
+        {
+          "titre": "Lire une propriété : le point",
+          "texte": "`card.rank` va chercher la case « rank » de la fiche.",
+          "code": ["const card = { rank: 14, suit: \"spades\" };", "console.log(card.rank);", "console.log(card.suit);"]
+        },
+        {
+          "titre": "Les constantes du TP",
+          "texte": "Le TP donne des noms aux figures : `JACK` vaut 11, `QUEEN` 12, `KING` 13, `ACE` 14. Ainsi, les rangs sont **tous des nombres**, et on peut les comparer.",
+          "code": ["const KING = 13;", "const ACE = 14;", "const card = { rank: KING, suit: \"hearts\" };", "console.log(card.rank);", "console.log(card.rank < ACE);"],
+          "piege": "`{ rank: \"KING\" }` met le **texte** « KING », pas le nombre 13. Sans guillemets, c'est la constante."
+        },
+        {
+          "titre": "Le raccourci { rank, suit }",
+          "texte": "Quand une variable porte le même nom que la propriété, on peut l'écrire une seule fois.",
+          "code": ["const rank = 10;", "const suit = \"clubs\";", "const card = { rank, suit };", "console.log(card);"]
+        }
+      ],
+      "exercices": [
+        { "id": "u12-l1-e1", "type": "objet", "notions": ["objet"], "question": "Construis l'**as de pique** (rang `ACE`, couleur `\"spades\"`).", "nom": "aceOfSpades", "code": ["const ACE = 14;"], "cles": ["rank", "suit"], "etiquettes": ["ACE", "\"ACE\"", "\"spades\"", "spades", "1"], "bonnes": { "rank": ["ACE"], "suit": ["\"spades\""] }, "explication": "Le rang est la **constante** ACE (14, un nombre) ; la couleur est un **texte**, entre guillemets." },
+        { "id": "u12-l1-e2", "type": "predire", "notions": ["objet"], "question": "Que va afficher ce code ?", "code": ["const QUEEN = 12;", "const card = { rank: QUEEN, suit: \"diamonds\" };", "console.log(card.rank + 1);"], "explication": "`card.rank` vaut 12 (un nombre) : 12 + 1 = 13." },
+        { "id": "u12-l1-e3", "type": "predire", "notions": ["objet"], "question": "Que va afficher ce code ?", "code": ["const card = { rank: 7, suit: \"clubs\" };", "console.log(card.color);"], "explication": "Une propriété qui n'existe pas vaut `undefined` : pas d'erreur." },
+        { "id": "u12-l1-e4", "type": "qcm", "notions": ["objet"], "question": "Pourquoi le TP donne-t-il des **rangs numériques** (11 pour le valet, 14 pour l'as) ?", "choix": ["Pour pouvoir comparer les cartes avec < et >", "Parce que JavaScript n'accepte pas les lettres", "Pour économiser de la mémoire", "Parce que suit doit être un nombre"], "bonne": 0, "explication": "Avec des nombres, `a.rank - b.rank` ou `a.rank > b.rank` disent directement quelle carte est la plus forte." },
+        {
+          "id": "u12-l1-e5", "type": "ecrire", "notions": ["objet"],
+          "question": "Écris `createStudent(name, grade)` qui retourne un objet avec deux propriétés : `name` et `grade`.",
+          "depart": ["function createStudent(name, grade) {", "  ", "}", "", "console.log(createStudent(\"Léa\", 5.5));"],
+          "tests": { "fonction": "createStudent", "cas": [ { "args": ["Léa", 5.5], "attendu": { "name": "Léa", "grade": 5.5 } }, { "args": ["Sami", 4], "attendu": { "name": "Sami", "grade": 4 } } ] },
+          "indices": ["Un objet s'écrit entre accolades : `{ nom: valeur, … }`.", { "code": "return { name: ___, grade: ___ };" }],
+          "solution": ["function createStudent(name, grade) {", "  return { name, grade };", "}", "", "console.log(createStudent(\"Léa\", 5.5));"],
+          "erreursTypiques": [
+            { "code": "function createStudent(name, grade) {\n  return { name: \"name\", grade: \"grade\" };\n}", "attendu": "echec" },
+            { "code": "function createStudent(name, grade) {\n  return [name, grade];\n}", "attendu": "echec" }
+          ],
+          "explication": "`{ name, grade }` est le raccourci de `{ name: name, grade: grade }`."
+        }
+      ]
+    },
+    {
+      "id": "u12-l2",
+      "titre": "Le paquet : un tableau d'objets",
+      "duree": 6,
+      "notions": ["tableau-objets", "objet"],
+      "cartes": [
+        {
+          "titre": "Des cartes dans une boîte",
+          "texte": "Le paquet est un **tableau** ; chaque case contient une **carte** (un objet).",
+          "code": ["const hand = [", "  { rank: 14, suit: \"hearts\" },", "  { rank: 9, suit: \"clubs\" },", "  { rank: 12, suit: \"spades\" },", "];", "console.log(hand.length);", "console.log(hand[0]);"],
+          "analogie": "Une boîte d'œufs où chaque œuf est une fiche d'identité.",
+          "fiche": "tableau-objets"
+        },
+        {
+          "titre": "Un numéro, puis un nom",
+          "texte": "`hand[2]` : la carte n° 2 (un objet). `hand[2].rank` : son rang. D'abord le **numéro** de la case, puis le **nom** de la propriété.",
+          "code": ["const hand = [{ rank: 14, suit: \"hearts\" }, { rank: 9, suit: \"clubs\" }];", "console.log(hand[1].rank);", "console.log(hand.rank);"],
+          "piege": "`hand.rank` vaut undefined : c'est la boîte, pas une carte."
+        },
+        {
+          "titre": "Toutes les méthodes fonctionnent",
+          "texte": "`map`, `filter`, `some`, `every`, `reduce`… reçoivent maintenant une **carte** à chaque tour.",
+          "code": ["const hand = [{ rank: 14, suit: \"hearts\" }, { rank: 9, suit: \"clubs\" }, { rank: 3, suit: \"hearts\" }];", "console.log(hand.map((card) => card.rank));", "console.log(hand.filter((card) => card.suit === \"hearts\").length);"]
+        },
+        {
+          "titre": "Retourner un objet depuis une flèche",
+          "texte": "Pour fabriquer des cartes avec `map`, la flèche doit retourner un objet : on l'entoure de **parenthèses**.",
+          "code": ["const ranks = [2, 3];", "console.log(ranks.map((rank) => ({ rank, suit: \"hearts\" })));"],
+          "piege": "Sans parenthèses, `{` ouvre le corps de la fonction : erreur, ou undefined partout."
+        }
+      ],
+      "exercices": [
+        { "id": "u12-l2-e1", "type": "predire", "notions": ["tableau-objets"], "question": "Que va afficher ce code ?", "code": ["const hand = [{ rank: 5, suit: \"clubs\" }, { rank: 13, suit: \"hearts\" }];", "console.log(hand[1].suit);"], "explication": "Case n° 1 (la deuxième carte), propriété suit." },
+        { "id": "u12-l2-e2", "type": "predire", "notions": ["tableau-objets", "map"], "question": "Que va afficher ce code ?", "code": ["const hand = [{ rank: 5, suit: \"clubs\" }, { rank: 13, suit: \"hearts\" }];", "console.log(hand.map((card) => card.suit));"], "explication": "map transforme chaque carte en sa couleur." },
+        { "id": "u12-l2-e3", "type": "bug", "notions": ["tableau-objets"], "question": "Ce code affiche undefined. Quelle ligne corriger ?", "code": ["const hand = [{ rank: 5, suit: \"clubs\" }, { rank: 13, suit: \"hearts\" }];", "console.log(hand.rank);"], "ligne": 2, "choix": ["Il faut choisir une carte d'abord : `hand[0].rank`", "Il faut `hand[rank]`", "Il faut des guillemets : `hand.\"rank\"`", "Il faut `let hand`"], "bonne": 0, "explication": "Le tableau n'a pas de rang : ce sont ses cartes qui en ont." },
+        { "id": "u12-l2-e4", "type": "qcm", "notions": ["tableau-objets", "fleche-objet"], "question": "Quelle flèche fabrique une carte de cœur à partir d'un rang ?", "choix": ["(rank) => ({ rank, suit: \"hearts\" })", "(rank) => { rank, suit: \"hearts\" }", "(rank) => [rank, \"hearts\"]", "(rank) => { rank: rank, suit: hearts }"], "bonne": 0, "mono": true, "explication": "Les parenthèses autour de l'objet disent à JavaScript : « ceci est une valeur, pas le corps de la fonction »." },
+        {
+          "id": "u12-l2-e5", "type": "ecrire", "notions": ["tableau-objets", "filter"],
+          "question": "Écris `getHearts(hand)` qui retourne seulement les cartes de **cœur** (`suit` vaut `\"hearts\"`), sans modifier la main.",
+          "depart": ["function getHearts(hand) {", "  ", "}", "", "console.log(getHearts([{ rank: 14, suit: \"hearts\" }, { rank: 9, suit: \"clubs\" }]));"],
+          "tests": { "fonction": "getHearts", "cas": [
+            { "args": [[{ "rank": 14, "suit": "hearts" }, { "rank": 9, "suit": "clubs" }, { "rank": 3, "suit": "hearts" }]], "attendu": [{ "rank": 14, "suit": "hearts" }, { "rank": 3, "suit": "hearts" }] },
+            { "args": [[{ "rank": 2, "suit": "spades" }]], "attendu": [] },
+            { "titre": "main vide", "args": [[]], "attendu": [] }
+          ] },
+          "indices": ["Garder certains éléments : relis [[filter]].", { "code": "return hand.filter((card) => ___);" }],
+          "solution": ["function getHearts(hand) {", "  return hand.filter((card) => card.suit === \"hearts\");", "}", "", "console.log(getHearts([{ rank: 14, suit: \"hearts\" }, { rank: 9, suit: \"clubs\" }]));"],
+          "erreursTypiques": [
+            { "code": "function getHearts(hand) {\n  return hand.filter((card) => card === \"hearts\");\n}", "attendu": "echec" },
+            { "code": "function getHearts(hand) {\n  return hand.map((card) => card.suit === \"hearts\");\n}", "attendu": "echec", "diagnostic": "map-condition" }
+          ],
+          "explication": "On compare la **propriété** `card.suit`, pas la carte entière."
+        }
+      ]
+    },
+    {
+      "id": "u12-l3",
+      "titre": "Toutes les combinaisons : flatMap",
+      "duree": 7,
+      "notions": ["flatmap", "map"],
+      "cartes": [
+        {
+          "titre": "Un map dans un map",
+          "texte": "Pour chaque taille, on fabrique toutes les couleurs : un `map` dans un `map`. Résultat : une boîte **de boîtes**.",
+          "code": ["const sizes = [\"S\", \"L\"];", "const colors = [\"red\", \"blue\"];", "console.log(sizes.map((size) => colors.map((color) => size + \"-\" + color)));"],
+          "fiche": "flatmap"
+        },
+        {
+          "titre": "flatMap vide les petites boîtes",
+          "texte": "`flatMap` fait le même travail, puis sort les éléments des petites boîtes pour tout ranger dans **une seule** boîte.",
+          "code": ["const sizes = [\"S\", \"L\"];", "const colors = [\"red\", \"blue\"];", "console.log(sizes.flatMap((size) => colors.map((color) => size + \"-\" + color)));"],
+          "analogie": "Comme le spread : on sort les œufs des petites boîtes pour les mettre dans la grande."
+        },
+        {
+          "titre": "Combien d'éléments ?",
+          "texte": "2 tailles × 2 couleurs = 4 combinaisons. Pour le jeu de cartes : 4 couleurs × 13 rangs = **52** cartes.",
+          "code": ["const a = [1, 2, 3];", "const b = [\"x\", \"y\"];", "console.log(a.flatMap((n) => b.map((l) => l + n)).length);"]
+        }
+      ],
+      "exercices": [
+        { "id": "u12-l3-e1", "type": "predire", "notions": ["flatmap"], "question": "Que va afficher ce code ?", "code": ["const a = [1, 2];", "console.log(a.map((n) => [n, n * 10]));"], "explication": "map met une petite boîte dans chaque case." },
+        { "id": "u12-l3-e2", "type": "predire", "notions": ["flatmap"], "question": "Que va afficher ce code ?", "code": ["const a = [1, 2];", "console.log(a.flatMap((n) => [n, n * 10]));"], "explication": "flatMap vide les petites boîtes dans une seule." },
+        { "id": "u12-l3-e3", "type": "qcm", "notions": ["flatmap"], "question": "`SUITS.map((suit) => RANKS.map(…))` avec 4 couleurs et 13 rangs : quelle est la longueur du résultat ?", "choix": ["4", "13", "52", "17"], "bonne": 0, "explication": "4 boîtes de 13 cartes. Avec flatMap : 52." },
+        {
+          "id": "u12-l3-e4", "type": "trous", "notions": ["flatmap", "tableau-objets"],
+          "question": "Complète pour obtenir **une seule** liste de 6 t-shirts `{ size, color }`.",
+          "code": ["const sizes = [\"S\", \"M\", \"L\"];", "const colors = [\"red\", \"blue\"];", "const shirts = sizes.___((size) => colors.map((color) => (___)));", "console.log(shirts.length);"],
+          "tests": { "cas": [ { "sortie": ["6"] } ], "obligatoire": ["flatMap"] },
+          "indices": ["Une seule boîte : pas `map`, mais sa cousine qui vide les petites boîtes.", "L'objet raccourci : `{ size, color }`."],
+          "solution": ["flatMap", "{ size, color }"],
+          "erreursTypiques": [ { "trous": ["map", "{ size, color }"], "attendu": "echec" } ],
+          "explication": "3 tailles × 2 couleurs = 6. Les parenthèses autour de l'objet sont déjà là."
+        },
+        {
+          "id": "u12-l3-e5", "type": "ecrire", "notions": ["flatmap"],
+          "question": "Écris `buildLabels(letters, numbers)` qui retourne toutes les étiquettes « lettre + nombre », lettre par lettre : `buildLabels([\"A\", \"B\"], [1, 2])` donne `[\"A1\", \"A2\", \"B1\", \"B2\"]`.",
+          "depart": ["function buildLabels(letters, numbers) {", "  ", "}", "", "console.log(buildLabels([\"A\", \"B\"], [1, 2]));"],
+          "tests": { "fonction": "buildLabels", "cas": [
+            { "args": [["A", "B"], [1, 2]], "attendu": ["A1", "A2", "B1", "B2"] },
+            { "args": [["X"], [7, 8, 9]], "attendu": ["X7", "X8", "X9"] },
+            { "titre": "aucune lettre", "args": [[], [1, 2]], "attendu": [] }
+          ], "interdit": ["push"] },
+          "indices": ["Pour chaque lettre, toutes les étiquettes avec chaque nombre.", "Une seule boîte à la fin : [[flatmap]].", { "code": "return letters.flatMap((letter) => numbers.map((n) => ___));" }],
+          "solution": ["function buildLabels(letters, numbers) {", "  return letters.flatMap((letter) => numbers.map((n) => letter + n));", "}", "", "console.log(buildLabels([\"A\", \"B\"], [1, 2]));"],
+          "erreursTypiques": [
+            { "code": "function buildLabels(letters, numbers) {\n  return letters.map((letter) => numbers.map((n) => letter + n));\n}", "attendu": "echec", "diagnostic": "oublie-spread" },
+            { "code": "function buildLabels(letters, numbers) {\n  return numbers.flatMap((n) => letters.map((letter) => letter + n));\n}", "attendu": "echec" }
+          ],
+          "explication": "Le tableau de l'extérieur (`letters`) décide de l'ordre : toutes les étiquettes de A, puis toutes celles de B."
+        }
+      ]
+    },
+    {
+      "id": "u12-l4",
+      "titre": "Afficher une carte",
+      "duree": 7,
+      "notions": ["objet-dictionnaire", "couleurs-terminal"],
+      "cartes": [
+        {
+          "titre": "Une table de correspondance",
+          "texte": "Pour trouver le symbole d'une couleur, un objet sert de **dictionnaire** : la couleur est la clé, le symbole est la valeur.",
+          "code": ["const symbols = { hearts: \"♥\", spades: \"♠\", clubs: \"♣\", diamonds: \"♦\" };", "console.log(symbols.hearts);"],
+          "fiche": "objet-dictionnaire"
+        },
+        {
+          "titre": "Les crochets : la clé est dans une variable",
+          "texte": "`symbols[card.suit]` : JavaScript calcule d'abord `card.suit` (par exemple \"clubs\"), puis va chercher la propriété qui porte ce nom.",
+          "code": ["const symbols = { hearts: \"♥\", spades: \"♠\", clubs: \"♣\", diamonds: \"♦\" };", "const card = { rank: 9, suit: \"clubs\" };", "console.log(symbols[card.suit]);", "console.log(symbols.suit);"],
+          "piege": "`symbols.suit` cherche une propriété nommée **suit** : elle n'existe pas, undefined."
+        },
+        {
+          "titre": "De la couleur dans le terminal",
+          "texte": "Un code comme `'\\x1b[31;47m'` dit au terminal : « texte rouge sur fond blanc à partir d'ici ». `'\\x1b[0m'` remet la couleur normale.",
+          "code": ["const red = '\\x1b[31;47m';", "const black = '\\x1b[30;47m';", "const defaultColor = '\\x1b[0m';", "console.log(red + 'A♥' + defaultColor);", "console.log(black + 'A♠' + defaultColor);"],
+          "fiche": "couleurs-terminal"
+        },
+        {
+          "titre": "Toujours remettre la couleur",
+          "texte": "Sans le code de fin, la couleur déborde sur tout ce qui suit.",
+          "code": ["const red = '\\x1b[31;47m';", "console.log(red + 'K♦');", "console.log('ce texte est encore en rouge…');"],
+          "piege": "Le TP le demande : « rétablir la couleur normale après chaque carte »."
+        }
+      ],
+      "exercices": [
+        { "id": "u12-l4-e1", "type": "predire", "notions": ["objet-dictionnaire"], "question": "Que va afficher ce code ?", "code": ["const fr = { hearts: \"cœur\", spades: \"pique\" };", "const suit = \"spades\";", "console.log(fr[suit]);"], "explication": "La variable `suit` contient \"spades\" : on lit la propriété spades." },
+        { "id": "u12-l4-e2", "type": "predire", "notions": ["objet-dictionnaire"], "question": "Que va afficher ce code ?", "code": ["const fr = { hearts: \"cœur\", spades: \"pique\" };", "const suit = \"spades\";", "console.log(fr.suit);"], "explication": "Avec le point, on cherche une propriété nommée littéralement « suit » : elle n'existe pas." },
+        { "id": "u12-l4-e3", "type": "qcm", "notions": ["couleurs-terminal"], "question": "Dans `'\\x1b[31;47m'`, que veut dire **47** ?", "choix": ["fond blanc", "texte rouge", "remettre par défaut", "texte noir"], "bonne": 0, "explication": "31 : texte rouge ; 30 : texte noir ; 47 : fond blanc ; 0 : par défaut." },
+        { "id": "u12-l4-e4", "type": "bug", "notions": ["couleurs-terminal"], "question": "Après cette ligne, tout le reste du terminal s'affiche en rouge. Que manque-t-il ?", "code": ["const red = '\\x1b[31;47m';", "const defaultColor = '\\x1b[0m';", "console.log(red + 'Q♥');", "console.log('Fin de la partie');"], "ligne": 3, "choix": ["Le code de fin : `red + 'Q♥' + defaultColor`", "Des guillemets doubles", "Il faut `black` à la place de `red`", "Un point-virgule après `red`"], "bonne": 0, "explication": "On remet la couleur normale après chaque carte." },
+        {
+          "id": "u12-l4-e5", "type": "ecrire", "notions": ["objet-dictionnaire"],
+          "question": "Écris `translateSuit(suit)` qui retourne le nom français d'une couleur : hearts → \"cœur\", spades → \"pique\", clubs → \"trèfle\", diamonds → \"carreau\". Utilise un objet comme dictionnaire.",
+          "depart": ["function translateSuit(suit) {", "  ", "}", "", "console.log(translateSuit(\"clubs\"));"],
+          "tests": { "fonction": "translateSuit", "cas": [
+            { "args": ["hearts"], "attendu": "cœur" }, { "args": ["spades"], "attendu": "pique" }, { "args": ["clubs"], "attendu": "trèfle" }, { "args": ["diamonds"], "attendu": "carreau" }
+          ] },
+          "indices": ["Un objet : les clés sont les couleurs anglaises, les valeurs les noms français.", "La clé est dans la variable `suit` : [[objet-dictionnaire]].", { "code": "const names = { hearts: \"cœur\", ___ };\nreturn names[___];" }],
+          "solution": ["function translateSuit(suit) {", "  const names = { hearts: \"cœur\", spades: \"pique\", clubs: \"trèfle\", diamonds: \"carreau\" };", "  return names[suit];", "}", "", "console.log(translateSuit(\"clubs\"));"],
+          "erreursTypiques": [
+            { "code": "function translateSuit(suit) {\n  const names = { hearts: \"cœur\", spades: \"pique\", clubs: \"trèfle\", diamonds: \"carreau\" };\n  return names.suit;\n}", "attendu": "echec" }
+          ],
+          "explication": "`names[suit]` : les crochets lisent la propriété dont le nom est **dans** la variable."
+        }
+      ]
+    }
+  ],
+  "jeux": [
+    {
+      "id": "u12-croupier",
+      "titre": "Le croupier",
+      "description": "Des cartes, des objets, des boîtes : prédis ce que le croupier annonce.",
+      "tours": 8,
+      "questions": [
+        { "id": "u12-j1-1", "type": "predire", "notions": ["objet"], "question": "Que va afficher ce code ?", "code": ["const card = { rank: 11, suit: \"spades\" };", "console.log(card.suit);"], "explication": "La propriété suit." },
+        { "id": "u12-j1-2", "type": "predire", "notions": ["tableau-objets"], "question": "Que va afficher ce code ?", "code": ["const hand = [{ rank: 2, suit: \"clubs\" }, { rank: 8, suit: \"hearts\" }, { rank: 5, suit: \"clubs\" }];", "console.log(hand.filter((c) => c.suit === \"clubs\").length);"], "explication": "Deux trèfles." },
+        { "id": "u12-j1-3", "type": "predire", "notions": ["tableau-objets", "reduce"], "question": "Que va afficher ce code ?", "code": ["const hand = [{ rank: 2, suit: \"clubs\" }, { rank: 8, suit: \"hearts\" }];", "console.log(hand.reduce((total, c) => total + c.rank, 0));"], "explication": "2 + 8 : le porte-monnaie additionne les rangs." },
+        { "id": "u12-j1-4", "type": "predire", "notions": ["flatmap"], "question": "Que va afficher ce code ?", "code": ["console.log([\"a\", \"b\"].flatMap((l) => [l, l]));"], "explication": "Chaque lettre devient une petite boîte de deux, vidée dans la grande." },
+        { "id": "u12-j1-5", "type": "predire", "notions": ["objet-dictionnaire"], "question": "Que va afficher ce code ?", "code": ["const symbols = { hearts: \"♥\", clubs: \"♣\" };", "const card = { rank: 3, suit: \"clubs\" };", "console.log(card.rank + symbols[card.suit]);"], "explication": "3 + \"♣\" : un nombre plus un texte donne un texte collé." },
+        { "id": "u12-j1-6", "type": "predire", "notions": ["tableau-objets", "some"], "question": "Que va afficher ce code ?", "code": ["const ACE = 14;", "const hand = [{ rank: 9, suit: \"clubs\" }, { rank: ACE, suit: \"hearts\" }];", "console.log(hand.some((c) => c.rank === ACE));"], "explication": "Il y a un as dans la main." },
+        { "id": "u12-j1-7", "type": "predire", "notions": ["flatmap"], "question": "Que va afficher ce code ?", "code": ["const suits = [\"hearts\", \"spades\"];", "const ranks = [2, 3, 4];", "console.log(suits.flatMap((s) => ranks.map((r) => r + s[0])));"], "explication": "`s[0]` : la première lettre de la couleur. 2 couleurs × 3 rangs." },
+        { "id": "u12-j1-8", "type": "predire", "notions": ["objet"], "question": "Que va afficher ce code ?", "code": ["const rank = 13;", "const suit = \"diamonds\";", "const card = { rank, suit };", "console.log(card.rank > 10);"], "explication": "Le raccourci donne { rank: 13, suit: \"diamonds\" }." }
+      ]
+    }
+  ],
+  "quiz": {
+    "titre": "Quiz : objets et cartes",
+    "questions": [
+      { "id": "u12-q1", "type": "predire", "notions": ["objet"], "question": "Que va afficher ce code ?", "code": ["const ACE = 14;", "const card = { rank: ACE, suit: \"hearts\" };", "console.log(card.rank);"], "explication": "La constante ACE vaut 14." },
+      { "id": "u12-q2", "type": "qcm", "notions": ["objet"], "question": "Quelle écriture représente le roi de trèfle avec les constantes du TP ?", "choix": ["{ rank: KING, suit: \"clubs\" }", "{ rank: \"KING\", suit: \"clubs\" }", "{ KING, clubs }", "[KING, \"clubs\"]"], "bonne": 0, "mono": true, "explication": "Un objet avec deux propriétés nommées ; le rang est la constante (un nombre)." },
+      { "id": "u12-q3", "type": "predire", "notions": ["tableau-objets"], "question": "Que va afficher ce code ?", "code": ["const deck = [{ rank: 2, suit: \"hearts\" }, { rank: 3, suit: \"hearts\" }];", "console.log(deck[deck.length - 1].rank);"], "explication": "La dernière carte a le rang 3." },
+      { "id": "u12-q4", "type": "predire", "notions": ["flatmap"], "question": "Que va afficher ce code ?", "code": ["const a = [\"x\", \"y\"];", "const b = [1, 2, 3];", "console.log(a.map((l) => b.map((n) => l + n)).length);"], "explication": "map dans map : 2 boîtes de 3." },
+      { "id": "u12-q5", "type": "predire", "notions": ["flatmap"], "question": "Que va afficher ce code ?", "code": ["const a = [\"x\", \"y\"];", "const b = [1, 2, 3];", "console.log(a.flatMap((l) => b.map((n) => l + n)).length);"], "explication": "flatMap : 2 × 3 = 6 éléments dans une seule boîte." },
+      { "id": "u12-q6", "type": "bug", "notions": ["tableau-objets", "fleche-objet"], "question": "Ce code affiche des undefined. Quelle ligne corriger ?", "code": ["const ranks = [2, 3, 4];", "const hearts = ranks.map((rank) => { rank, suit: \"hearts\" });", "console.log(hearts);"], "ligne": 2, "choix": ["Il faut des parenthèses autour de l'objet : `(rank) => ({ rank, suit: \"hearts\" })`", "Il faut flatMap", "`rank` doit être entre guillemets", "Il faut `forEach`"], "bonne": 0, "explication": "Sans parenthèses, l'accolade ouvre le corps de la fonction." },
+      { "id": "u12-q7", "type": "predire", "notions": ["objet-dictionnaire"], "question": "Que va afficher ce code ?", "code": ["const labels = { 11: \"J\", 12: \"Q\", 13: \"K\", 14: \"A\" };", "console.log(labels[13]);"], "explication": "Les clés peuvent être des nombres : labels[13] vaut \"K\"." },
+      { "id": "u12-q8", "type": "predire", "notions": ["objet-dictionnaire"], "question": "Que va afficher ce code ?", "code": ["const labels = { 11: \"J\", 12: \"Q\", 13: \"K\", 14: \"A\" };", "console.log(labels[7] ?? String(7));"], "explication": "Pas de clé 7 : undefined, donc `??` donne la valeur de secours \"7\"." },
+      { "id": "u12-q9", "type": "qcm", "notions": ["couleurs-terminal"], "question": "Quel code remet la couleur normale du terminal ?", "choix": ["'\\x1b[0m'", "'\\x1b[31;47m'", "'\\x1b[30;47m'", "'\\x1b[47m'"], "bonne": 0, "mono": true, "explication": "0 : tout remettre par défaut." },
+      { "id": "u12-q10", "type": "qcm", "notions": ["couleurs-terminal"], "question": "Quelles couleurs doivent apparaître en **rouge** selon le TP ?", "choix": ["cœurs et carreaux", "piques et trèfles", "cœurs et piques", "toutes"], "bonne": 0, "explication": "♥ et ♦ en rouge, ♠ et ♣ en noir, toujours sur fond blanc." },
+      { "id": "u12-q11", "type": "vf", "notions": ["tableau-objets"], "question": "`deck.suit` donne la couleur de la première carte du paquet.", "bonne": false, "explication": "`deck` est le tableau : il faut d'abord choisir une carte, `deck[0].suit`." },
+      { "id": "u12-q12", "type": "predire", "notions": ["tableau-objets", "comparateur"], "question": "Que va afficher ce code ?", "code": ["const a = { rank: 12, suit: \"hearts\" };", "const b = { rank: 9, suit: \"spades\" };", "console.log(a.rank - b.rank);"], "explication": "12 - 9 = 3 : positif, la première carte est plus forte." },
+      { "id": "u12-q13", "type": "predire", "notions": ["tableau-objets", "every"], "question": "Que va afficher ce code ?", "code": ["const hand = [{ rank: 9, suit: \"hearts\" }, { rank: 4, suit: \"hearts\" }];", "console.log(hand.every((c) => c.suit === hand[0].suit));"], "explication": "Révision de every : toutes les cartes ont la même couleur que la première (une « couleur » au poker)." },
+      { "id": "u12-q14", "type": "assoc", "notions": ["objet", "tableau-objets"], "mono": true, "question": "Associe chaque expression à ce qu'elle désigne (avec `deck` un tableau de cartes).", "paires": [["deck", "le paquet (un tableau)"], ["deck[0]", "la première carte (un objet)"], ["deck[0].rank", "le rang de la première carte"], ["deck.length", "le nombre de cartes"]], "explication": "D'abord la case (le numéro), puis la propriété (le nom)." }
+    ]
+  },
+  "boss": [
+    {
+      "id": "u12-b1",
+      "titre": "La structure d'une carte",
+      "source": "TP Tableaux · jeu de cartes, exercice 1",
+      "notions": ["objet", "tableau-objets"],
+      "enonce": "**Proposer une structure d'objet pour représenter une carte** (son rang numérique et sa couleur), ainsi qu'une structure pour représenter le paquet entier.\n\nÉcris une fonction `createCard(rank, suit)` qui retourne une carte. Par exemple `createCard(ACE, \"spades\")` représente l'as de pique. Le paquet, lui, sera un **tableau** de ces cartes.",
+      "regles": ["Le rang reste un nombre (2 à 14) : c'est lui qui permettra de comparer les cartes.", "La couleur est l'un des textes de SUITS."],
+      "prelude": ["const JACK = 11;", "const QUEEN = 12;", "const KING = 13;", "const ACE = 14;", "", "const RANKS = [2, 3, 4, 5, 6, 7, 8, 9, 10, JACK, QUEEN, KING, ACE];", "const SUITS = ['hearts', 'spades', 'clubs', 'diamonds'];"],
+      "depart": ["function createCard(rank, suit) {", "  ", "}", "", "const aceOfSpades = createCard(ACE, 'spades');", "console.log(aceOfSpades);", "const smallHand = [aceOfSpades, createCard(2, 'hearts')];", "console.log(smallHand);"],
+      "tests": { "fonction": "createCard", "cas": [
+        { "titre": "As de pique", "args": [14, "spades"], "attendu": { "rank": 14, "suit": "spades" } },
+        { "titre": "Dame de cœur", "args": [12, "hearts"], "attendu": { "rank": 12, "suit": "hearts" } },
+        { "titre": "2 de carreau", "args": [2, "diamonds"], "attendu": { "rank": 2, "suit": "diamonds" }, "siEchec": "Les noms des propriétés sont ceux du TP : `rank` et `suit`." }
+      ] },
+      "indices": ["Deux informations nommées : un objet. Relis [[objet]].", "Les propriétés s'appellent `rank` et `suit`, comme les paramètres : le raccourci marche.", { "code": "return { ___, ___ };" }],
+      "solution": ["function createCard(rank, suit) {", "  return { rank, suit };", "}", "", "const aceOfSpades = createCard(ACE, 'spades');", "console.log(aceOfSpades);", "const smallHand = [aceOfSpades, createCard(2, 'hearts')];", "console.log(smallHand);"],
+      "erreursTypiques": [
+        { "code": "function createCard(rank, suit) {\n  return [rank, suit];\n}", "attendu": "echec" },
+        { "code": "function createCard(rank, suit) {\n  return { value: rank, color: suit };\n}", "attendu": "echec" },
+        { "code": "function createCard(rank, suit) {\n  return { rank: \"rank\", suit: \"suit\" };\n}", "attendu": "echec" },
+        { "code": "function createCard(rank, suit) {\n  console.log({ rank, suit });\n}", "attendu": "echec", "diagnostic": "return-vs-log" }
+      ],
+      "explication": "Exercice 1 du jeu de cartes. Une carte : `{ rank, suit }` (rank numérique de 2 à 14). Le paquet : un tableau de cartes, `[{ rank: 2, suit: 'hearts' }, …]`. Un tableau `[14, 'spades']` marcherait aussi, mais `card.rank` se lit bien mieux que `card[0]`."
+    },
+    {
+      "id": "u12-b2",
+      "titre": "Le paquet de 52 cartes",
+      "source": "TP Tableaux · jeu de cartes, exercice 2",
+      "notions": ["flatmap", "tableau-objets", "fleche-objet"],
+      "enonce": "Écrire une fonction `buildBaseDeck` qui **construit et retourne un paquet de 52 cartes classiques** à partir de `RANKS` et `SUITS`.\n\nChaque carte est un objet `{ rank, suit }` : 13 rangs pour chacune des 4 couleurs.",
+      "regles": ["RANKS et SUITS ne doivent pas être modifiés.", "Le paquet est un seul tableau de 52 cartes (pas 4 tableaux de 13)."],
+      "prelude": ["const JACK = 11;", "const QUEEN = 12;", "const KING = 13;", "const ACE = 14;", "", "const RANKS = [2, 3, 4, 5, 6, 7, 8, 9, 10, JACK, QUEEN, KING, ACE];", "const SUITS = ['hearts', 'spades', 'clubs', 'diamonds'];"],
+      "depart": ["function buildBaseDeck() {", "  ", "}", "", "const deck = buildBaseDeck();", "console.log(deck.length);", "console.log(deck[0]);", "console.log(deck[51]);"],
+      "tests": { "fonction": "buildBaseDeck", "cas": [
+        { "titre": "Un tableau de 52 cartes", "args": [], "verifie": "Array.isArray(r) && r.length === 52", "messageVerifie": "Le paquet doit être UN tableau de 52 cartes", "siEchec": "4 boîtes de 13 cartes ? `map` dans `map` donne des boîtes dans la boîte : relis [[flatmap]]." },
+        { "titre": "Chaque carte est un objet { rank, suit }", "args": [], "verifie": "Array.isArray(r) && r.length > 0 && r.every((c) => c !== null && typeof c === 'object' && !Array.isArray(c) && typeof c.rank === 'number' && typeof c.suit === 'string')", "messageVerifie": "Chaque carte doit être un objet { rank, suit } : rank est un nombre (2 à 14), suit un texte" },
+        { "titre": "52 cartes toutes différentes", "args": [], "verifie": "Array.isArray(r) && new Set(r.map((c) => c && c.rank + '-' + c.suit)).size === 52 && r.every((c) => c && c.rank >= 2 && c.rank <= 14 && ['hearts', 'spades', 'clubs', 'diamonds'].includes(c.suit))", "messageVerifie": "Il faut chaque rang de RANKS avec chaque couleur de SUITS, sans doublon" }
+      ] },
+      "indices": ["Toutes les combinaisons de deux listes : relis [[flatmap]].", "Pour chaque couleur, on fabrique les 13 cartes de cette couleur avec `RANKS.map(…)`. Attention aux parenthèses autour de l'objet retourné par la flèche.", { "code": "return SUITS.flatMap((suit) => RANKS.map((rank) => (___)));" }],
+      "solution": ["function buildBaseDeck() {", "  return SUITS.flatMap((suit) => RANKS.map((rank) => ({ rank, suit })));", "}", "", "const deck = buildBaseDeck();", "console.log(deck.length);", "console.log(deck[0]);", "console.log(deck[51]);"],
+      "erreursTypiques": [
+        { "code": "function buildBaseDeck() {\n  return SUITS.map((suit) => RANKS.map((rank) => ({ rank, suit })));\n}", "attendu": "echec" },
+        { "code": "function buildBaseDeck() {\n  return SUITS.flatMap((suit) => RANKS.map((rank) => { rank, suit }));\n}", "attendu": "echec" },
+        { "code": "function buildBaseDeck() {\n  return SUITS.map((suit) => ({ rank: RANKS, suit }));\n}", "attendu": "echec" },
+        { "code": "function buildBaseDeck() {\n  return RANKS.flatMap((rank) => SUITS.map((suit) => ({ rank: String(rank), suit })));\n}", "attendu": "echec" }
+      ],
+      "explication": "Exercice 2 du jeu de cartes. Une version avec deux boucles `for…of` qui remplissent un tableau local marche aussi ; `flatMap` + `map` est la version « nouveau tableau » du cours. L'ordre des cartes n'a pas d'importance : on va les mélanger."
+    },
+    {
+      "id": "u12-b3",
+      "titre": "Comparer deux cartes",
+      "source": "TP Tableaux · jeu de cartes, exercice 5",
+      "notions": ["comparateur", "objet"],
+      "enonce": "Écrire une fonction `compareRank` qui reçoit deux cartes et **compare uniquement leurs rangs numériques**. Elle retourne un nombre **négatif** si la première est plus faible, **zéro** si les deux rangs sont égaux, ou un nombre **positif** si la première est plus forte.",
+      "regles": ["Les cartes reçues ne doivent pas être modifiées.", "La couleur ne compte pas : seul le rang."],
+      "prelude": ["const JACK = 11;", "const QUEEN = 12;", "const KING = 13;", "const ACE = 14;"],
+      "depart": ["function compareRank(cardA, cardB) {", "  ", "}", "", "const a = { rank: ACE, suit: 'hearts' };", "const b = { rank: 9, suit: 'spades' };", "const result = compareRank(a, b);", "if (result > 0) {", "  console.log('La première carte est la plus forte');", "} else if (result < 0) {", "  console.log('La deuxième carte est la plus forte');", "} else {", "  console.log('Égalité');", "}"],
+      "tests": { "fonction": "compareRank", "cas": [
+        { "titre": "Première plus faible", "args": [{ "rank": 2, "suit": "hearts" }, { "rank": 14, "suit": "spades" }], "verifie": "typeof r === 'number' && r < 0", "messageVerifie": "2 contre l'as : il faut un nombre négatif" },
+        { "titre": "Première plus forte", "args": [{ "rank": 13, "suit": "clubs" }, { "rank": 11, "suit": "clubs" }], "verifie": "typeof r === 'number' && r > 0", "messageVerifie": "Roi contre valet : il faut un nombre positif" },
+        { "titre": "Même rang, couleurs différentes", "args": [{ "rank": 7, "suit": "hearts" }, { "rank": 7, "suit": "diamonds" }], "verifie": "r === 0", "messageVerifie": "Deux 7 : il faut 0 (la couleur ne compte pas)" }
+      ] },
+      "indices": ["C'est un **comparateur**, comme ceux de toSorted : relis [[comparateur]].", "On compare les **propriétés** rank, pas les cartes entières (une carte ne se soustrait pas).", { "code": "return cardA.___ - cardB.___;" }],
+      "solution": ["function compareRank(cardA, cardB) {", "  return cardA.rank - cardB.rank;", "}", "", "const a = { rank: ACE, suit: 'hearts' };", "const b = { rank: 9, suit: 'spades' };", "const result = compareRank(a, b);", "if (result > 0) {", "  console.log('La première carte est la plus forte');", "} else if (result < 0) {", "  console.log('La deuxième carte est la plus forte');", "} else {", "  console.log('Égalité');", "}"],
+      "erreursTypiques": [
+        { "code": "function compareRank(cardA, cardB) {\n  return cardA.rank > cardB.rank;\n}", "attendu": "echec" },
+        { "code": "function compareRank(cardA, cardB) {\n  return cardA - cardB;\n}", "attendu": "echec" },
+        { "code": "function compareRank(cardA, cardB) {\n  return cardB.rank - cardA.rank;\n}", "attendu": "echec" }
+      ],
+      "explication": "Exercice 5 du jeu de cartes. `cardA.rank - cardB.rank` donne directement le signe demandé ; c'est aussi un comparateur tout prêt pour `toSorted` : `hand.toSorted(compareRank)`. Le TP demande ensuite de tirer deux cartes pour annoncer la plus forte : tu le feras dans l'unité suivante, avec drawCards."
+    },
+    {
+      "id": "u12-b4",
+      "titre": "La carte la plus forte",
+      "source": "TP Tableaux · jeu de cartes, exercice 6",
+      "notions": ["reduce-max", "tableau-objets", "comparateur"],
+      "enonce": "Écrire une fonction `getHighestCard(hand)` qui parcourt une main et **retourne la carte de plus forte valeur**. Si plusieurs cartes ont ce rang, **la première** sera retournée.",
+      "regles": ["La main reçue ne doit pas être modifiée.", "On retourne la **carte** entière (l'objet), pas seulement son rang."],
+      "prelude": ["const JACK = 11;", "const QUEEN = 12;", "const KING = 13;", "const ACE = 14;"],
+      "depart": ["function getHighestCard(hand) {", "  ", "}", "", "const hand = [", "  { rank: 9, suit: 'clubs' },", "  { rank: KING, suit: 'hearts' },", "  { rank: 4, suit: 'spades' },", "  { rank: KING, suit: 'diamonds' },", "  { rank: JACK, suit: 'hearts' },", "];", "console.log(getHighestCard(hand));"],
+      "tests": { "fonction": "getHighestCard", "cas": [
+        { "titre": "Une main de cinq cartes", "args": [[{ "rank": 9, "suit": "clubs" }, { "rank": 14, "suit": "hearts" }, { "rank": 4, "suit": "spades" }, { "rank": 12, "suit": "diamonds" }, { "rank": 11, "suit": "hearts" }]], "attendu": { "rank": 14, "suit": "hearts" } },
+        { "titre": "La plus forte au début", "args": [[{ "rank": 13, "suit": "spades" }, { "rank": 2, "suit": "hearts" }, { "rank": 5, "suit": "clubs" }]], "attendu": { "rank": 13, "suit": "spades" } },
+        { "titre": "La plus forte à la fin", "args": [[{ "rank": 3, "suit": "spades" }, { "rank": 2, "suit": "hearts" }, { "rank": 10, "suit": "clubs" }]], "attendu": { "rank": 10, "suit": "clubs" } },
+        { "titre": "Égalité : la première", "args": [[{ "rank": 9, "suit": "clubs" }, { "rank": 13, "suit": "hearts" }, { "rank": 4, "suit": "spades" }, { "rank": 13, "suit": "diamonds" }]], "attendu": { "rank": 13, "suit": "hearts" }, "siEchec": "Deux rois : il faut garder le **premier** (le roi de cœur). On ne remplace la meilleure carte que si la nouvelle est **strictement** plus forte : `>` et pas `>=`." },
+        { "titre": "Une seule carte", "args": [[{ "rank": 6, "suit": "diamonds" }]], "attendu": { "rank": 6, "suit": "diamonds" } }
+      ], "interdit": ["sort"] },
+      "indices": ["C'est un maximum, comme getLargest (relis [[reduce-max]]), mais on compare les **rangs** et on garde la **carte**.", "En cas d'égalité, la carte déjà gardée reste : remplace seulement si la nouvelle est strictement plus forte.", { "code": "return hand.reduce((best, card) => (card.rank ___ best.rank ? ___ : ___));" }],
+      "solution": ["function getHighestCard(hand) {", "  return hand.reduce((best, card) => (card.rank > best.rank ? card : best));", "}", "", "const hand = [", "  { rank: 9, suit: 'clubs' },", "  { rank: KING, suit: 'hearts' },", "  { rank: 4, suit: 'spades' },", "  { rank: KING, suit: 'diamonds' },", "  { rank: JACK, suit: 'hearts' },", "];", "console.log(getHighestCard(hand));"],
+      "erreursTypiques": [
+        { "code": "function getHighestCard(hand) {\n  return hand.reduce((best, card) => (card.rank >= best.rank ? card : best));\n}", "attendu": "echec", "diagnostic": "contenu" },
+        { "code": "function getHighestCard(hand) {\n  return Math.max(...hand.map((card) => card.rank));\n}", "attendu": "echec" },
+        { "code": "function getHighestCard(hand) {\n  return hand.toSorted((a, b) => a.rank - b.rank).at(-1);\n}", "attendu": "echec" },
+        { "code": "function getHighestCard(hand) {\n  return hand.reduce((best, card) => (card > best ? card : best));\n}", "attendu": "echec" }
+      ],
+      "explication": "Exercice 6 du jeu de cartes. Sans valeur de départ, reduce commence avec la première carte dans le porte-monnaie. Avec ta fonction `compareRank`, la condition devient `compareRank(card, best) > 0`. Le TP tire la main avec drawCards : ce sera pour l'unité suivante."
+    },
+    {
+      "id": "u12-b5",
+      "titre": "Afficher le rang",
+      "source": "TP Tableaux · jeu de cartes, exercice 7 (1re partie)",
+      "notions": ["objet-dictionnaire", "types"],
+      "enonce": "Écrire une fonction `displayRank(rank)` qui **retourne les rangs de 2 à 10 sous forme de texte** et remplace 11, 12, 13 et 14 par **J, Q, K et A** respectivement.",
+      "regles": ["La fonction retourne toujours un **texte** : \"7\" et non 7."],
+      "prelude": ["const JACK = 11;", "const QUEEN = 12;", "const KING = 13;", "const ACE = 14;", "", "const RANKS = [2, 3, 4, 5, 6, 7, 8, 9, 10, JACK, QUEEN, KING, ACE];"],
+      "depart": ["function displayRank(rank) {", "  ", "}", "", "console.log(RANKS.map(displayRank));"],
+      "tests": { "fonction": "displayRank", "cas": [
+        { "titre": "2", "args": [2], "attendu": "2" },
+        { "titre": "10", "args": [10], "attendu": "10" },
+        { "titre": "Valet", "args": [11], "attendu": "J" },
+        { "titre": "Dame", "args": [12], "attendu": "Q" },
+        { "titre": "Roi", "args": [13], "attendu": "K" },
+        { "titre": "As", "args": [14], "attendu": "A", "siEchec": "L'as vaut 14 : il s'affiche « A »." }
+      ] },
+      "indices": ["Quatre cas spéciaux, et tous les autres deviennent du texte (`String(rank)`).", "Un objet peut servir de table de correspondance : [[objet-dictionnaire]]. Les clés peuvent être les constantes : `{ [JACK]: \"J\", … }` ou simplement `{ 11: \"J\", … }`.", { "code": "const labels = { 11: \"J\", 12: \"Q\", 13: \"K\", 14: \"A\" };\nreturn labels[rank] ?? ___;" }],
+      "solution": ["function displayRank(rank) {", "  const labels = { [JACK]: 'J', [QUEEN]: 'Q', [KING]: 'K', [ACE]: 'A' };", "  return labels[rank] ?? String(rank);", "}", "", "console.log(RANKS.map(displayRank));"],
+      "erreursTypiques": [
+        { "code": "function displayRank(rank) {\n  const labels = { 11: 'J', 12: 'Q', 13: 'K', 14: 'A' };\n  return labels[rank] ?? rank;\n}", "attendu": "echec", "diagnostic": "texte-vs-nombre" },
+        { "code": "function displayRank(rank) {\n  if (rank === JACK) return 'J';\n  if (rank === QUEEN) return 'Q';\n  if (rank === KING) return 'K';\n  return String(rank);\n}", "attendu": "echec", "diagnostic": "contenu" },
+        { "code": "function displayRank(rank) {\n  const labels = { 11: 'J', 12: 'Q', 13: 'K', 14: 'A' };\n  return labels.rank ?? String(rank);\n}", "attendu": "echec" }
+      ],
+      "explication": "Exercice 7 du jeu de cartes, première partie. Une suite de `if` marche aussi ; le dictionnaire évite de répéter quatre fois la même forme. `String(rank)` transforme le nombre en texte (comme `rank + \"\"` ou `` `${rank}` ``)."
+    },
+    {
+      "id": "u12-b6",
+      "titre": "Afficher une carte en couleur",
+      "source": "TP Tableaux · jeu de cartes, exercice 7 (2e partie)",
+      "notions": ["couleurs-terminal", "objet-dictionnaire", "console-log"],
+      "enonce": "Écrire une fonction `showCard(card)` qui **affiche une carte dans le terminal** avec son rang (grâce à `displayRank`) et le symbole Unicode de sa couleur (♥, ♠, ♣ ou ♦).\n\nLes **cœurs et carreaux** doivent apparaître en **rouge**, les **piques et trèfles** en **noir**, sur fond blanc, et la couleur normale est **rétablie après chaque carte**.\n\nExemple : l'as de cœur s'affiche `A♥`, en rouge sur blanc.",
+      "regles": ["showCard affiche (console.log) ; elle ne retourne rien.", "Une seule ligne par carte : couleur + rang + symbole + couleur normale."],
+      "prelude": ["const JACK = 11;", "const QUEEN = 12;", "const KING = 13;", "const ACE = 14;", "", "// displayRank (boss précédent)", "function displayRank(rank) {", "  const labels = { [JACK]: 'J', [QUEEN]: 'Q', [KING]: 'K', [ACE]: 'A' };", "  return labels[rank] ?? String(rank);", "}"],
+      "depart": ["const red = '\\x1b[31;47m';", "const black = '\\x1b[30;47m';", "const defaultColor = '\\x1b[0m';", "", "function showCard(card) {", "  ", "}", "", "showCard({ rank: ACE, suit: 'hearts' });", "showCard({ rank: 10, suit: 'spades' });", "showCard({ rank: QUEEN, suit: 'diamonds' });", "showCard({ rank: 2, suit: 'clubs' });"],
+      "tests": { "fonction": "showCard", "cas": [
+        { "titre": "As de cœur", "args": [{ "rank": 14, "suit": "hearts" }], "sortie": ["\u001b[31;47mA♥\u001b[0m"], "siEchec": "Cœur : `red`, puis le rang (`displayRank(card.rank)`), le symbole ♥, et `defaultColor` à la fin." },
+        { "titre": "10 de pique", "args": [{ "rank": 10, "suit": "spades" }], "sortie": ["\u001b[30;47m10♠\u001b[0m"], "siEchec": "Pique : en **noir** (`black`). Seuls les cœurs et les carreaux sont rouges." },
+        { "titre": "Valet de trèfle", "args": [{ "rank": 11, "suit": "clubs" }], "sortie": ["\u001b[30;47mJ♣\u001b[0m"] },
+        { "titre": "2 de carreau", "args": [{ "rank": 2, "suit": "diamonds" }], "sortie": ["\u001b[31;47m2♦\u001b[0m"], "siEchec": "Carreau : rouge, comme le cœur." }
+      ] },
+      "indices": ["Trois morceaux à coller : la couleur du terminal, le texte de la carte, puis `defaultColor`. Relis [[couleurs-terminal]].", "Le symbole : un dictionnaire `{ hearts: '♥', … }` lu avec `symbols[card.suit]` ([[objet-dictionnaire]]). La couleur : rouge si la couleur est hearts **ou** diamonds.", { "code": "const symbols = { hearts: '♥', spades: '♠', clubs: '♣', diamonds: '♦' };\nconst color = card.suit === 'hearts' || card.suit === 'diamonds' ? ___ : ___;\nconsole.log(color + ___ + ___ + defaultColor);" }],
+      "solution": ["const red = '\\x1b[31;47m';", "const black = '\\x1b[30;47m';", "const defaultColor = '\\x1b[0m';", "", "function showCard(card) {", "  const symbols = { hearts: '♥', spades: '♠', clubs: '♣', diamonds: '♦' };", "  const isRed = card.suit === 'hearts' || card.suit === 'diamonds';", "  const color = isRed ? red : black;", "  console.log(color + displayRank(card.rank) + symbols[card.suit] + defaultColor);", "}", "", "showCard({ rank: ACE, suit: 'hearts' });", "showCard({ rank: 10, suit: 'spades' });", "showCard({ rank: QUEEN, suit: 'diamonds' });", "showCard({ rank: 2, suit: 'clubs' });"],
+      "erreursTypiques": [
+        { "code": "const red = '\\x1b[31;47m';\nconst black = '\\x1b[30;47m';\nconst defaultColor = '\\x1b[0m';\n\nfunction showCard(card) {\n  const symbols = { hearts: '♥', spades: '♠', clubs: '♣', diamonds: '♦' };\n  const color = card.suit === 'hearts' || card.suit === 'diamonds' ? red : black;\n  console.log(color + displayRank(card.rank) + symbols[card.suit]);\n}", "attendu": "echec" },
+        { "code": "const red = '\\x1b[31;47m';\nconst black = '\\x1b[30;47m';\nconst defaultColor = '\\x1b[0m';\n\nfunction showCard(card) {\n  const symbols = { hearts: '♥', spades: '♠', clubs: '♣', diamonds: '♦' };\n  console.log(red + displayRank(card.rank) + symbols[card.suit] + defaultColor);\n}", "attendu": "echec" },
+        { "code": "const red = '\\x1b[31;47m';\nconst black = '\\x1b[30;47m';\nconst defaultColor = '\\x1b[0m';\n\nfunction showCard(card) {\n  const symbols = { hearts: '♥', spades: '♠', clubs: '♣', diamonds: '♦' };\n  const color = card.suit === 'hearts' || card.suit === 'diamonds' ? red : black;\n  console.log(color + card.rank + symbols[card.suit] + defaultColor);\n}", "attendu": "echec" },
+        { "code": "const red = '\\x1b[31;47m';\nconst black = '\\x1b[30;47m';\nconst defaultColor = '\\x1b[0m';\n\nfunction showCard(card) {\n  const symbols = { hearts: '♥', spades: '♠', clubs: '♣', diamonds: '♦' };\n  const color = card.suit === 'hearts' || card.suit === 'diamonds' ? red : black;\n  return color + displayRank(card.rank) + symbols[card.suit] + defaultColor;\n}", "attendu": "echec", "diagnostic": "log-vs-return" }
+      ],
+      "explication": "Exercice 7 du jeu de cartes, deuxième partie. Dans le vrai terminal de Node.js, ces codes colorent la carte exactement comme dans la console de ProgWeb 2. Afficher la main entière : `hand.forEach(showCard)` (unité suivante)."
+    }
+  ]
+}

@@ -11,19 +11,11 @@
     "content/unites/u08-tester.json",
     "content/unites/u09-extraire.json",
     "content/unites/u10-trier.json",
-    "content/unites/u11-chaines.json"
+    "content/unites/u11-chaines.json",
+    "content/unites/u12-cartes.json",
+    "content/unites/u13-melanger.json"
   ],
   "aVenir": [
-    {
-      "titre": "Objets : le jeu de cartes",
-      "resume": "TP Tableaux : carte, paquet, buildBaseDeck, compareRank, getHighestCard, displayRank, showCard",
-      "icone": "♠"
-    },
-    {
-      "titre": "Mélanger et tirer",
-      "resume": "TP Tableaux : shuffleInPlace (Fisher–Yates), drawCards",
-      "icone": "🔀"
-    },
     {
       "titre": "DOM : sélectionner",
       "resume": "TP DOM : querySelector, querySelectorAll, sélecteurs CSS (id, classe, OU, attribut, :not), classList",

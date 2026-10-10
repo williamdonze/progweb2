@@ -18,7 +18,7 @@ TYPES = {
     "bug": ["question", "code", "ligne", "choix", "bonne"], "predire": ["question", "code"], "reduce-pas": ["question", "tableau", "fonction"],
     "filtre-visuel": ["question", "tableau", "condition"], "map-visuel": ["question", "tableau", "fonction"],
     "objet": ["question", "cles", "etiquettes", "bonnes"], "fisher-yates": ["question", "tableau", "tirages"],
-    "types-chaine": ["question", "depart", "maillons"],
+    "types-chaine": ["question", "depart", "maillons"], "selecteur": ["question", "dom", "attendu"],
     "trous": ["question", "code", "tests", "solution"], "corriger": ["question", "depart", "tests", "solution"],
     "ecrire": ["question", "tests", "solution"], "boss": ["titre", "enonce", "tests", "solution", "indices"],
 }
