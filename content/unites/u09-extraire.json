@@ -1,0 +1,1982 @@
+{
+  "id": "u09",
+  "titre": "Extraire et assembler",
+  "sousTitre": "TP Tableaux · nombres 4, 5, 10 · chaînes 3, 4, 5",
+  "objectif": "Couper un tableau avec slice, sortir les œufs avec le spread ..., remplacer une case avec with, sans jamais toucher l'original.",
+  "icone": "...",
+  "fiches": [
+    {
+      "id": "slice",
+      "titre": "slice : couper sans abîmer",
+      "icone": "✂",
+      "resume": "`tab.slice(debut, fin)` retourne une **copie** d'un morceau : de `debut` (compris) à `fin` (**non** compris). L'original ne bouge pas.",
+      "analogie": "On **photocopie** une partie de la boîte : de la case `debut` jusqu'à la case juste **avant** `fin`. La boîte d'origine reste intacte.",
+      "texte": "- `tab.slice(1)` : tout sauf le premier (de l'indice 1 jusqu'au bout).\n- `tab.slice(0, 3)` : les indices 0, 1, 2 (le 3 est exclu).\n- `tab.slice(0, -1)` : tout sauf le dernier (-1 = le dernier, exclu).\n- `tab.slice(-2)` : les deux derniers.\n- `tab.slice()` : une copie complète.\n\nLe nombre d'éléments obtenus est `fin - debut`.\n\nNe pas confondre avec `splice` (avec un p), qui **modifie** l'original : interdit sur les données du cours.",
+      "exemples": [
+        {
+          "code": [
+            "const numbers = Object.freeze([3, 14, 15, 92, 65]);",
+            "console.log(numbers.slice(1));",
+            "console.log(numbers.slice(0, -1));",
+            "console.log(numbers.slice(1, 3));",
+            "console.log(numbers);"
+          ]
+        }
+      ],
+      "pieges": [
+        "Croire que `fin` est compris : `slice(1, 3)` donne 2 éléments, pas 3.",
+        "`splice` au lieu de `slice` : il modifie l'original."
+      ]
+    },
+    {
+      "id": "spread",
+      "titre": "Le spread ... : sortir les œufs de la boîte",
+      "icone": "...",
+      "resume": "`[...tab]` sort les éléments de `tab` pour les mettre dans une **nouvelle** boîte. `[...a, ...b, x]` assemble.",
+      "analogie": "Les trois points **sortent les œufs de la boîte**. `[tab, x]` met la boîte entière dans une nouvelle boîte (un tableau dans un tableau) ; `[...tab, x]` y met les œufs, un par un.",
+      "texte": "- `[...tab]` : une copie (nouvelle boîte, mêmes œufs).\n- `[x, ...tab]` : x au début ; `[...tab, x]` : x à la fin.\n- `[...a, ...b]` : a puis b, à la suite.\n- `Math.max(...numbers)` : les nombres donnés un par un à `Math.max`.\n- `[...document.querySelectorAll(\"…\")]` : une collection du DOM convertie en vrai tableau (TP DOM).\n\nC'est le même symbole que le paramètre du reste (unité 4), dans l'autre sens : le reste **range** des valeurs dans une boîte, le spread les **sort**.",
+      "exemples": [
+        {
+          "code": [
+            "const fruits = [\"pomme\", \"kiwi\"];",
+            "console.log([fruits, \"mangue\"]);",
+            "console.log([...fruits, \"mangue\"]);",
+            "console.log([\"poire\", ...fruits]);",
+            "console.log(Math.max(...[3, 92, 14]));"
+          ]
+        }
+      ],
+      "pieges": [
+        "Oublier les `...` : on obtient un tableau dans le tableau.",
+        "`const copie = tab` ne copie rien (deux étiquettes sur la même boîte) : `[...tab]` en fabrique une nouvelle."
+      ]
+    },
+    {
+      "id": "with",
+      "titre": "with : remplacer une case",
+      "icone": "with",
+      "resume": "`tab.with(i, valeur)` retourne une **copie** où la case `i` est remplacée. L'original ne bouge pas.",
+      "texte": "`tab[i] = valeur` **modifie** le tableau (impossible s'il est gelé). `tab.with(i, valeur)` fabrique une nouvelle boîte avec un œuf échangé.\n\n- Indices négatifs acceptés : `tab.with(-1, x)` remplace le dernier.\n- Un indice hors du tableau provoque une erreur (`RangeError`).\n\nSans `with`, on peut assembler : `[...tab.slice(0, i), valeur, ...tab.slice(i + 1)]`.",
+      "exemples": [
+        {
+          "code": [
+            "const strings = Object.freeze([\"Sator\", \"Arepo\", \"Tenet\", \"Opera\", \"Rotas\"]);",
+            "console.log(strings.with(2, \"radar\"));",
+            "console.log(strings);"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ordre-relatif",
+      "titre": "Regrouper en gardant l'ordre",
+      "icone": "⇉",
+      "resume": "Les pairs puis les impairs, dans leur ordre d'origine : `[...tab.filter(pair), ...tab.filter(impair)]`.",
+      "texte": "« En conservant leur ordre relatif dans chaque groupe » : dans le groupe des pairs, 14 reste avant 92 s'il était avant dans le tableau d'origine.\n\n`filter` garde justement l'ordre d'origine. On filtre deux fois, puis on assemble avec le spread :\n\n```\nconst pairs = numbers.filter((n) => n % 2 === 0);\nconst impairs = numbers.filter((n) => n % 2 !== 0);\nconst resultat = [...pairs, ...impairs];\n```\n\nUn tri (`toSorted`) mélangerait l'ordre : ce n'est pas ce qui est demandé.",
+      "exemples": [
+        {
+          "code": [
+            "const numbers = [3, 14, 15, 92];",
+            "const pairs = numbers.filter((n) => n % 2 === 0);",
+            "const impairs = numbers.filter((n) => n % 2 !== 0);",
+            "console.log([...pairs, ...impairs]);"
+          ]
+        }
+      ]
+    }
+  ],
+  "lecons": [
+    {
+      "id": "u09-l1",
+      "titre": "slice : couper sans abîmer",
+      "duree": 6,
+      "notions": [
+        "slice",
+        "indice"
+      ],
+      "cartes": [
+        {
+          "titre": "Une photocopie d'un morceau",
+          "illu": "boite",
+          "tableau": [
+            3,
+            14,
+            15,
+            92,
+            65
+          ],
+          "nom": "numbers",
+          "texte": "`slice(debut, fin)` copie les cases de `debut` **jusqu'à fin, non compris**, dans une nouvelle boîte.",
+          "code": [
+            "const numbers = [3, 14, 15, 92, 65];",
+            "console.log(numbers.slice(1, 3));"
+          ],
+          "analogie": "On photocopie une partie de la boîte, en s'arrêtant **juste avant** la case `fin`.",
+          "fiche": "slice"
+        },
+        {
+          "titre": "Sans le premier",
+          "texte": "Avec un seul argument, `slice` va jusqu'au bout. `slice(1)` : tout sauf le premier (exercice 4 du TP).",
+          "code": [
+            "const numbers = Object.freeze([3, 14, 15, 92]);",
+            "console.log(numbers.slice(1));",
+            "console.log(numbers);"
+          ]
+        },
+        {
+          "titre": "Sans le dernier : -1",
+          "texte": "Les indices négatifs comptent depuis la fin (-1 = le dernier). `slice(0, -1)` s'arrête **avant** le dernier (exercice 5).",
+          "code": [
+            "const numbers = [3, 14, 15, 92];",
+            "console.log(numbers.slice(0, -1));",
+            "console.log(numbers.slice(-2));"
+          ],
+          "illu": "boite",
+          "tableau": [
+            3,
+            14,
+            15,
+            92
+          ],
+          "nom": "numbers",
+          "negatifs": true
+        },
+        {
+          "titre": "slice ≠ splice",
+          "texte": "`splice` (avec un p) **retire** des éléments de l'original : mutante, interdite sur les données gelées. `slice` ne touche à rien.",
+          "piege": "Une lettre de différence, un monde de différence."
+        }
+      ],
+      "exercices": [
+        {
+          "id": "u09-l1-e1",
+          "type": "pointer-tableau",
+          "notions": [
+            "slice"
+          ],
+          "question": "Touche les cases que garde `numbers.slice(1, 3)`.",
+          "tableau": [
+            3,
+            14,
+            15,
+            92,
+            65
+          ],
+          "nom": "numbers",
+          "bonnes": [
+            1,
+            2
+          ],
+          "explication": "De l'indice 1 (compris) à 3 (exclu) : indices 1 et 2."
+        },
+        {
+          "id": "u09-l1-e2",
+          "type": "pointer-tableau",
+          "notions": [
+            "slice"
+          ],
+          "question": "Touche les cases que garde `numbers.slice(-2)`.",
+          "tableau": [
+            3,
+            14,
+            15,
+            92,
+            65
+          ],
+          "nom": "numbers",
+          "negatifs": true,
+          "bonnes": [
+            3,
+            4
+          ],
+          "explication": "À partir de -2 jusqu'au bout : les deux derniers."
+        },
+        {
+          "id": "u09-l1-e3",
+          "type": "pointer-tableau",
+          "notions": [
+            "slice"
+          ],
+          "question": "Touche les cases que garde `strings.slice(0, -1)`.",
+          "tableau": [
+            "Sator",
+            "Arepo",
+            "Tenet",
+            "Opera",
+            "Rotas"
+          ],
+          "nom": "strings",
+          "negatifs": true,
+          "bonnes": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "explication": "Tout sauf le dernier : -1 est exclu."
+        },
+        {
+          "id": "u09-l1-e4",
+          "type": "predire",
+          "notions": [
+            "slice"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "const t = [\"a\", \"b\", \"c\", \"d\"];",
+            "console.log(t.slice(1, 2));"
+          ],
+          "explication": "Un seul élément : 2 - 1 = 1."
+        },
+        {
+          "id": "u09-l1-e5",
+          "type": "qcm",
+          "notions": [
+            "slice"
+          ],
+          "question": "Combien d'éléments contient `tab.slice(2, 6)` (si tab est assez long) ?",
+          "choix": [
+            "4",
+            "5",
+            "6",
+            "2"
+          ],
+          "bonne": 0,
+          "explication": "fin - debut = 6 - 2 = 4 (indices 2, 3, 4, 5)."
+        },
+        {
+          "id": "u09-l1-e6",
+          "type": "ecrire",
+          "notions": [
+            "slice"
+          ],
+          "question": "Écris `getTop3(classement)` qui retourne les **trois premiers** éléments (ou moins s'il y en a moins).",
+          "depart": [
+            "function getTop3(classement) {",
+            "  ",
+            "}",
+            "",
+            "console.log(getTop3([\"Léa\", \"Sami\", \"Noé\", \"Ana\"]));"
+          ],
+          "tests": {
+            "fonction": "getTop3",
+            "cas": [
+              {
+                "args": [
+                  [
+                    "Léa",
+                    "Sami",
+                    "Noé",
+                    "Ana"
+                  ]
+                ],
+                "attendu": [
+                  "Léa",
+                  "Sami",
+                  "Noé"
+                ]
+              },
+              {
+                "args": [
+                  [
+                    "Léa"
+                  ]
+                ],
+                "attendu": [
+                  "Léa"
+                ]
+              },
+              {
+                "titre": "tableau vide",
+                "args": [
+                  []
+                ],
+                "attendu": []
+              }
+            ],
+            "interdit": [
+              "splice"
+            ]
+          },
+          "indices": [
+            "slice de l'indice 0 à l'indice 3 (exclu).",
+            {
+              "code": "return classement.slice(___, ___);"
+            }
+          ],
+          "solution": [
+            "function getTop3(classement) {",
+            "  return classement.slice(0, 3);",
+            "}",
+            "",
+            "console.log(getTop3([\"Léa\", \"Sami\", \"Noé\", \"Ana\"]));"
+          ],
+          "erreursTypiques": [
+            {
+              "code": "function getTop3(classement) {\n  return classement.slice(0, 2);\n}",
+              "attendu": "echec"
+            },
+            {
+              "code": "function getTop3(classement) {\n  return classement.splice(0, 3);\n}",
+              "attendu": "echec",
+              "diagnostic": "interdit"
+            }
+          ],
+          "explication": "`slice(0, 3)` : indices 0, 1, 2. S'il y a moins d'éléments, slice s'arrête simplement au bout."
+        }
+      ]
+    },
+    {
+      "id": "u09-l2",
+      "titre": "Le spread : sortir les œufs",
+      "duree": 6,
+      "notions": [
+        "spread",
+        "immutabilite"
+      ],
+      "cartes": [
+        {
+          "titre": "La boîte ou les œufs ?",
+          "illu": "spread",
+          "texte": "Mettre un tableau dans un autre crée une **boîte dans la boîte**. Avec `...`, on **sort les œufs** et on les pose un par un dans la nouvelle boîte.",
+          "code": [
+            "const fruits = [\"pomme\", \"kiwi\"];",
+            "console.log([fruits, \"mangue\"]);",
+            "console.log([...fruits, \"mangue\"]);"
+          ],
+          "analogie": "`...` = sortir les œufs de la boîte.",
+          "fiche": "spread"
+        },
+        {
+          "titre": "Au début, à la fin, au milieu",
+          "texte": "Les exercices 3 et 4 des chaînes : un mot de plus au début, un mot de plus à la fin. Une nouvelle boîte, l'original intact.",
+          "code": [
+            "const strings = Object.freeze([\"Sator\", \"Arepo\"]);",
+            "console.log([\"Lorem\", ...strings]);",
+            "console.log([...strings, \"Ipsum\"]);",
+            "console.log(strings);"
+          ]
+        },
+        {
+          "titre": "Assembler deux boîtes",
+          "texte": "`[...a, ...b]` : les œufs de a, puis ceux de b.",
+          "code": [
+            "const pairs = [14, 92];",
+            "const impairs = [3, 15];",
+            "console.log([...pairs, ...impairs]);",
+            "console.log([pairs, impairs]);"
+          ],
+          "piege": "Sans les `...`, on obtient `[[14, 92], [3, 15]]` : deux boîtes dans une boîte."
+        },
+        {
+          "titre": "Copier pour de vrai",
+          "texte": "`const b = a` colle une deuxième étiquette sur la **même** boîte. `[...a]` fabrique une **nouvelle** boîte avec les mêmes œufs : on peut la modifier sans toucher l'original (indispensable pour mélanger le jeu de cartes, unité 13).",
+          "code": [
+            "const a = Object.freeze([1, 2]);",
+            "const b = [...a];",
+            "b.push(3);",
+            "console.log(a, b);"
+          ]
+        },
+        {
+          "titre": "Donner les œufs un par un",
+          "texte": "`Math.max(3, 92, 14)` attend des nombres séparés, pas un tableau. Le spread les sort de la boîte.",
+          "code": [
+            "const numbers = [3, 92, 14];",
+            "console.log(Math.max(numbers));",
+            "console.log(Math.max(...numbers));"
+          ]
+        }
+      ],
+      "exercices": [
+        {
+          "id": "u09-l2-e1",
+          "type": "predire",
+          "notions": [
+            "spread"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "const t = [1, 2];",
+            "console.log([0, ...t, 3]);"
+          ],
+          "explication": "Les œufs de t sont posés entre 0 et 3."
+        },
+        {
+          "id": "u09-l2-e2",
+          "type": "predire",
+          "notions": [
+            "spread"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "const t = [1, 2];",
+            "console.log([0, t, 3]);"
+          ],
+          "explication": "Sans `...`, c'est la boîte entière qui est rangée : un tableau dans le tableau."
+        },
+        {
+          "id": "u09-l2-e3",
+          "type": "qcm",
+          "notions": [
+            "spread"
+          ],
+          "question": "Comment obtenir `[\"Lorem\", \"Sator\", \"Arepo\"]` à partir de `strings = [\"Sator\", \"Arepo\"]`, sans le modifier ?",
+          "choix": [
+            "[\"Lorem\", ...strings]",
+            "[\"Lorem\", strings]",
+            "strings.unshift(\"Lorem\")",
+            "\"Lorem\" + strings"
+          ],
+          "bonne": 0,
+          "mono": true,
+          "explication": "Le spread sort les mots ; `unshift` modifierait l'original ; sans `...`, on aurait un tableau dans le tableau."
+        },
+        {
+          "id": "u09-l2-e4",
+          "type": "predire",
+          "notions": [
+            "spread"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "console.log(Math.max(...[3, 14, 92, 65]));"
+          ],
+          "explication": "Le spread donne les nombres un par un à Math.max."
+        },
+        {
+          "id": "u09-l2-e5",
+          "type": "ecrire",
+          "notions": [
+            "spread"
+          ],
+          "question": "Écris `addTwo(fruits, a, b)` qui retourne un **nouveau** tableau : `a`, puis les fruits, puis `b`.",
+          "depart": [
+            "function addTwo(fruits, a, b) {",
+            "  ",
+            "}",
+            "",
+            "console.log(addTwo([\"kiwi\"], \"pomme\", \"poire\"));"
+          ],
+          "tests": {
+            "fonction": "addTwo",
+            "cas": [
+              {
+                "args": [
+                  [
+                    "kiwi"
+                  ],
+                  "pomme",
+                  "poire"
+                ],
+                "attendu": [
+                  "pomme",
+                  "kiwi",
+                  "poire"
+                ]
+              },
+              {
+                "args": [
+                  [
+                    "a",
+                    "b"
+                  ],
+                  "x",
+                  "y"
+                ],
+                "attendu": [
+                  "x",
+                  "a",
+                  "b",
+                  "y"
+                ]
+              },
+              {
+                "titre": "tableau vide",
+                "args": [
+                  [],
+                  "x",
+                  "y"
+                ],
+                "attendu": [
+                  "x",
+                  "y"
+                ]
+              }
+            ],
+            "interdit": [
+              "push",
+              "unshift",
+              "splice"
+            ]
+          },
+          "indices": [
+            "Une nouvelle boîte `[ … ]` : a, les œufs de fruits, b.",
+            {
+              "code": "return [a, ___, b];"
+            }
+          ],
+          "solution": [
+            "function addTwo(fruits, a, b) {",
+            "  return [a, ...fruits, b];",
+            "}",
+            "",
+            "console.log(addTwo([\"kiwi\"], \"pomme\", \"poire\"));"
+          ],
+          "erreursTypiques": [
+            {
+              "code": "function addTwo(fruits, a, b) {\n  return [a, fruits, b];\n}",
+              "attendu": "echec",
+              "diagnostic": "oublie-spread"
+            },
+            {
+              "code": "function addTwo(fruits, a, b) {\n  fruits.push(b);\n  return fruits;\n}",
+              "attendu": "echec",
+              "diagnostic": "interdit"
+            }
+          ],
+          "explication": "`[a, ...fruits, b]` : les œufs sortis de la boîte, entre a et b."
+        }
+      ]
+    },
+    {
+      "id": "u09-l3",
+      "titre": "with : remplacer une case",
+      "duree": 5,
+      "notions": [
+        "with",
+        "length",
+        "immutabilite"
+      ],
+      "cartes": [
+        {
+          "titre": "tab[i] = … : interdit sur un tableau gelé",
+          "texte": "Écrire dans une case modifie la boîte d'origine : impossible avec `Object.freeze`.",
+          "code": [
+            "const strings = Object.freeze([\"Sator\", \"Arepo\", \"Tenet\"]);",
+            "strings[1] = \"radar\";"
+          ],
+          "erreurVoulue": true,
+          "fiche": "with"
+        },
+        {
+          "titre": "with : une copie avec un œuf échangé",
+          "texte": "`with(i, valeur)` fabrique une nouvelle boîte identique, sauf la case `i`.",
+          "code": [
+            "const strings = Object.freeze([\"Sator\", \"Arepo\", \"Tenet\", \"Opera\", \"Rotas\"]);",
+            "const nouveau = strings.with(2, \"radar\");",
+            "console.log(nouveau);",
+            "console.log(strings);"
+          ]
+        },
+        {
+          "titre": "Le mot du milieu",
+          "texte": "Exercice 5 des chaînes : remplacer le mot du milieu (ou celui juste avant le milieu si le nombre de mots est pair). Tu as déjà la formule de l'indice (unité 5) : `Math.floor((tab.length - 1) / 2)`.",
+          "code": [
+            "const quatre = [\"un\", \"deux\", \"trois\", \"quatre\"];",
+            "const i = Math.floor((quatre.length - 1) / 2);",
+            "console.log(i, quatre.with(i, \"radar\"));"
+          ]
+        },
+        {
+          "titre": "Sans with",
+          "texte": "Autre façon, avec slice et le spread : la partie avant, la nouvelle valeur, la partie après.",
+          "code": [
+            "const t = [\"a\", \"b\", \"c\"];",
+            "console.log([...t.slice(0, 1), \"X\", ...t.slice(2)]);"
+          ]
+        }
+      ],
+      "exercices": [
+        {
+          "id": "u09-l3-e1",
+          "type": "predire",
+          "notions": [
+            "with"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "const notes = [4, 5, 6];",
+            "console.log(notes.with(0, 3));"
+          ],
+          "explication": "Une copie avec la case 0 remplacée."
+        },
+        {
+          "id": "u09-l3-e2",
+          "type": "predire",
+          "notions": [
+            "with"
+          ],
+          "question": "Que va afficher la dernière ligne ?",
+          "code": [
+            "const notes = [4, 5, 6];",
+            "const n2 = notes.with(-1, 1);",
+            "console.log(notes);"
+          ],
+          "explication": "with ne touche pas l'original."
+        },
+        {
+          "id": "u09-l3-e3",
+          "type": "pointer-tableau",
+          "notions": [
+            "with",
+            "length"
+          ],
+          "question": "Quelle case `strings.with(Math.floor((strings.length - 1) / 2), \"radar\")` remplace-t-elle ?",
+          "tableau": [
+            "Sator",
+            "Arepo",
+            "Tenet",
+            "Opera",
+            "Rotas",
+            "Ipsum"
+          ],
+          "nom": "strings",
+          "bonnes": [
+            2
+          ],
+          "explication": "6 mots : (6 - 1) / 2 = 2.5 → 2 : juste avant le milieu."
+        },
+        {
+          "id": "u09-l3-e4",
+          "type": "tri",
+          "notions": [
+            "immutabilite",
+            "with",
+            "slice",
+            "spread"
+          ],
+          "mono": true,
+          "question": "Modifie l'original, ou fabrique un nouveau tableau ?",
+          "categories": [
+            "modifie l'original",
+            "nouveau tableau"
+          ],
+          "items": [
+            [
+              "tab[2] = x",
+              0
+            ],
+            [
+              "tab.with(2, x)",
+              1
+            ],
+            [
+              "tab.splice(2, 1)",
+              0
+            ],
+            [
+              "tab.slice(2)",
+              1
+            ],
+            [
+              "[...tab, x]",
+              1
+            ],
+            [
+              "tab.push(x)",
+              0
+            ]
+          ],
+          "explication": "Seules les méthodes « nouveau tableau » sont permises sur les données du cours."
+        }
+      ]
+    },
+    {
+      "id": "u09-l4",
+      "titre": "Pairs puis impairs",
+      "duree": 5,
+      "notions": [
+        "ordre-relatif",
+        "spread",
+        "filter"
+      ],
+      "cartes": [
+        {
+          "titre": "Deux tamis, une boîte",
+          "texte": "Exercice 10 des nombres : d'abord les pairs, puis les impairs, **chacun dans son ordre d'origine**. `filter` garde l'ordre : on filtre deux fois, puis on assemble.",
+          "code": [
+            "const numbers = [3, 14, 15, 92, 65];",
+            "const pairs = numbers.filter((n) => n % 2 === 0);",
+            "const impairs = numbers.filter((n) => n % 2 !== 0);",
+            "console.log(pairs, impairs);"
+          ],
+          "fiche": "ordre-relatif"
+        },
+        {
+          "titre": "Assembler",
+          "texte": "Le spread pose les pairs, puis les impairs, dans une seule boîte.",
+          "piege": "`[pairs, impairs]` donnerait deux boîtes dans une boîte. Il faut sortir les œufs : `[...pairs, ...impairs]`."
+        },
+        {
+          "titre": "Pourquoi pas un tri ?",
+          "texte": "Un tri changerait l'ordre **dans** chaque groupe (14 avant 92 resterait vrai par hasard, mais 92 avant 14 deviendrait 14 avant 92). Le TP demande de **conserver l'ordre relatif** : deux filter, c'est exactement ça."
+        }
+      ],
+      "exercices": [
+        {
+          "id": "u09-l4-e1",
+          "type": "predire",
+          "notions": [
+            "ordre-relatif"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "const t = [5, 8, 1, 2];",
+            "console.log([...t.filter((n) => n % 2 === 0), ...t.filter((n) => n % 2 !== 0)]);"
+          ],
+          "explication": "Pairs dans leur ordre (8, 2), puis impairs dans leur ordre (5, 1)."
+        },
+        {
+          "id": "u09-l4-e2",
+          "type": "parsons",
+          "notions": [
+            "ordre-relatif",
+            "spread"
+          ],
+          "question": "Reconstitue `vowelsFirst(letters)` : les voyelles d'abord, puis les autres, dans leur ordre.",
+          "lignes": [
+            "function vowelsFirst(letters) {",
+            "  const v = letters.filter((l) => \"aeiou\".includes(l));",
+            "  const c = letters.filter((l) => !\"aeiou\".includes(l));",
+            "  return [...v, ...c];",
+            "}"
+          ],
+          "distracteurs": [
+            "  return [v, c];"
+          ],
+          "explication": "Deux tamis, puis le spread pour assembler les œufs dans une seule boîte."
+        },
+        {
+          "id": "u09-l4-e3",
+          "type": "ecrire",
+          "notions": [
+            "ordre-relatif",
+            "spread",
+            "filter"
+          ],
+          "question": "Écris `shortFirst(words)` : d'abord les mots de **moins de 5 lettres**, puis les autres, chaque groupe dans son ordre d'origine.",
+          "depart": [
+            "function shortFirst(words) {",
+            "  ",
+            "}",
+            "",
+            "console.log(shortFirst([\"Sator\", \"kiwi\", \"Opera\", \"ail\"]));"
+          ],
+          "tests": {
+            "fonction": "shortFirst",
+            "cas": [
+              {
+                "args": [
+                  [
+                    "Sator",
+                    "kiwi",
+                    "Opera",
+                    "ail"
+                  ]
+                ],
+                "attendu": [
+                  "kiwi",
+                  "ail",
+                  "Sator",
+                  "Opera"
+                ]
+              },
+              {
+                "titre": "tableau vide",
+                "args": [
+                  []
+                ],
+                "attendu": []
+              }
+            ],
+            "interdit": [
+              "sort",
+              "push"
+            ]
+          },
+          "indices": [
+            "Deux filter (longueur < 5, puis >= 5), puis assembler avec `...`.",
+            {
+              "code": "return [...words.filter((w) => ___), ...words.filter((w) => ___)];"
+            }
+          ],
+          "solution": [
+            "function shortFirst(words) {",
+            "  return [...words.filter((w) => w.length < 5), ...words.filter((w) => w.length >= 5)];",
+            "}",
+            "",
+            "console.log(shortFirst([\"Sator\", \"kiwi\", \"Opera\", \"ail\"]));"
+          ],
+          "erreursTypiques": [
+            {
+              "code": "function shortFirst(words) {\n  return [words.filter((w) => w.length < 5), words.filter((w) => w.length >= 5)];\n}",
+              "attendu": "echec",
+              "diagnostic": "oublie-spread"
+            }
+          ],
+          "explication": "Deux tamis, une boîte."
+        }
+      ]
+    }
+  ],
+  "jeux": [
+    {
+      "id": "u09-ciseaux",
+      "titre": "Ciseaux et colle",
+      "description": "slice coupe, ... colle, with remplace : prédis le résultat.",
+      "tours": 8,
+      "questions": [
+        {
+          "id": "u09-j1-1",
+          "type": "predire",
+          "notions": [
+            "slice"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "console.log([3, 14, 15, 92].slice(2));"
+          ],
+          "explication": "À partir de l'indice 2."
+        },
+        {
+          "id": "u09-j1-2",
+          "type": "predire",
+          "notions": [
+            "slice"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "console.log([3, 14, 15, 92].slice(-3, -1));"
+          ],
+          "explication": "De -3 (14) jusqu'à -1 exclu (92 exclu)."
+        },
+        {
+          "id": "u09-j1-3",
+          "type": "predire",
+          "notions": [
+            "spread"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "console.log([...\"abc\"]);"
+          ],
+          "explication": "Le spread sort aussi les lettres d'une chaîne."
+        },
+        {
+          "id": "u09-j1-4",
+          "type": "predire",
+          "notions": [
+            "spread"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "const a = [1];",
+            "const b = [2];",
+            "console.log([...a, ...b, ...a]);"
+          ],
+          "explication": "Les œufs de a, de b, puis de a encore."
+        },
+        {
+          "id": "u09-j1-5",
+          "type": "predire",
+          "notions": [
+            "with"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "console.log([\"x\", \"y\", \"z\"].with(1, \"radar\"));"
+          ],
+          "explication": "Case 1 remplacée."
+        },
+        {
+          "id": "u09-j1-6",
+          "type": "pointer-tableau",
+          "notions": [
+            "slice"
+          ],
+          "question": "Touche les cases que garde `tab.slice(1, -1)`.",
+          "tableau": [
+            "a",
+            "b",
+            "c",
+            "d",
+            "e"
+          ],
+          "nom": "tab",
+          "negatifs": true,
+          "bonnes": [
+            1,
+            2,
+            3
+          ],
+          "explication": "Ni le premier, ni le dernier."
+        },
+        {
+          "id": "u09-j1-7",
+          "type": "predire",
+          "notions": [
+            "slice",
+            "length"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "console.log([3, 14, 15, 92].slice(1).length);"
+          ],
+          "explication": "Un de moins que l'original."
+        },
+        {
+          "id": "u09-j1-8",
+          "type": "predire",
+          "notions": [
+            "spread",
+            "immutabilite"
+          ],
+          "question": "Que va afficher la dernière ligne ?",
+          "code": [
+            "const a = [1, 2];",
+            "const b = [...a];",
+            "b[0] = 9;",
+            "console.log(a);"
+          ],
+          "explication": "b est une nouvelle boîte : a ne change pas."
+        },
+        {
+          "id": "u09-j1-9",
+          "type": "predire",
+          "notions": [
+            "spread",
+            "immutabilite"
+          ],
+          "question": "Et ici ?",
+          "code": [
+            "const a = [1, 2];",
+            "const b = a;",
+            "b[0] = 9;",
+            "console.log(a);"
+          ],
+          "explication": "Même boîte, deux étiquettes : a change aussi."
+        }
+      ]
+    }
+  ],
+  "quiz": {
+    "titre": "Quiz : slice, spread, with",
+    "questions": [
+      {
+        "id": "u09-q1",
+        "type": "predire",
+        "notions": [
+          "slice"
+        ],
+        "question": "Que va afficher ce code ?",
+        "code": [
+          "console.log([3, 14, 15].slice(1));"
+        ],
+        "explication": "Sans le premier."
+      },
+      {
+        "id": "u09-q2",
+        "type": "predire",
+        "notions": [
+          "slice"
+        ],
+        "question": "Que va afficher ce code ?",
+        "code": [
+          "console.log([3, 14, 15].slice(0, -1));"
+        ],
+        "explication": "Sans le dernier."
+      },
+      {
+        "id": "u09-q3",
+        "type": "pointer-tableau",
+        "notions": [
+          "slice"
+        ],
+        "question": "Touche les cases que garde `numbers.slice(2, 4)`.",
+        "tableau": [
+          3,
+          14,
+          15,
+          92,
+          65,
+          35
+        ],
+        "nom": "numbers",
+        "bonnes": [
+          2,
+          3
+        ],
+        "explication": "Indices 2 et 3 (4 exclu)."
+      },
+      {
+        "id": "u09-q4",
+        "type": "qcm",
+        "notions": [
+          "spread"
+        ],
+        "question": "Que donne `[[\"a\"], \"b\"]` ?",
+        "choix": [
+          "un tableau qui contient un tableau et une chaîne",
+          "[\"a\", \"b\"]",
+          "une erreur",
+          "\"ab\""
+        ],
+        "bonne": 0,
+        "explication": "Sans spread, la boîte est rangée telle quelle."
+      },
+      {
+        "id": "u09-q5",
+        "type": "predire",
+        "notions": [
+          "spread"
+        ],
+        "question": "Que va afficher ce code ?",
+        "code": [
+          "const strings = [\"Sator\"];",
+          "console.log([...strings, \"Ipsum\"]);"
+        ],
+        "explication": "Un mot de plus à la fin."
+      },
+      {
+        "id": "u09-q6",
+        "type": "tri",
+        "notions": [
+          "immutabilite",
+          "slice",
+          "spread",
+          "with"
+        ],
+        "mono": true,
+        "question": "Permis sur un tableau gelé ?",
+        "categories": [
+          "oui",
+          "non (erreur)"
+        ],
+        "items": [
+          [
+            "tab.slice(1)",
+            0
+          ],
+          [
+            "tab.with(0, 1)",
+            0
+          ],
+          [
+            "[...tab, 1]",
+            0
+          ],
+          [
+            "tab.splice(0, 1)",
+            1
+          ],
+          [
+            "tab[0] = 1",
+            1
+          ],
+          [
+            "tab.unshift(1)",
+            1
+          ]
+        ],
+        "explication": "Les mutantes plantent sur un tableau gelé."
+      },
+      {
+        "id": "u09-q7",
+        "type": "bug",
+        "notions": [
+          "spread"
+        ],
+        "question": "Ce code doit retourner `[14, 92, 3, 15]`. Il retourne `[[14, 92], [3, 15]]`. Quelle ligne ?",
+        "code": [
+          "const pairs = [14, 92];",
+          "const impairs = [3, 15];",
+          "const r = [pairs, impairs];",
+          "console.log(r);"
+        ],
+        "ligne": 3,
+        "choix": [
+          "Il manque les `...` : `[...pairs, ...impairs]`",
+          "Il faut `slice`",
+          "Il faut `with`",
+          "Il faut trier"
+        ],
+        "bonne": 0,
+        "explication": "Sortir les œufs de la boîte."
+      },
+      {
+        "id": "u09-q8",
+        "type": "predire",
+        "notions": [
+          "with"
+        ],
+        "question": "Que va afficher ce code ?",
+        "code": [
+          "console.log([\"Sator\", \"Arepo\", \"Tenet\"].with(1, \"radar\"));"
+        ],
+        "explication": "Case 1 remplacée dans une copie."
+      },
+      {
+        "id": "u09-q9",
+        "type": "qcm",
+        "notions": [
+          "slice"
+        ],
+        "question": "Que retourne `tab.slice()` ?",
+        "choix": [
+          "une copie complète de tab",
+          "un tableau vide",
+          "le premier élément",
+          "une erreur"
+        ],
+        "bonne": 0,
+        "explication": "Sans argument : de 0 jusqu'au bout."
+      },
+      {
+        "id": "u09-q10",
+        "type": "predire",
+        "notions": [
+          "ordre-relatif"
+        ],
+        "question": "Que va afficher ce code ?",
+        "code": [
+          "const t = [7, 2, 9, 4];",
+          "console.log([...t.filter((n) => n > 5), ...t.filter((n) => n <= 5)]);"
+        ],
+        "explication": "Les grands dans leur ordre, puis les petits dans leur ordre."
+      },
+      {
+        "id": "u09-q11",
+        "type": "vf",
+        "notions": [
+          "slice"
+        ],
+        "question": "`slice` et `splice` font la même chose.",
+        "bonne": false,
+        "explication": "`splice` modifie l'original, `slice` non."
+      },
+      {
+        "id": "u09-q12",
+        "type": "predire",
+        "notions": [
+          "spread",
+          "parametre-reste"
+        ],
+        "question": "Que va afficher ce code ?",
+        "code": [
+          "const somme = (...ns) => ns.reduce((a, n) => a + n, 0);",
+          "console.log(somme(...[1, 2, 3]));"
+        ],
+        "explication": "Révision : le spread sort les nombres, le paramètre du reste les range, reduce les additionne."
+      },
+      {
+        "id": "u09-q13",
+        "type": "predire",
+        "notions": [
+          "slice",
+          "map"
+        ],
+        "question": "Que va afficher ce code ?",
+        "code": [
+          "console.log([1, 2, 3, 4].slice(1).map((n) => n * 10));"
+        ],
+        "explication": "Sans le premier, puis × 10."
+      },
+      {
+        "id": "u09-q14",
+        "type": "pointer-tableau",
+        "notions": [
+          "with",
+          "length"
+        ],
+        "question": "Quelle case remplace `t.with(Math.floor((t.length - 1) / 2), \"radar\")` ?",
+        "tableau": [
+          "a",
+          "b",
+          "c",
+          "d",
+          "e",
+          "f",
+          "g"
+        ],
+        "nom": "t",
+        "bonnes": [
+          3
+        ],
+        "explication": "7 éléments : (7 - 1) / 2 = 3."
+      },
+      {
+        "id": "u09-q15",
+        "type": "predire",
+        "notions": [
+          "spread"
+        ],
+        "question": "Que va afficher ce code ?",
+        "code": [
+          "console.log(Math.max(...[-5, -2, -9]));"
+        ],
+        "explication": "Le plus grand des trois."
+      }
+    ]
+  },
+  "boss": [
+    {
+      "id": "u09-b1",
+      "titre": "Sans le premier élément",
+      "source": "TP Tableaux · nombres, exercice 4",
+      "notions": [
+        "slice"
+      ],
+      "enonce": "À partir du tableau `numbers` : **retourner un tableau ne contenant pas le premier élément**.\n\nÉcris une fonction `withoutFirst(numbers)`.",
+      "regles": [
+        "La structure de données initiale ne doit pas être modifiée (structure immutable). Utilisez des méthodes qui retournent un nouveau tableau.",
+        "Vos solutions doivent rester fonctionnelles même si le contenu du tableau initial diffère."
+      ],
+      "donnees": {
+        "numbers": [
+          3,
+          14,
+          15,
+          92,
+          65,
+          35,
+          89,
+          79,
+          32,
+          38
+        ]
+      },
+      "depart": [
+        "function withoutFirst(numbers) {",
+        "  ",
+        "}",
+        "",
+        "console.log(withoutFirst(numbers));"
+      ],
+      "tests": {
+        "fonction": "withoutFirst",
+        "cas": [
+          {
+            "titre": "Données du cours",
+            "args": [
+              [
+                3,
+                14,
+                15,
+                92,
+                65,
+                35,
+                89,
+                79,
+                32,
+                38
+              ]
+            ],
+            "attendu": [
+              14,
+              15,
+              92,
+              65,
+              35,
+              89,
+              79,
+              32,
+              38
+            ]
+          },
+          {
+            "titre": "Deux éléments",
+            "args": [
+              [
+                7,
+                8
+              ]
+            ],
+            "attendu": [
+              8
+            ]
+          },
+          {
+            "titre": "Un seul élément",
+            "args": [
+              [
+                7
+              ]
+            ],
+            "attendu": []
+          },
+          {
+            "titre": "Tableau vide",
+            "args": [
+              []
+            ],
+            "attendu": []
+          }
+        ],
+        "interdit": [
+          "shift",
+          "splice"
+        ]
+      },
+      "indices": [
+        "Relis la fiche [[slice]] : une copie à partir d'un indice.",
+        "Le premier élément a l'indice 0 : on commence juste après.",
+        {
+          "code": "return numbers.slice(___);"
+        }
+      ],
+      "solution": [
+        "function withoutFirst(numbers) {",
+        "  return numbers.slice(1);",
+        "}",
+        "",
+        "console.log(withoutFirst(numbers));"
+      ],
+      "erreursTypiques": [
+        {
+          "code": "function withoutFirst(numbers) {\n  numbers.shift();\n  return numbers;\n}",
+          "attendu": "echec",
+          "diagnostic": "interdit"
+        },
+        {
+          "code": "function withoutFirst(numbers) {\n  return numbers.slice(0);\n}",
+          "attendu": "echec"
+        },
+        {
+          "code": "function withoutFirst(numbers) {\n  return numbers.slice(1, -1);\n}",
+          "attendu": "echec"
+        }
+      ],
+      "explication": "Exercice 4 du TP."
+    },
+    {
+      "id": "u09-b2",
+      "titre": "Sans le dernier élément",
+      "source": "TP Tableaux · nombres, exercice 5",
+      "notions": [
+        "slice",
+        "length"
+      ],
+      "enonce": "À partir du tableau `numbers` : **retourner un tableau ne contenant pas le dernier élément**.\n\nÉcris une fonction `withoutLast(numbers)`.",
+      "regles": [
+        "La structure de données initiale ne doit pas être modifiée (structure immutable).",
+        "Vos solutions doivent rester fonctionnelles même si le contenu du tableau initial diffère."
+      ],
+      "donnees": {
+        "numbers": [
+          3,
+          14,
+          15,
+          92,
+          65,
+          35,
+          89,
+          79,
+          32,
+          38
+        ]
+      },
+      "depart": [
+        "function withoutLast(numbers) {",
+        "  ",
+        "}",
+        "",
+        "console.log(withoutLast(numbers));"
+      ],
+      "tests": {
+        "fonction": "withoutLast",
+        "cas": [
+          {
+            "titre": "Données du cours",
+            "args": [
+              [
+                3,
+                14,
+                15,
+                92,
+                65,
+                35,
+                89,
+                79,
+                32,
+                38
+              ]
+            ],
+            "attendu": [
+              3,
+              14,
+              15,
+              92,
+              65,
+              35,
+              89,
+              79,
+              32
+            ]
+          },
+          {
+            "titre": "Autres données",
+            "args": [
+              [
+                1,
+                2,
+                3
+              ]
+            ],
+            "attendu": [
+              1,
+              2
+            ]
+          },
+          {
+            "titre": "Un seul élément",
+            "args": [
+              [
+                7
+              ]
+            ],
+            "attendu": []
+          },
+          {
+            "titre": "Tableau vide",
+            "args": [
+              []
+            ],
+            "attendu": []
+          }
+        ],
+        "interdit": [
+          "pop",
+          "splice"
+        ]
+      },
+      "indices": [
+        "slice accepte un indice de fin **exclu**, et les indices négatifs comptent depuis la fin.",
+        "-1 désigne le dernier élément.",
+        {
+          "code": "return numbers.slice(0, ___);"
+        }
+      ],
+      "solution": [
+        "function withoutLast(numbers) {",
+        "  return numbers.slice(0, -1);",
+        "}",
+        "",
+        "console.log(withoutLast(numbers));"
+      ],
+      "erreursTypiques": [
+        {
+          "code": "function withoutLast(numbers) {\n  numbers.pop();\n  return numbers;\n}",
+          "attendu": "echec",
+          "diagnostic": "interdit"
+        },
+        {
+          "code": "function withoutLast(numbers) {\n  return numbers.slice(0, numbers.length);\n}",
+          "attendu": "echec"
+        },
+        {
+          "code": "function withoutLast(numbers) {\n  return numbers.slice(0, 9);\n}",
+          "attendu": "echec"
+        }
+      ],
+      "explication": "Exercice 5 du TP. `slice(0, numbers.length - 1)` marche aussi."
+    },
+    {
+      "id": "u09-b3",
+      "titre": "Les pairs, puis les impairs",
+      "source": "TP Tableaux · nombres, exercice 10",
+      "notions": [
+        "ordre-relatif",
+        "spread",
+        "filter",
+        "modulo"
+      ],
+      "enonce": "À partir du tableau `numbers` : **retourner un tableau contenant d'abord les nombres pairs, puis les nombres impairs, en conservant leur ordre relatif dans chaque groupe**.\n\nÉcris une fonction `evensThenOdds(numbers)`.",
+      "regles": [
+        "La structure de données initiale ne doit pas être modifiée (structure immutable).",
+        "Vos solutions doivent rester fonctionnelles même si le contenu du tableau initial diffère (nombres négatifs compris)."
+      ],
+      "donnees": {
+        "numbers": [
+          3,
+          14,
+          15,
+          92,
+          65,
+          35,
+          89,
+          79,
+          32,
+          38
+        ]
+      },
+      "depart": [
+        "function evensThenOdds(numbers) {",
+        "  ",
+        "}",
+        "",
+        "console.log(evensThenOdds(numbers));"
+      ],
+      "tests": {
+        "fonction": "evensThenOdds",
+        "cas": [
+          {
+            "titre": "Données du cours",
+            "args": [
+              [
+                3,
+                14,
+                15,
+                92,
+                65,
+                35,
+                89,
+                79,
+                32,
+                38
+              ]
+            ],
+            "attendu": [
+              14,
+              92,
+              32,
+              38,
+              3,
+              15,
+              65,
+              35,
+              89,
+              79
+            ]
+          },
+          {
+            "titre": "Ordre relatif",
+            "args": [
+              [
+                9,
+                8,
+                1,
+                2
+              ]
+            ],
+            "attendu": [
+              8,
+              2,
+              9,
+              1
+            ],
+            "siEchec": "Chaque groupe doit garder l'ordre d'origine : 8 avant 2 (comme dans le tableau), 9 avant 1. Pas de tri !"
+          },
+          {
+            "titre": "Négatifs",
+            "args": [
+              [
+                -3,
+                -2,
+                5
+              ]
+            ],
+            "attendu": [
+              -2,
+              -3,
+              5
+            ],
+            "siEchec": "-3 est impair : `-3 % 2` vaut -1. Teste « impair » avec `!== 0`."
+          },
+          {
+            "titre": "Tableau vide",
+            "args": [
+              []
+            ],
+            "attendu": []
+          }
+        ],
+        "interdit": [
+          "sort",
+          "push",
+          "splice"
+        ]
+      },
+      "indices": [
+        "Relis la fiche [[ordre-relatif]] : deux tamis, puis une seule boîte.",
+        "filter garde l'ordre d'origine ; le spread assemble.",
+        {
+          "code": "return [...numbers.filter((n) => ___), ...numbers.filter((n) => ___)];"
+        }
+      ],
+      "solution": [
+        "function evensThenOdds(numbers) {",
+        "  const evens = numbers.filter((n) => n % 2 === 0);",
+        "  const odds = numbers.filter((n) => n % 2 !== 0);",
+        "  return [...evens, ...odds];",
+        "}",
+        "",
+        "console.log(evensThenOdds(numbers));"
+      ],
+      "erreursTypiques": [
+        {
+          "code": "function evensThenOdds(numbers) {\n  return [numbers.filter((n) => n % 2 === 0), numbers.filter((n) => n % 2 !== 0)];\n}",
+          "attendu": "echec",
+          "diagnostic": "oublie-spread"
+        },
+        {
+          "code": "function evensThenOdds(numbers) {\n  return numbers.toSorted((a, b) => (a % 2) - (b % 2));\n}",
+          "attendu": "echec"
+        },
+        {
+          "code": "function evensThenOdds(numbers) {\n  return [...numbers.filter((n) => n % 2 === 0), ...numbers.filter((n) => n % 2 === 1)];\n}",
+          "attendu": "echec",
+          "diagnostic": "contenu"
+        }
+      ],
+      "explication": "Exercice 10 du TP : deux filter (qui gardent l'ordre) et un spread."
+    },
+    {
+      "id": "u09-b4",
+      "titre": "Lorem au début",
+      "source": "TP Tableaux · chaînes, exercice 3",
+      "notions": [
+        "spread"
+      ],
+      "enonce": "À partir du tableau `strings` : **retourner un nouveau tableau contenant le mot Lorem au début, suivi des mots du tableau initial**.\n\nÉcris une fonction `addLorem(strings)`.",
+      "regles": [
+        "La structure de données initiale ne doit pas être modifiée.",
+        "Vos solutions doivent rester fonctionnelles même si le contenu du tableau initial diffère."
+      ],
+      "donnees": {
+        "strings": [
+          "Sator",
+          "Arepo",
+          "Tenet",
+          "Opera",
+          "Rotas"
+        ]
+      },
+      "depart": [
+        "function addLorem(strings) {",
+        "  ",
+        "}",
+        "",
+        "console.log(addLorem(strings));"
+      ],
+      "tests": {
+        "fonction": "addLorem",
+        "cas": [
+          {
+            "titre": "Données du cours",
+            "args": [
+              [
+                "Sator",
+                "Arepo",
+                "Tenet",
+                "Opera",
+                "Rotas"
+              ]
+            ],
+            "attendu": [
+              "Lorem",
+              "Sator",
+              "Arepo",
+              "Tenet",
+              "Opera",
+              "Rotas"
+            ]
+          },
+          {
+            "titre": "Autres données",
+            "args": [
+              [
+                "dolor"
+              ]
+            ],
+            "attendu": [
+              "Lorem",
+              "dolor"
+            ]
+          },
+          {
+            "titre": "Tableau vide",
+            "args": [
+              []
+            ],
+            "attendu": [
+              "Lorem"
+            ]
+          }
+        ],
+        "interdit": [
+          "unshift",
+          "splice"
+        ]
+      },
+      "indices": [
+        "Une nouvelle boîte : d'abord \"Lorem\", puis les œufs de `strings`.",
+        "Relis la fiche [[spread]].",
+        {
+          "code": "return [\"Lorem\", ___];"
+        }
+      ],
+      "solution": [
+        "function addLorem(strings) {",
+        "  return [\"Lorem\", ...strings];",
+        "}",
+        "",
+        "console.log(addLorem(strings));"
+      ],
+      "erreursTypiques": [
+        {
+          "code": "function addLorem(strings) {\n  return [\"Lorem\", strings];\n}",
+          "attendu": "echec",
+          "diagnostic": "oublie-spread"
+        },
+        {
+          "code": "function addLorem(strings) {\n  strings.unshift(\"Lorem\");\n  return strings;\n}",
+          "attendu": "echec",
+          "diagnostic": "interdit"
+        },
+        {
+          "code": "function addLorem(strings) {\n  return [...strings, \"Lorem\"];\n}",
+          "attendu": "echec"
+        }
+      ],
+      "explication": "Exercice 3 du TP sur les chaînes."
+    },
+    {
+      "id": "u09-b5",
+      "titre": "Ipsum à la fin",
+      "source": "TP Tableaux · chaînes, exercice 4",
+      "notions": [
+        "spread"
+      ],
+      "enonce": "À partir du tableau `strings` : **retourner un nouveau tableau contenant les mots du tableau initial, suivis du mot Ipsum**.\n\nÉcris une fonction `addIpsum(strings)`.",
+      "regles": [
+        "La structure de données initiale ne doit pas être modifiée.",
+        "Vos solutions doivent rester fonctionnelles même si le contenu du tableau initial diffère."
+      ],
+      "donnees": {
+        "strings": [
+          "Sator",
+          "Arepo",
+          "Tenet",
+          "Opera",
+          "Rotas"
+        ]
+      },
+      "depart": [
+        "function addIpsum(strings) {",
+        "  ",
+        "}",
+        "",
+        "console.log(addIpsum(strings));"
+      ],
+      "tests": {
+        "fonction": "addIpsum",
+        "cas": [
+          {
+            "titre": "Données du cours",
+            "args": [
+              [
+                "Sator",
+                "Arepo",
+                "Tenet",
+                "Opera",
+                "Rotas"
+              ]
+            ],
+            "attendu": [
+              "Sator",
+              "Arepo",
+              "Tenet",
+              "Opera",
+              "Rotas",
+              "Ipsum"
+            ]
+          },
+          {
+            "titre": "Autres données",
+            "args": [
+              [
+                "Lorem"
+              ]
+            ],
+            "attendu": [
+              "Lorem",
+              "Ipsum"
+            ]
+          },
+          {
+            "titre": "Tableau vide",
+            "args": [
+              []
+            ],
+            "attendu": [
+              "Ipsum"
+            ]
+          }
+        ],
+        "interdit": [
+          "push",
+          "splice"
+        ]
+      },
+      "indices": [
+        "Même idée que Lorem, dans l'autre sens.",
+        "Les trois points sortent les mots de la boîte.",
+        {
+          "code": "return [___, \"Ipsum\"];"
+        }
+      ],
+      "solution": [
+        "function addIpsum(strings) {",
+        "  return [...strings, \"Ipsum\"];",
+        "}",
+        "",
+        "console.log(addIpsum(strings));"
+      ],
+      "erreursTypiques": [
+        {
+          "code": "function addIpsum(strings) {\n  return [strings, \"Ipsum\"];\n}",
+          "attendu": "echec",
+          "diagnostic": "oublie-spread"
+        },
+        {
+          "code": "function addIpsum(strings) {\n  strings.push(\"Ipsum\");\n  return strings;\n}",
+          "attendu": "echec",
+          "diagnostic": "interdit"
+        }
+      ],
+      "explication": "Exercice 4 du TP sur les chaînes."
+    },
+    {
+      "id": "u09-b6",
+      "titre": "Radar au milieu",
+      "source": "TP Tableaux · chaînes, exercice 5",
+      "notions": [
+        "with",
+        "length",
+        "arithmetique"
+      ],
+      "enonce": "À partir du tableau `strings` : **retourner un tableau en remplaçant le mot du milieu par le mot radar** (si le tableau a un nombre de mots pair, remplacer le mot situé à l'indice juste avant le milieu).\n\nÉcris une fonction `replaceMiddle(strings)`. Le tableau contient au moins un mot.",
+      "regles": [
+        "La structure de données initiale ne doit pas être modifiée.",
+        "Vos solutions doivent rester fonctionnelles même si le contenu du tableau initial diffère (nombre de mots pair ou impair)."
+      ],
+      "donnees": {
+        "strings": [
+          "Sator",
+          "Arepo",
+          "Tenet",
+          "Opera",
+          "Rotas"
+        ]
+      },
+      "depart": [
+        "function replaceMiddle(strings) {",
+        "  ",
+        "}",
+        "",
+        "console.log(replaceMiddle(strings));"
+      ],
+      "tests": {
+        "fonction": "replaceMiddle",
+        "cas": [
+          {
+            "titre": "Données du cours",
+            "args": [
+              [
+                "Sator",
+                "Arepo",
+                "Tenet",
+                "Opera",
+                "Rotas"
+              ]
+            ],
+            "attendu": [
+              "Sator",
+              "Arepo",
+              "radar",
+              "Opera",
+              "Rotas"
+            ]
+          },
+          {
+            "titre": "Nombre de mots pair",
+            "args": [
+              [
+                "un",
+                "deux",
+                "trois",
+                "quatre"
+              ]
+            ],
+            "attendu": [
+              "un",
+              "radar",
+              "trois",
+              "quatre"
+            ],
+            "siEchec": "Avec 4 mots, c'est le mot d'indice 1 (juste avant le milieu) qui est remplacé : `Math.floor((strings.length - 1) / 2)`."
+          },
+          {
+            "titre": "Un seul mot",
+            "args": [
+              [
+                "seul"
+              ]
+            ],
+            "attendu": [
+              "radar"
+            ]
+          },
+          {
+            "titre": "Deux mots",
+            "args": [
+              [
+                "a",
+                "b"
+              ]
+            ],
+            "attendu": [
+              "radar",
+              "b"
+            ]
+          }
+        ],
+        "interdit": [
+          "splice"
+        ]
+      },
+      "indices": [
+        "Deux étapes : calculer l'indice du milieu (unité 5), puis remplacer sans modifier.",
+        "Relis les fiches [[length]] et [[with]].",
+        {
+          "code": "const i = Math.floor((___) / 2);\nreturn strings.with(___, \"radar\");"
+        }
+      ],
+      "solution": [
+        "function replaceMiddle(strings) {",
+        "  const middle = Math.floor((strings.length - 1) / 2);",
+        "  return strings.with(middle, \"radar\");",
+        "}",
+        "",
+        "console.log(replaceMiddle(strings));"
+      ],
+      "erreursTypiques": [
+        {
+          "code": "function replaceMiddle(strings) {\n  return strings.with(Math.floor(strings.length / 2), \"radar\");\n}",
+          "attendu": "echec",
+          "diagnostic": "contenu"
+        },
+        {
+          "code": "function replaceMiddle(strings) {\n  const copie = strings;\n  copie[2] = \"radar\";\n  return copie;\n}",
+          "attendu": "erreur"
+        },
+        {
+          "code": "function replaceMiddle(strings) {\n  return strings.with(2, \"radar\");\n}",
+          "attendu": "echec"
+        }
+      ],
+      "explication": "Exercice 5 du TP sur les chaînes. Version sans with : `[...strings.slice(0, i), \"radar\", ...strings.slice(i + 1)]`."
+    }
+  ]
+}

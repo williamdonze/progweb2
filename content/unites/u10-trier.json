@@ -1,0 +1,233 @@
+{
+  "id": "u10",
+  "titre": "Trier",
+  "sousTitre": "TP Tableaux · chaînes 7",
+  "objectif": "Trier sans modifier l'original avec toSorted, écrire un comparateur, comparer des mots avec localeCompare.",
+  "icone": "a-z",
+  "fiches": [
+    {
+      "id": "tosorted",
+      "titre": "toSorted : trier une copie",
+      "icone": "↕",
+      "resume": "`tab.toSorted(comparateur)` retourne une **copie triée**. `sort` trie l'original (interdit sur les données gelées).",
+      "texte": "- `toSorted()` : copie triée ; l'original ne bouge pas.\n- `sort()` : trie **sur place** (mutante).\n\n**Sans comparateur**, JavaScript trie comme des **textes** : `[10, 9, 1].toSorted()` donne `[1, 10, 9]` (le texte \"10\" commence par \"1\"). Pour des nombres, il faut **toujours** un comparateur.",
+      "exemples": [
+        { "code": ["const numbers = Object.freeze([10, 9, 1, 100]);", "console.log(numbers.toSorted());", "console.log(numbers.toSorted((a, b) => a - b));", "console.log(numbers);"] }
+      ],
+      "pieges": ["`sort` au lieu de `toSorted` : il modifie l'original.", "Trier des nombres sans comparateur : ordre alphabétique."]
+    },
+    {
+      "id": "comparateur",
+      "titre": "Le comparateur (a, b) => …",
+      "icone": "a-b",
+      "resume": "Le comparateur reçoit **deux éléments** et retourne un **nombre** : négatif si a vient avant b, positif si a vient après, 0 si égal.",
+      "analogie": "Un **arbitre** qui regarde deux œufs à la fois et dit lequel passe devant. Il ne trie pas toute la boîte : il compare seulement deux œufs. C'est `toSorted` qui l'appelle autant de fois qu'il faut.",
+      "texte": "- `(a, b) => a - b` : ordre **croissant** (si a < b, a - b est négatif : a passe devant).\n- `(a, b) => b - a` : ordre **décroissant**.\n- Pour des objets : `(a, b) => a.rank - b.rank` (le jeu de cartes, `compareRank`).\n\nLe comparateur ne contient **jamais** d'appel à `toSorted` : il compare deux éléments, c'est tout.\n\nIl doit retourner un **nombre**, pas un booléen : `(a, b) => a > b` ne trie pas correctement.",
+      "exemples": [
+        { "code": ["const prix = [12, 5, 30];", "console.log(prix.toSorted((a, b) => a - b));", "console.log(prix.toSorted((a, b) => b - a));"] },
+        { "titre": "Voir l'arbitre travailler", "code": ["[3, 1, 2].toSorted((a, b) => {", "  console.log(\"compare\", a, b, \"→\", a - b);", "  return a - b;", "});"] }
+      ],
+      "pieges": ["`toSorted` à l'intérieur du comparateur.", "Retourner `a > b` (un booléen) au lieu de `a - b` (un nombre)."]
+    },
+    {
+      "id": "localecompare",
+      "titre": "localeCompare : comparer des mots",
+      "icone": "é",
+      "resume": "`a.localeCompare(b)` compare deux textes comme un dictionnaire (accents et majuscules compris) et retourne un nombre : parfait comme comparateur.",
+      "texte": "Les textes ne se soustraient pas (`\"a\" - \"b\"` vaut `NaN`). Pour les mots, le comparateur est :\n\n`(a, b) => a.localeCompare(b)`\n\nSans comparateur, `toSorted()` compare les codes des caractères : toutes les majuscules passent avant toutes les minuscules, et les lettres accentuées à la fin. `localeCompare` range `\"abricot\"` avant `\"Banane\"`, et `\"école\"` entre `\"avion\"` et `\"zèbre\"`.",
+      "exemples": [
+        { "code": ["const mots = [\"Banane\", \"abricot\", \"école\", \"zèbre\"];", "console.log(mots.toSorted());", "console.log(mots.toSorted((a, b) => a.localeCompare(b)));"] }
+      ]
+    }
+  ],
+  "lecons": [
+    {
+      "id": "u10-l1",
+      "titre": "toSorted et le piège des nombres",
+      "duree": 5,
+      "notions": ["tosorted", "immutabilite"],
+      "cartes": [
+        {
+          "titre": "Une copie triée",
+          "texte": "`toSorted` fabrique une **nouvelle boîte** triée. Le TP le cite explicitement : « Utilisez des méthodes qui retournent un nouveau tableau, comme toSorted, plutôt que des méthodes qui modifient le tableau d'origine, comme sort. »",
+          "code": ["const strings = Object.freeze([\"Sator\", \"Arepo\", \"Tenet\"]);", "console.log(strings.toSorted());", "console.log(strings);"],
+          "fiche": "tosorted"
+        },
+        {
+          "titre": "sort plante sur un tableau gelé",
+          "texte": "`sort` trie **sur place** : sur les données du cours, c'est une erreur.",
+          "code": ["const numbers = Object.freeze([3, 1, 2]);", "numbers.sort();"],
+          "erreurVoulue": true
+        },
+        {
+          "titre": "Le piège : 10 avant 9",
+          "texte": "Sans consigne, `toSorted` compare des **textes**. Et en texte, \"10\" vient avant \"9\" (on compare le premier caractère : \"1\" < \"9\").",
+          "code": ["console.log([10, 9, 1, 100].toSorted());"],
+          "piege": "Pour trier des nombres, il faut **toujours** un comparateur (leçon suivante)."
+        }
+      ],
+      "exercices": [
+        { "id": "u10-l1-e1", "type": "predire", "notions": ["tosorted"], "question": "Que va afficher ce code ?", "code": ["console.log([\"kiwi\", \"ananas\", \"mangue\"].toSorted());"], "explication": "Ordre alphabétique (tout en minuscules, sans accent : pas de surprise ici)." },
+        { "id": "u10-l1-e2", "type": "predire", "notions": ["tosorted"], "question": "Que va afficher ce code ?", "code": ["console.log([25, 3, 100].toSorted());"], "explication": "Tri en texte : \"100\" < \"25\" < \"3\" (on compare caractère par caractère)." },
+        { "id": "u10-l1-e3", "type": "tri", "notions": ["tosorted", "immutabilite"], "mono": true, "question": "Modifie l'original ou retourne une copie ?", "categories": ["modifie l'original", "retourne une copie"], "items": [["sort", 0], ["toSorted", 1], ["reverse", 0], ["toReversed", 1]], "explication": "Les versions « to… » sont les copies : celles du cours." },
+        { "id": "u10-l1-e4", "type": "bug", "notions": ["tosorted"], "question": "Ce code plante. Quelle ligne, et pourquoi ?", "code": ["const notes = Object.freeze([4, 6, 5]);", "const triees = notes.sort((a, b) => a - b);", "console.log(triees);"], "ligne": 2, "choix": ["`sort` modifie le tableau gelé : il faut `toSorted`", "Le comparateur est faux", "Il faut `let triees`", "`notes` doit être un texte"], "bonne": 0, "explication": "`toSorted` fait la même chose dans une copie." }
+      ]
+    },
+    {
+      "id": "u10-l2",
+      "titre": "Le comparateur",
+      "duree": 6,
+      "notions": ["comparateur", "tosorted"],
+      "cartes": [
+        {
+          "titre": "Un arbitre entre deux œufs",
+          "texte": "Le comparateur reçoit **deux** éléments, `a` et `b`, et retourne un **nombre** :\n- négatif : `a` passe devant ;\n- positif : `b` passe devant ;\n- 0 : égalité.",
+          "code": ["const prix = [12, 5, 30];", "console.log(prix.toSorted((a, b) => a - b));"],
+          "analogie": "Un **arbitre** qui ne regarde que deux œufs à la fois. C'est toSorted qui l'appelle autant de fois que nécessaire.",
+          "fiche": "comparateur"
+        },
+        {
+          "titre": "a - b : pourquoi ça marche",
+          "texte": "Si a = 5 et b = 12 : `a - b` = -7, négatif : 5 passe devant 12. C'est l'ordre croissant. Pour décroissant : `b - a`.",
+          "code": ["[12, 5, 30].toSorted((a, b) => {", "  console.log(a, \"vs\", b, \"→\", a - b);", "  return a - b;", "});"]
+        },
+        {
+          "titre": "Un nombre, pas un booléen",
+          "texte": "`(a, b) => a > b` retourne true / false. Le tri attend un nombre négatif, positif ou nul : avec un booléen, le résultat peut être faux.",
+          "piege": "Et jamais de `toSorted` à l'intérieur du comparateur : l'arbitre compare deux éléments, il ne trie pas."
+        },
+        {
+          "titre": "Trier des objets",
+          "texte": "On compare une **propriété** des deux objets. C'est exactement `compareRank` du jeu de cartes.",
+          "code": ["const eleves = [{ nom: \"Léa\", note: 5 }, { nom: \"Sami\", note: 4 }];", "console.log(eleves.toSorted((a, b) => a.note - b.note));"]
+        }
+      ],
+      "exercices": [
+        { "id": "u10-l2-e1", "type": "predire", "notions": ["comparateur"], "question": "Que va afficher ce code ?", "code": ["console.log([3, 14, 15, 92].toSorted((a, b) => b - a));"], "explication": "b - a : ordre décroissant." },
+        { "id": "u10-l2-e2", "type": "qcm", "notions": ["comparateur"], "question": "Que doit retourner le comparateur quand `a` doit passer **avant** `b` ?", "choix": ["un nombre négatif", "un nombre positif", "true", "0"], "bonne": 0, "explication": "Négatif : a devant." },
+        { "id": "u10-l2-e3", "type": "pointer-code", "notions": ["comparateur"], "question": "Touche le **comparateur**.", "code": ["const triees = prix.toSorted(⟦(a, b) => a - b⟧);"], "explication": "La fonction donnée à toSorted : elle compare deux éléments." },
+        { "id": "u10-l2-e4", "type": "bug", "notions": ["comparateur"], "question": "Ce tri ne fonctionne pas. Quelle ligne corriger ?", "code": ["const numbers = [3, 92, 14];", "const tries = numbers.toSorted((a, b) => numbers.toSorted());", "console.log(tries);"], "ligne": 2, "choix": ["Le comparateur doit comparer a et b et retourner un nombre : `(a, b) => a - b`", "Il faut `sort`", "Il manque `return` ligne 3", "Il faut trier `a` et `b` séparément"], "bonne": 0, "explication": "L'arbitre compare deux éléments : pas de toSorted à l'intérieur." },
+        {
+          "id": "u10-l2-e5", "type": "ecrire", "notions": ["comparateur", "tosorted"],
+          "question": "Écris `sortDesc(numbers)` qui retourne une copie triée du **plus grand au plus petit**.",
+          "depart": ["function sortDesc(numbers) {", "  ", "}", "", "console.log(sortDesc([3, 92, 14, 100]));"],
+          "tests": { "fonction": "sortDesc", "cas": [ { "args": [[3, 92, 14, 100]], "attendu": [100, 92, 14, 3] }, { "args": [[-1, 5, 0]], "attendu": [5, 0, -1] }, { "titre": "tableau vide", "args": [[]], "attendu": [] } ], "interdit": ["sort"] },
+          "indices": ["Décroissant : le plus grand passe devant.", { "code": "return numbers.toSorted((a, b) => ___);" }],
+          "solution": ["function sortDesc(numbers) {", "  return numbers.toSorted((a, b) => b - a);", "}", "", "console.log(sortDesc([3, 92, 14, 100]));"],
+          "erreursTypiques": [
+            { "code": "function sortDesc(numbers) {\n  return numbers.toSorted((a, b) => a - b);\n}", "attendu": "echec" },
+            { "code": "function sortDesc(numbers) {\n  return numbers.toSorted().toReversed();\n}", "attendu": "echec" },
+            { "code": "function sortDesc(numbers) {\n  return numbers.sort((a, b) => b - a);\n}", "attendu": "erreur" },
+            { "code": "function sortDesc(numbers) {\n  return numbers.toSorted((a, b) => numbers.toSorted());\n}", "attendu": "echec", "diagnostic": "tosorted-imbrique" }
+          ],
+          "explication": "`b - a` : décroissant. (toSorted() sans comparateur puis toReversed échoue : 100 serait trié comme du texte.)"
+        }
+      ]
+    },
+    {
+      "id": "u10-l3",
+      "titre": "Trier des mots",
+      "duree": 5,
+      "notions": ["localecompare", "comparateur"],
+      "cartes": [
+        {
+          "titre": "Les mots ne se soustraient pas",
+          "texte": "`\"a\" - \"b\"` vaut `NaN`. Pour comparer deux mots, on demande à JavaScript de les comparer comme un dictionnaire : `a.localeCompare(b)`.",
+          "code": ["console.log(\"avion\".localeCompare(\"zèbre\"));", "console.log(\"zèbre\".localeCompare(\"avion\"));", "console.log(\"kiwi\".localeCompare(\"kiwi\"));"],
+          "fiche": "localecompare"
+        },
+        {
+          "titre": "Le comparateur des mots",
+          "texte": "`localeCompare` retourne déjà un nombre négatif, positif ou nul : c'est un comparateur tout prêt.",
+          "code": ["const mots = [\"Banane\", \"abricot\", \"école\", \"zèbre\"];", "console.log(mots.toSorted((a, b) => a.localeCompare(b)));", "console.log(mots.toSorted());"],
+          "piege": "Sans comparateur, les majuscules passent avant toutes les minuscules et les accents à la fin."
+        },
+        {
+          "titre": "Le premier dans l'ordre alphabétique",
+          "texte": "Exercice 7 des chaînes : trier une copie, puis prendre la première case. L'original reste intact.",
+          "code": ["const strings = Object.freeze([\"Sator\", \"Arepo\", \"Tenet\"]);", "const triees = strings.toSorted((a, b) => a.localeCompare(b));", "console.log(triees[0], strings);"]
+        }
+      ],
+      "exercices": [
+        { "id": "u10-l3-e1", "type": "predire", "notions": ["localecompare"], "question": "Que va afficher ce code ?", "code": ["console.log([\"poire\", \"Abricot\", \"cerise\"].toSorted((a, b) => a.localeCompare(b)));"], "explication": "Ordre du dictionnaire, sans se soucier des majuscules." },
+        { "id": "u10-l3-e2", "type": "predire", "notions": ["tosorted", "localecompare"], "question": "Que va afficher ce code ?", "code": ["console.log([\"poire\", \"Zoé\", \"abricot\"].toSorted());"], "explication": "Sans comparateur : les majuscules d'abord (Z avant a)." },
+        { "id": "u10-l3-e3", "type": "qcm", "notions": ["localecompare"], "question": "Quel comparateur trie des mots par ordre alphabétique ?", "choix": ["(a, b) => a.localeCompare(b)", "(a, b) => a - b", "(a, b) => a > b", "(a, b) => b.localeCompare(a)"], "bonne": 0, "mono": true, "explication": "La 2e donne NaN pour des mots, la 3e un booléen, la 4e l'ordre inverse." },
+        {
+          "id": "u10-l3-e4", "type": "ecrire", "notions": ["localecompare", "tosorted"],
+          "question": "Écris `getLastAlphabetical(words)` qui retourne le mot qui vient en **dernier** dans l'ordre alphabétique (undefined si le tableau est vide), sans modifier le tableau.",
+          "depart": ["function getLastAlphabetical(words) {", "  ", "}", "", "console.log(getLastAlphabetical([\"pomme\", \"Zoé\", \"ananas\"]));"],
+          "tests": { "fonction": "getLastAlphabetical", "cas": [ { "args": [["pomme", "Zoé", "ananas"]], "attendu": "Zoé" }, { "args": [["zèbre", "Abricot"]], "attendu": "zèbre" }, { "args": [["Kiwi", "école"]], "attendu": "Kiwi" }, { "titre": "tableau vide", "args": [[]], "attenduUndefined": true } ], "interdit": ["sort"] },
+          "indices": ["Trier une copie avec localeCompare, puis prendre la dernière case.", { "code": "return words.toSorted((a, b) => ___).at(___);" }],
+          "solution": ["function getLastAlphabetical(words) {", "  return words.toSorted((a, b) => a.localeCompare(b)).at(-1);", "}", "", "console.log(getLastAlphabetical([\"pomme\", \"Zoé\", \"ananas\"]));"],
+          "erreursTypiques": [ { "code": "function getLastAlphabetical(words) {\n  return words.toSorted().at(-1);\n}", "attendu": "echec" }, { "code": "function getLastAlphabetical(words) {\n  return words.toSorted((a, b) => a.localeCompare(b))[0];\n}", "attendu": "echec" } ],
+          "explication": "Avec localeCompare, \"école\" vient avant \"Kiwi\", même si le é a un code plus grand."
+        }
+      ]
+    }
+  ],
+  "jeux": [
+    {
+      "id": "u10-arbitre",
+      "titre": "L'arbitre",
+      "description": "Qui passe devant ? Prédis l'ordre après le tri.",
+      "tours": 8,
+      "questions": [
+        { "id": "u10-j1-1", "type": "predire", "notions": ["comparateur"], "question": "Que va afficher ce code ?", "code": ["console.log([5, 1, 4].toSorted((a, b) => a - b));"], "explication": "Croissant." },
+        { "id": "u10-j1-2", "type": "predire", "notions": ["tosorted"], "question": "Que va afficher ce code ?", "code": ["console.log([5, 10, 1].toSorted());"], "explication": "En texte : \"1\" < \"10\" < \"5\"." },
+        { "id": "u10-j1-3", "type": "predire", "notions": ["localecompare"], "question": "Que va afficher ce code ?", "code": ["console.log([\"Opera\", \"Arepo\", \"Rotas\"].toSorted((a, b) => a.localeCompare(b))[0]);"], "explication": "Arepo vient en premier." },
+        { "id": "u10-j1-4", "type": "predire", "notions": ["comparateur"], "question": "Que va afficher ce code ?", "code": ["console.log([\"kiwi\", \"ail\", \"mangue\"].toSorted((a, b) => a.length - b.length));"], "explication": "Trié par longueur." },
+        { "id": "u10-j1-5", "type": "qcm", "notions": ["comparateur"], "question": "Quel nombre retourne le comparateur `(a, b) => a - b` pour a = 92, b = 14 ?", "choix": ["78 (positif : 14 passe devant)", "-78 (négatif : 92 passe devant)", "true", "0"], "bonne": 0, "explication": "92 - 14 = 78 : positif, donc b (14) passe devant." },
+        { "id": "u10-j1-6", "type": "predire", "notions": ["comparateur"], "question": "Que va afficher ce code ?", "code": ["const cartes = [{ rank: 13 }, { rank: 2 }, { rank: 11 }];", "console.log(cartes.toSorted((a, b) => a.rank - b.rank).map((c) => c.rank));"], "explication": "Trié par rang, puis on garde les rangs." },
+        { "id": "u10-j1-7", "type": "predire", "notions": ["tosorted", "immutabilite"], "question": "Que va afficher la dernière ligne ?", "code": ["const t = [3, 1, 2];", "const u = t.toSorted((a, b) => a - b);", "console.log(t);"], "explication": "toSorted ne touche pas l'original." },
+        { "id": "u10-j1-8", "type": "predire", "notions": ["tosorted"], "question": "Et avec sort ?", "code": ["const t = [3, 1, 2];", "const u = t.sort((a, b) => a - b);", "console.log(t);"], "explication": "sort trie l'original sur place." }
+      ]
+    }
+  ],
+  "quiz": {
+    "titre": "Quiz : trier",
+    "questions": [
+      { "id": "u10-q1", "type": "predire", "notions": ["comparateur"], "question": "Que va afficher ce code ?", "code": ["console.log([3, 14, 15, 92, 65].toSorted((a, b) => a - b));"], "explication": "Croissant." },
+      { "id": "u10-q2", "type": "predire", "notions": ["tosorted"], "question": "Que va afficher ce code ?", "code": ["console.log([9, 80, 700].toSorted());"], "explication": "En texte : \"700\" < \"80\" < \"9\"." },
+      { "id": "u10-q3", "type": "qcm", "notions": ["tosorted"], "question": "Pourquoi le cours préfère `toSorted` à `sort` ?", "choix": ["toSorted retourne une copie et ne modifie pas l'original", "toSorted est plus rapide", "sort ne trie pas les nombres", "sort n'existe plus"], "bonne": 0, "explication": "Structure immutable." },
+      { "id": "u10-q4", "type": "qcm", "notions": ["comparateur"], "question": "Ordre décroissant :", "choix": ["(a, b) => b - a", "(a, b) => a - b", "(a, b) => a > b", "(a, b) => -1"], "bonne": 0, "mono": true, "explication": "b - a." },
+      { "id": "u10-q5", "type": "predire", "notions": ["localecompare"], "question": "Que va afficher ce code ?", "code": ["console.log([\"Sator\", \"Arepo\", \"Tenet\", \"Opera\", \"Rotas\"].toSorted((a, b) => a.localeCompare(b)));"], "explication": "Ordre alphabétique des cinq mots." },
+      { "id": "u10-q6", "type": "bug", "notions": ["comparateur"], "question": "Trouve l'erreur.", "code": ["const mots = [\"kiwi\", \"ail\"];", "const tries = mots.toSorted((a, b) => a - b);", "console.log(tries);"], "ligne": 2, "choix": ["On ne soustrait pas des mots : `a.localeCompare(b)`", "Il faut `sort`", "Il faut `b - a`", "Il manque `return`"], "bonne": 0, "explication": "\"kiwi\" - \"ail\" vaut NaN." },
+      { "id": "u10-q7", "type": "vf", "notions": ["comparateur"], "question": "Un comparateur peut retourner `true` ou `false`.", "bonne": false, "explication": "Il doit retourner un nombre (négatif, positif ou 0)." },
+      { "id": "u10-q8", "type": "predire", "notions": ["localecompare"], "question": "Que va afficher ce code ?", "code": ["console.log(\"b\".localeCompare(\"a\") > 0);"], "explication": "b vient après a : positif." },
+      { "id": "u10-q9", "type": "pointer-code", "notions": ["comparateur"], "question": "Touche ce que retourne le comparateur.", "code": ["const t = notes.toSorted((a, b) => ⟦b - a⟧);"], "explication": "Le nombre qui dit qui passe devant." },
+      { "id": "u10-q10", "type": "predire", "notions": ["tosorted", "slice"], "question": "Que va afficher ce code ?", "code": ["console.log([5, 3, 9, 1].toSorted((a, b) => a - b).slice(0, 2));"], "explication": "Les deux plus petits." },
+      { "id": "u10-q11", "type": "predire", "notions": ["comparateur", "map"], "question": "Que va afficher ce code ?", "code": ["const e = [{ n: \"Léa\", age: 20 }, { n: \"Noé\", age: 18 }];", "console.log(e.toSorted((a, b) => a.age - b.age).map((x) => x.n));"], "explication": "Le plus jeune d'abord." },
+      { "id": "u10-q12", "type": "tri", "notions": ["tosorted", "immutabilite"], "mono": true, "question": "Permis sur `Object.freeze([…])` ?", "categories": ["oui", "non"], "items": [["toSorted()", 0], ["sort()", 1], ["toReversed()", 0], ["reverse()", 1]], "explication": "Les copies, oui ; les tris sur place, non." },
+      { "id": "u10-q13", "type": "predire", "notions": ["every", "comparateur"], "question": "Que va afficher ce code ?", "code": ["const t = [1, 2, 3];", "const s = t.toSorted((a, b) => b - a);", "console.log(s.every((n, i) => i === 0 || n < s[i - 1]));"], "explication": "Révision : every avec l'indice. Décroissant : chaque nombre est plus petit que le précédent." },
+      { "id": "u10-q14", "type": "predire", "notions": ["reduce", "tosorted"], "question": "Que va afficher ce code ?", "code": ["console.log([\"b\", \"a\", \"c\"].toSorted().reduce((acc, l) => acc + l, \"\"));"], "explication": "Révision de reduce : trié, puis collé." },
+      { "id": "u10-q15", "type": "qcm", "notions": ["comparateur"], "question": "Combien de fois toSorted appelle-t-il le comparateur pour trier 3 éléments ?", "choix": ["Plusieurs fois, deux éléments à la fois", "Une seule fois, avec tout le tableau", "Jamais", "Une fois par élément, avec un seul élément"], "bonne": 0, "explication": "L'arbitre ne voit jamais que deux œufs à la fois." }
+    ]
+  },
+  "boss": [
+    {
+      "id": "u10-b1",
+      "titre": "Le premier dans l'ordre alphabétique",
+      "source": "TP Tableaux · chaînes, exercice 7",
+      "notions": ["localecompare", "tosorted", "comparateur"],
+      "enonce": "À partir du tableau `strings` : **retourner le mot qui vient en premier selon l'ordre alphabétique, sans modifier le tableau initial** (localeCompare et toSorted peuvent être utiles).\n\nÉcris une fonction `getFirstAlphabetical(strings)` (undefined si le tableau est vide).",
+      "regles": ["La structure de données initiale ne doit pas être modifiée.", "Vos solutions doivent rester fonctionnelles même si le contenu du tableau initial diffère (majuscules et minuscules mélangées, accents)."],
+      "donnees": { "strings": ["Sator", "Arepo", "Tenet", "Opera", "Rotas"] },
+      "depart": ["function getFirstAlphabetical(strings) {", "  ", "}", "", "console.log(getFirstAlphabetical(strings));"],
+      "tests": { "fonction": "getFirstAlphabetical", "cas": [
+        { "titre": "Données du cours", "args": [["Sator", "Arepo", "Tenet", "Opera", "Rotas"]], "attendu": "Arepo" },
+        { "titre": "Minuscules et majuscules", "args": [["Banane", "abricot", "cerise"]], "attendu": "abricot", "siEchec": "Sans comparateur, les majuscules passent avant les minuscules (\"Banane\" avant \"abricot\"). Utilise `(a, b) => a.localeCompare(b)`." },
+        { "titre": "Accents", "args": [["zèbre", "école", "kiwi"]], "attendu": "école" },
+        { "titre": "Tableau vide", "args": [[]], "attenduUndefined": true }
+      ], "interdit": ["sort"] },
+      "indices": ["Deux étapes : trier une **copie**, puis prendre la première case.", "Le comparateur des mots : relis la fiche [[localecompare]].", { "code": "return strings.toSorted((a, b) => ___)[___];" }],
+      "solution": ["function getFirstAlphabetical(strings) {", "  return strings.toSorted((a, b) => a.localeCompare(b))[0];", "}", "", "console.log(getFirstAlphabetical(strings));"],
+      "erreursTypiques": [
+        { "code": "function getFirstAlphabetical(strings) {\n  return strings.sort()[0];\n}", "attendu": "echec", "diagnostic": "interdit" },
+        { "code": "function getFirstAlphabetical(strings) {\n  return strings.toSorted()[0];\n}", "attendu": "echec", "diagnostic": "contenu" },
+        { "code": "function getFirstAlphabetical(strings) {\n  return strings.toSorted((a, b) => strings.toSorted())[0];\n}", "attendu": "echec", "diagnostic": "tosorted-imbrique" },
+        { "code": "function getFirstAlphabetical(strings) {\n  return strings.toSorted((a, b) => a - b)[0];\n}", "attendu": "echec" }
+      ],
+      "explication": "Exercice 7 du TP sur les chaînes. Autre solution sans trier : un reduce qui garde le mot le plus « petit » avec localeCompare."
+    }
+  ]
+}

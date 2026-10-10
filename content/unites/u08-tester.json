@@ -1,0 +1,1304 @@
+{
+  "id": "u08",
+  "titre": "Tester : some, every",
+  "sousTitre": "TP Tableaux · nombres 8, 9 · chaînes 2",
+  "objectif": "Répondre par oui ou non à une question sur tout un tableau : au moins un ? tous ? Et chercher un élément.",
+  "icone": "?",
+  "fiches": [
+    {
+      "id": "some",
+      "titre": "some : au moins un ?",
+      "icone": "∃",
+      "resume": "`tab.some((x) => condition)` retourne `true` si **au moins un** élément vérifie la condition.",
+      "analogie": "Un **détecteur** passé sur la boîte d'œufs : il sonne dès qu'il trouve **un** œuf qui répond à la question, et s'arrête là. S'il arrive au bout sans sonner : `false`.",
+      "texte": "`numbers.some((n) => n % 9 === 0)` : « y a-t-il au moins un multiple de 9 ? »\n\n- La fonction reçoit chaque élément et retourne un booléen (comme pour `filter`).\n- `some` retourne **un seul booléen**, pas un tableau.\n- Il s'arrête dès qu'il trouve un `true`.\n- Sur un tableau **vide** : `false` (personne ne répond oui).",
+      "exemples": [
+        {
+          "code": [
+            "const numbers = [3, 14, 15, 92];",
+            "console.log(numbers.some((n) => n > 90));",
+            "console.log(numbers.some((n) => n < 0));",
+            "console.log([].some((n) => n > 0));"
+          ]
+        }
+      ],
+      "pieges": [
+        "Utiliser `filter` puis regarder le tableau : `filter` retourne un tableau (toujours « vrai » dans un if), pas un booléen.",
+        "Écrire `numbers.some(numbers % 9 === 0)` : il faut une **fonction** `(n) => …`."
+      ]
+    },
+    {
+      "id": "every",
+      "titre": "every : tous ?",
+      "icone": "∀",
+      "resume": "`tab.every((x) => condition)` retourne `true` si **tous** les éléments vérifient la condition.",
+      "analogie": "Un **contrôle qualité** : chaque œuf est inspecté. Au premier œuf qui ne passe pas, la boîte entière est refusée (`false`). Si tous passent : `true`.",
+      "texte": "`numbers.every((n) => n >= 0)` : « tous les nombres sont-ils positifs ? »\n\n- Il s'arrête au premier `false`.\n- Sur un tableau **vide** : `true` (aucun œuf n'a échoué au contrôle). C'est surprenant, mais logique : « tous les élèves de la classe vide ont la moyenne » n'est contredit par personne.\n- `every` et `some` sont liés : « tous positifs » = « pas un seul négatif » : `!numbers.some((n) => n < 0)`.",
+      "exemples": [
+        {
+          "code": [
+            "const strings = [\"Sator\", \"Arepo\", \"Tenet\"];",
+            "console.log(strings.every((word) => word.length === 5));",
+            "console.log([3, -1].every((n) => n >= 0));",
+            "console.log([].every((n) => n >= 0));"
+          ]
+        }
+      ],
+      "pieges": [
+        "Confondre `some` (au moins un) et `every` (tous) : relis la question.",
+        "« Positif » en français inclut 0 : `n >= 0`."
+      ]
+    },
+    {
+      "id": "chercher",
+      "titre": "Chercher : includes, indexOf, find",
+      "icone": "🔍",
+      "resume": "`includes(x)` : est-il dedans ? `indexOf(x)` : à quel indice (-1 sinon) ? `find(fn)` : le premier élément qui vérifie une condition.",
+      "texte": "- `fruits.includes(\"kiwi\")` → `true` / `false`\n- `fruits.indexOf(\"kiwi\")` → l'indice de la première occurrence, ou **-1** s'il n'y est pas\n- `numbers.find((n) => n > 50)` → le **premier élément** qui vérifie la condition (`undefined` s'il n'y en a pas)\n- `numbers.findIndex((n) => n > 50)` → son indice (-1 sinon)\n\n`includes` et `indexOf` comparent avec `===` : pratiques pour des valeurs simples. Pour une condition, c'est `some` / `find`.",
+      "exemples": [
+        {
+          "code": [
+            "const fruits = [\"pomme\", \"kiwi\", \"mangue\"];",
+            "console.log(fruits.includes(\"kiwi\"), fruits.indexOf(\"kiwi\"), fruits.indexOf(\"poire\"));",
+            "const numbers = [3, 14, 92, 65];",
+            "console.log(numbers.find((n) => n > 50), numbers.findIndex((n) => n > 50));"
+          ]
+        }
+      ]
+    }
+  ],
+  "lecons": [
+    {
+      "id": "u08-l1",
+      "titre": "some : au moins un ?",
+      "duree": 5,
+      "notions": [
+        "some",
+        "callback-param"
+      ],
+      "cartes": [
+        {
+          "titre": "Une question, une réponse",
+          "texte": "Parfois, on ne veut ni transformer ni filtrer : on veut **une réponse oui / non** sur tout le tableau. « Y a-t-il au moins un nombre supérieur à 90 ? »",
+          "code": [
+            "const numbers = [3, 14, 15, 92, 65];",
+            "console.log(numbers.some((n) => n > 90));"
+          ],
+          "analogie": "Un **détecteur** passé sur la boîte : il sonne dès qu'un œuf répond oui, et s'arrête.",
+          "fiche": "some"
+        },
+        {
+          "titre": "Même fonction que filter, autre résultat",
+          "texte": "La fonction donnée à `some` est la même que pour `filter` : elle répond `true` ou `false` pour un élément. Mais `filter` retourne **un tableau** ; `some` retourne **un booléen**.",
+          "code": [
+            "const numbers = [3, 14, 15];",
+            "console.log(numbers.filter((n) => n > 10));",
+            "console.log(numbers.some((n) => n > 10));"
+          ]
+        },
+        {
+          "titre": "Le multiple de 9 du TP",
+          "texte": "« Indiquer si le tableau contient au moins un nombre multiple de 9 » : un détecteur de multiples de 9 (unité 2 : `n % 9 === 0`).",
+          "code": [
+            "console.log([3, 14, 27].some((n) => n % 9 === 0));",
+            "console.log([3, 14, 15].some((n) => n % 9 === 0));"
+          ]
+        },
+        {
+          "titre": "La boîte vide",
+          "texte": "Dans une boîte vide, aucun œuf ne peut répondre oui : `some` retourne `false`.",
+          "code": [
+            "console.log([].some((n) => n % 9 === 0));"
+          ]
+        }
+      ],
+      "exercices": [
+        {
+          "id": "u08-l1-e1",
+          "type": "predire",
+          "notions": [
+            "some"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "const notes = [3.5, 4, 2];",
+            "console.log(notes.some((note) => note >= 4));"
+          ],
+          "explication": "La note 4 suffit : au moins une."
+        },
+        {
+          "id": "u08-l1-e2",
+          "type": "predire",
+          "notions": [
+            "some"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "const prix = [12, 8, 25];",
+            "console.log(prix.some((p) => p > 100));"
+          ],
+          "explication": "Aucun prix ne dépasse 100."
+        },
+        {
+          "id": "u08-l1-e3",
+          "type": "tri",
+          "notions": [
+            "some",
+            "filter",
+            "map"
+          ],
+          "mono": true,
+          "question": "Que retourne chaque appel ?",
+          "categories": [
+            "un booléen",
+            "un tableau"
+          ],
+          "items": [
+            [
+              "numbers.some((n) => n > 0)",
+              0
+            ],
+            [
+              "numbers.filter((n) => n > 0)",
+              1
+            ],
+            [
+              "numbers.map((n) => n > 0)",
+              1
+            ],
+            [
+              "numbers.every((n) => n > 0)",
+              0
+            ]
+          ],
+          "explication": "some et every répondent par un booléen ; filter et map fabriquent des tableaux (même map avec une condition)."
+        },
+        {
+          "id": "u08-l1-e4",
+          "type": "bug",
+          "notions": [
+            "some"
+          ],
+          "question": "Ce code plante. Pourquoi ?",
+          "code": [
+            "const numbers = [3, 18, 4];",
+            "const reponse = numbers.some(numbers % 9 === 0);",
+            "console.log(reponse);"
+          ],
+          "ligne": 2,
+          "choix": [
+            "`some` attend une **fonction** : `(n) => n % 9 === 0`",
+            "Il faut `filter`",
+            "Il faut `==`",
+            "Il faut `let reponse`"
+          ],
+          "bonne": 0,
+          "explication": "On donne une recette (une fonction), pas un résultat. Et on teste l'élément `n`, pas la boîte `numbers`."
+        },
+        {
+          "id": "u08-l1-e5",
+          "type": "ecrire",
+          "notions": [
+            "some"
+          ],
+          "question": "Écris `hasNegative(numbers)` qui retourne `true` si le tableau contient **au moins un** nombre négatif.",
+          "depart": [
+            "function hasNegative(numbers) {",
+            "  ",
+            "}",
+            "",
+            "console.log(hasNegative([3, -1, 4]));"
+          ],
+          "tests": {
+            "fonction": "hasNegative",
+            "cas": [
+              {
+                "args": [
+                  [
+                    3,
+                    -1,
+                    4
+                  ]
+                ],
+                "attendu": true
+              },
+              {
+                "args": [
+                  [
+                    3,
+                    0,
+                    4
+                  ]
+                ],
+                "attendu": false
+              },
+              {
+                "titre": "tableau vide",
+                "args": [
+                  []
+                ],
+                "attendu": false
+              }
+            ],
+            "obligatoire": [
+              "some"
+            ]
+          },
+          "indices": [
+            "« Au moins un » : quelle méthode ?",
+            {
+              "code": "return numbers.some((n) => ___);"
+            }
+          ],
+          "solution": [
+            "function hasNegative(numbers) {",
+            "  return numbers.some((n) => n < 0);",
+            "}",
+            "",
+            "console.log(hasNegative([3, -1, 4]));"
+          ],
+          "erreursTypiques": [
+            {
+              "code": "function hasNegative(numbers) {\n  return numbers.filter((n) => n < 0);\n}",
+              "attendu": "echec"
+            },
+            {
+              "code": "function hasNegative(numbers) {\n  return numbers.every((n) => n < 0);\n}",
+              "attendu": "echec"
+            },
+            {
+              "code": "function hasNegative(numbers) {\n  return numbers.some((n) => n <= 0);\n}",
+              "attendu": "echec"
+            }
+          ],
+          "explication": "`some` répond « oui » dès le premier nombre négatif."
+        }
+      ]
+    },
+    {
+      "id": "u08-l2",
+      "titre": "every : tous ?",
+      "duree": 5,
+      "notions": [
+        "every",
+        "callback-param"
+      ],
+      "cartes": [
+        {
+          "titre": "Tous, sans exception",
+          "texte": "`every` vérifie que **tous** les éléments répondent oui. Au premier « non », il s'arrête et retourne `false`.",
+          "code": [
+            "const strings = [\"Sator\", \"Arepo\", \"Tenet\", \"Opera\", \"Rotas\"];",
+            "console.log(strings.every((word) => word.length === 5));"
+          ],
+          "analogie": "Un **contrôle qualité** : un seul œuf raté, et toute la boîte est refusée.",
+          "fiche": "every"
+        },
+        {
+          "titre": "Que des positifs ?",
+          "texte": "« Indiquer si le tableau ne contient que des nombres positifs » : tous doivent être `>= 0`. En français, 0 est positif.",
+          "code": [
+            "console.log([3, 14, 0].every((n) => n >= 0));",
+            "console.log([3, -14, 15].every((n) => n >= 0));"
+          ]
+        },
+        {
+          "titre": "La boîte vide, encore",
+          "texte": "Dans une boîte vide, **aucun** œuf ne rate le contrôle : `every` retourne `true`. Étonnant, mais c'est la logique : rien ne contredit « tous ».",
+          "code": [
+            "console.log([].every((n) => n >= 0));"
+          ],
+          "piege": "Les tests du cours essaient le tableau vide : `every` répond true, `some` répond false."
+        },
+        {
+          "titre": "some ou every ?",
+          "texte": "- « au moins un », « contient un », « y a-t-il » → `some`\n- « tous », « que des », « aucun… ne » → `every`\n\n« Aucun négatif » = « tous positifs » : `every((n) => n >= 0)`, ou `!some((n) => n < 0)`."
+        }
+      ],
+      "exercices": [
+        {
+          "id": "u08-l2-e1",
+          "type": "predire",
+          "notions": [
+            "every"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "const ages = [19, 22, 17];",
+            "console.log(ages.every((age) => age >= 18));"
+          ],
+          "explication": "17 rate le contrôle : false."
+        },
+        {
+          "id": "u08-l2-e2",
+          "type": "predire",
+          "notions": [
+            "every"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "console.log([].every((x) => x > 1000));"
+          ],
+          "explication": "Boîte vide : rien ne contredit, donc true."
+        },
+        {
+          "id": "u08-l2-e3",
+          "type": "methode",
+          "notions": [
+            "some",
+            "every"
+          ],
+          "question": "« Tous les t-shirts sont-ils en stock ? »",
+          "choix": [
+            "every",
+            "some",
+            "filter",
+            "map"
+          ],
+          "bonne": 0,
+          "explication": "Tous : every."
+        },
+        {
+          "id": "u08-l2-e4",
+          "type": "methode",
+          "notions": [
+            "some",
+            "every"
+          ],
+          "question": "« Le panier contient-il au moins un article à plus de 100 francs ? »",
+          "choix": [
+            "some",
+            "every",
+            "filter",
+            "find"
+          ],
+          "bonne": 0,
+          "explication": "Au moins un : some."
+        },
+        {
+          "id": "u08-l2-e5",
+          "type": "assoc",
+          "notions": [
+            "some",
+            "every"
+          ],
+          "mono": true,
+          "question": "Associe chaque question à son code.",
+          "paires": [
+            [
+              "que des positifs",
+              "tab.every((n) => n >= 0)"
+            ],
+            [
+              "au moins un négatif",
+              "tab.some((n) => n < 0)"
+            ],
+            [
+              "aucun zéro",
+              "tab.every((n) => n !== 0)"
+            ],
+            [
+              "au moins un zéro",
+              "tab.some((n) => n === 0)"
+            ]
+          ],
+          "explication": "« aucun… » se dit avec every et une condition inversée."
+        },
+        {
+          "id": "u08-l2-e6",
+          "type": "ecrire",
+          "notions": [
+            "every"
+          ],
+          "question": "Écris `allPassed(notes)` qui retourne `true` si **toutes** les notes sont d'au moins 4.",
+          "depart": [
+            "function allPassed(notes) {",
+            "  ",
+            "}",
+            "",
+            "console.log(allPassed([4, 5.5, 6]));"
+          ],
+          "tests": {
+            "fonction": "allPassed",
+            "cas": [
+              {
+                "args": [
+                  [
+                    4,
+                    5.5,
+                    6
+                  ]
+                ],
+                "attendu": true
+              },
+              {
+                "args": [
+                  [
+                    4,
+                    3.5,
+                    6
+                  ]
+                ],
+                "attendu": false
+              },
+              {
+                "titre": "tableau vide",
+                "args": [
+                  []
+                ],
+                "attendu": true
+              }
+            ],
+            "obligatoire": [
+              "every"
+            ]
+          },
+          "indices": [
+            "« Toutes » : quelle méthode ?",
+            {
+              "code": "return notes.every((note) => ___);"
+            }
+          ],
+          "solution": [
+            "function allPassed(notes) {",
+            "  return notes.every((note) => note >= 4);",
+            "}",
+            "",
+            "console.log(allPassed([4, 5.5, 6]));"
+          ],
+          "erreursTypiques": [
+            {
+              "code": "function allPassed(notes) {\n  return notes.some((note) => note >= 4);\n}",
+              "attendu": "echec"
+            },
+            {
+              "code": "function allPassed(notes) {\n  return notes.every((note) => note > 4);\n}",
+              "attendu": "echec"
+            }
+          ],
+          "explication": "`every` refuse dès la première note insuffisante."
+        }
+      ]
+    },
+    {
+      "id": "u08-l3",
+      "titre": "Chercher dans un tableau",
+      "duree": 5,
+      "notions": [
+        "chercher",
+        "some"
+      ],
+      "cartes": [
+        {
+          "titre": "includes : est-il dedans ?",
+          "texte": "Pour une valeur précise, pas besoin de fonction : `includes`.",
+          "code": [
+            "const fruits = [\"pomme\", \"kiwi\", \"mangue\"];",
+            "console.log(fruits.includes(\"kiwi\"));",
+            "console.log(fruits.includes(\"Kiwi\"));"
+          ],
+          "fiche": "chercher"
+        },
+        {
+          "titre": "indexOf : où est-il ?",
+          "texte": "`indexOf` donne l'indice de la première occurrence, ou **-1** si l'élément n'y est pas. -1 n'est jamais un vrai indice : c'est le code « pas trouvé ».",
+          "code": [
+            "const fruits = [\"pomme\", \"kiwi\", \"mangue\"];",
+            "console.log(fruits.indexOf(\"mangue\"));",
+            "console.log(fruits.indexOf(\"poire\"));"
+          ]
+        },
+        {
+          "titre": "find : le premier qui…",
+          "texte": "Avec une **condition**, `find` retourne le premier élément qui la vérifie (`undefined` s'il n'y en a pas), et `findIndex` son indice.",
+          "code": [
+            "const numbers = [3, 14, 92, 65];",
+            "console.log(numbers.find((n) => n > 50));",
+            "console.log(numbers.findIndex((n) => n > 50));",
+            "console.log(numbers.find((n) => n > 500));"
+          ]
+        }
+      ],
+      "exercices": [
+        {
+          "id": "u08-l3-e1",
+          "type": "predire",
+          "notions": [
+            "chercher"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "const tailles = [\"S\", \"M\", \"L\"];",
+            "console.log(tailles.indexOf(\"L\"), tailles.indexOf(\"XL\"));"
+          ],
+          "explication": "L est à l'indice 2 ; XL n'y est pas : -1."
+        },
+        {
+          "id": "u08-l3-e2",
+          "type": "predire",
+          "notions": [
+            "chercher"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "const notes = [3, 4.5, 6, 5];",
+            "console.log(notes.find((note) => note >= 5));"
+          ],
+          "explication": "Le **premier** élément qui vérifie : 6 (pas 5, qui vient après)."
+        },
+        {
+          "id": "u08-l3-e3",
+          "type": "assoc",
+          "notions": [
+            "chercher",
+            "some"
+          ],
+          "mono": true,
+          "question": "Associe chaque méthode à ce qu'elle retourne.",
+          "paires": [
+            [
+              "includes",
+              "true ou false"
+            ],
+            [
+              "indexOf",
+              "un indice, ou -1"
+            ],
+            [
+              "find",
+              "un élément, ou undefined"
+            ],
+            [
+              "filter",
+              "un tableau"
+            ]
+          ],
+          "explication": "Quatre façons de chercher, quatre types de réponses."
+        },
+        {
+          "id": "u08-l3-e4",
+          "type": "pointer-tableau",
+          "notions": [
+            "chercher"
+          ],
+          "question": "Touche l'élément retourné par `numbers.find((n) => n % 2 === 0)`.",
+          "tableau": [
+            3,
+            15,
+            14,
+            92,
+            65
+          ],
+          "nom": "numbers",
+          "bonnes": [
+            2
+          ],
+          "explication": "Le premier pair : 14 (indice 2)."
+        }
+      ]
+    }
+  ],
+  "jeux": [
+    {
+      "id": "u08-oui-non",
+      "titre": "Oui ou non ?",
+      "description": "some, every, includes : la bonne méthode pour chaque question.",
+      "tours": 8,
+      "questions": [
+        {
+          "id": "u08-j1-1",
+          "type": "predire",
+          "notions": [
+            "some"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "console.log([3, 14, 15].some((n) => n % 2 === 0));"
+          ],
+          "explication": "14 est pair."
+        },
+        {
+          "id": "u08-j1-2",
+          "type": "predire",
+          "notions": [
+            "every"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "console.log([3, 14, 15].every((n) => n > 2));"
+          ],
+          "explication": "Tous sont plus grands que 2."
+        },
+        {
+          "id": "u08-j1-3",
+          "type": "predire",
+          "notions": [
+            "every"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "console.log([\"Sator\", \"Tenet\", \"Op\"].every((w) => w.length === 5));"
+          ],
+          "explication": "\"Op\" n'a que 2 lettres."
+        },
+        {
+          "id": "u08-j1-4",
+          "type": "predire",
+          "notions": [
+            "some"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "console.log([].some((n) => true));"
+          ],
+          "explication": "Boîte vide : some répond toujours false."
+        },
+        {
+          "id": "u08-j1-5",
+          "type": "methode",
+          "notions": [
+            "some",
+            "every",
+            "chercher"
+          ],
+          "question": "« Le mot \"radar\" est-il dans le tableau ? »",
+          "choix": [
+            "includes",
+            "every",
+            "map",
+            "reduce"
+          ],
+          "bonne": 0,
+          "explication": "Une valeur précise : includes."
+        },
+        {
+          "id": "u08-j1-6",
+          "type": "methode",
+          "notions": [
+            "every"
+          ],
+          "question": "« Tous les mots commencent-ils par une majuscule ? »",
+          "choix": [
+            "every",
+            "some",
+            "filter",
+            "find"
+          ],
+          "bonne": 0,
+          "explication": "Tous : every."
+        },
+        {
+          "id": "u08-j1-7",
+          "type": "methode",
+          "notions": [
+            "chercher"
+          ],
+          "question": "« Quel est le premier prix supérieur à 50 ? »",
+          "choix": [
+            "find",
+            "some",
+            "filter",
+            "includes"
+          ],
+          "bonne": 0,
+          "explication": "Le premier élément qui vérifie : find."
+        },
+        {
+          "id": "u08-j1-8",
+          "type": "predire",
+          "notions": [
+            "chercher"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "console.log([\"a\", \"b\"].indexOf(\"c\"));"
+          ],
+          "explication": "Pas trouvé : -1."
+        },
+        {
+          "id": "u08-j1-9",
+          "type": "predire",
+          "notions": [
+            "some",
+            "every"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "const t = [2, 4, 7];",
+            "console.log(!t.some((n) => n % 2 !== 0));"
+          ],
+          "explication": "Il y a un impair (7), donc « pas d'impair » est faux."
+        }
+      ]
+    }
+  ],
+  "quiz": {
+    "titre": "Quiz : some, every",
+    "questions": [
+      {
+        "id": "u08-q1",
+        "type": "predire",
+        "notions": [
+          "some"
+        ],
+        "question": "Que va afficher ce code ?",
+        "code": [
+          "console.log([3, 14, 15, 92, 65, 35, 89, 79, 32, 38].some((n) => n % 9 === 0));"
+        ],
+        "explication": "Aucun multiple de 9 dans les nombres du cours."
+      },
+      {
+        "id": "u08-q2",
+        "type": "predire",
+        "notions": [
+          "every"
+        ],
+        "question": "Que va afficher ce code ?",
+        "code": [
+          "console.log([3, 14, 15, 92, 65, 35, 89, 79, 32, 38].every((n) => n >= 0));"
+        ],
+        "explication": "Tous sont positifs."
+      },
+      {
+        "id": "u08-q3",
+        "type": "qcm",
+        "notions": [
+          "every"
+        ],
+        "question": "Que retourne `[].every((n) => n > 0)` ?",
+        "choix": [
+          "true",
+          "false",
+          "undefined",
+          "une erreur"
+        ],
+        "bonne": 0,
+        "mono": true,
+        "explication": "Rien ne contredit « tous » : true."
+      },
+      {
+        "id": "u08-q4",
+        "type": "qcm",
+        "notions": [
+          "some"
+        ],
+        "question": "Que retourne `[].some((n) => n > 0)` ?",
+        "choix": [
+          "false",
+          "true",
+          "undefined",
+          "[]"
+        ],
+        "bonne": 0,
+        "mono": true,
+        "explication": "Personne ne répond oui : false."
+      },
+      {
+        "id": "u08-q5",
+        "type": "methode",
+        "notions": [
+          "some",
+          "every"
+        ],
+        "question": "« Indiquer si tous les mots font 5 lettres » :",
+        "choix": [
+          "every",
+          "some",
+          "filter",
+          "map"
+        ],
+        "bonne": 0,
+        "explication": "Tous : every."
+      },
+      {
+        "id": "u08-q6",
+        "type": "methode",
+        "notions": [
+          "some",
+          "every"
+        ],
+        "question": "« Indiquer si le tableau contient au moins un multiple de 9 » :",
+        "choix": [
+          "some",
+          "every",
+          "filter",
+          "reduce"
+        ],
+        "bonne": 0,
+        "explication": "Au moins un : some."
+      },
+      {
+        "id": "u08-q7",
+        "type": "bug",
+        "notions": [
+          "some",
+          "filter"
+        ],
+        "question": "Cette fonction doit retourner un booléen. Où est le problème ?",
+        "code": [
+          "function hasBig(numbers) {",
+          "  return numbers.filter((n) => n > 50);",
+          "}"
+        ],
+        "ligne": 2,
+        "choix": [
+          "`filter` retourne un tableau : il faut `some`",
+          "Il faut `n >= 50`",
+          "Il manque des accolades",
+          "`numbers` doit être gelé"
+        ],
+        "bonne": 0,
+        "explication": "La question appelle un oui / non : some."
+      },
+      {
+        "id": "u08-q8",
+        "type": "predire",
+        "notions": [
+          "chercher"
+        ],
+        "question": "Que va afficher ce code ?",
+        "code": [
+          "console.log([\"Sator\", \"Arepo\"].includes(\"sator\"));"
+        ],
+        "explication": "Les majuscules comptent."
+      },
+      {
+        "id": "u08-q9",
+        "type": "predire",
+        "notions": [
+          "chercher"
+        ],
+        "question": "Que va afficher ce code ?",
+        "code": [
+          "console.log([5, 10, 15].findIndex((n) => n > 7));"
+        ],
+        "explication": "10 est le premier, à l'indice 1."
+      },
+      {
+        "id": "u08-q10",
+        "type": "vf",
+        "notions": [
+          "some"
+        ],
+        "question": "`some` continue à tester les éléments après avoir trouvé un `true`.",
+        "bonne": false,
+        "explication": "Il s'arrête dès qu'il a sa réponse."
+      },
+      {
+        "id": "u08-q11",
+        "type": "pointer-code",
+        "notions": [
+          "every",
+          "callback-param"
+        ],
+        "question": "Touche la condition que chaque élément doit vérifier.",
+        "code": [
+          "const ok = strings.every((word) => ⟦word.length === 5⟧);"
+        ],
+        "explication": "Ce que retourne la fléchée : la question posée à chaque mot."
+      },
+      {
+        "id": "u08-q12",
+        "type": "predire",
+        "notions": [
+          "every"
+        ],
+        "question": "Que va afficher ce code ?",
+        "code": [
+          "console.log([\"Sator\", \"Arepo\", \"Tenet\", \"Opera\", \"Rotas\"].every((w) => w.length === 5));"
+        ],
+        "explication": "Cinq mots de cinq lettres."
+      },
+      {
+        "id": "u08-q13",
+        "type": "qcm",
+        "notions": [
+          "every",
+          "some"
+        ],
+        "question": "« Aucun nombre négatif » s'écrit :",
+        "choix": [
+          "tab.every((n) => n >= 0)",
+          "tab.some((n) => n >= 0)",
+          "tab.every((n) => n < 0)",
+          "tab.filter((n) => n >= 0)"
+        ],
+        "bonne": 0,
+        "mono": true,
+        "explication": "Tous positifs = aucun négatif."
+      },
+      {
+        "id": "u08-q14",
+        "type": "predire",
+        "notions": [
+          "map",
+          "every"
+        ],
+        "question": "Que va afficher ce code ?",
+        "code": [
+          "console.log([1, 2, 3].map((n) => n * 2).every((n) => n % 2 === 0));"
+        ],
+        "explication": "Révision de map : on double, puis tous sont pairs."
+      },
+      {
+        "id": "u08-q15",
+        "type": "predire",
+        "notions": [
+          "reduce",
+          "some"
+        ],
+        "question": "Que va afficher ce code ?",
+        "code": [
+          "const t = [3, 4];",
+          "console.log(t.reduce((acc, n) => acc + n, 0) > 5 && t.some((n) => n > 3));"
+        ],
+        "explication": "Révision de reduce : 7 > 5, et 4 > 3."
+      }
+    ]
+  },
+  "boss": [
+    {
+      "id": "u08-b1",
+      "titre": "Au moins un multiple de 9",
+      "source": "TP Tableaux · nombres, exercice 8",
+      "notions": [
+        "some",
+        "modulo"
+      ],
+      "enonce": "À partir du tableau `numbers` : **indiquer si le tableau contient au moins un nombre multiple de 9**.\n\nÉcris une fonction `hasMultipleOf9(numbers)` qui retourne `true` ou `false`.",
+      "regles": [
+        "La structure de données initiale ne doit pas être modifiée (structure immutable).",
+        "Vos solutions doivent rester fonctionnelles même si le contenu du tableau initial diffère (tableau vide compris)."
+      ],
+      "donnees": {
+        "numbers": [
+          3,
+          14,
+          15,
+          92,
+          65,
+          35,
+          89,
+          79,
+          32,
+          38
+        ]
+      },
+      "depart": [
+        "function hasMultipleOf9(numbers) {",
+        "  ",
+        "}",
+        "",
+        "console.log(hasMultipleOf9(numbers));"
+      ],
+      "tests": {
+        "fonction": "hasMultipleOf9",
+        "cas": [
+          {
+            "titre": "Données du cours",
+            "args": [
+              [
+                3,
+                14,
+                15,
+                92,
+                65,
+                35,
+                89,
+                79,
+                32,
+                38
+              ]
+            ],
+            "attendu": false
+          },
+          {
+            "titre": "Un multiple de 9 au milieu",
+            "args": [
+              [
+                3,
+                27,
+                15
+              ]
+            ],
+            "attendu": true
+          },
+          {
+            "titre": "Multiple de 9 négatif",
+            "args": [
+              [
+                -18,
+                1
+              ]
+            ],
+            "attendu": true
+          },
+          {
+            "titre": "Tableau vide",
+            "args": [
+              []
+            ],
+            "attendu": false
+          }
+        ]
+      },
+      "indices": [
+        "« Au moins un » : relis la fiche [[some]].",
+        "Un multiple de 9 : le reste de la division par 9 est 0 (unité 2).",
+        {
+          "code": "return numbers.some((n) => ___);"
+        }
+      ],
+      "solution": [
+        "function hasMultipleOf9(numbers) {",
+        "  return numbers.some((n) => n % 9 === 0);",
+        "}",
+        "",
+        "console.log(hasMultipleOf9(numbers));"
+      ],
+      "erreursTypiques": [
+        {
+          "code": "function hasMultipleOf9(numbers) {\n  return numbers.filter((n) => n % 9 === 0);\n}",
+          "attendu": "echec"
+        },
+        {
+          "code": "function hasMultipleOf9(numbers) {\n  return numbers.every((n) => n % 9 === 0);\n}",
+          "attendu": "echec"
+        },
+        {
+          "code": "function hasMultipleOf9(numbers) {\n  return numbers.some((n) => n / 9 === 0);\n}",
+          "attendu": "echec"
+        },
+        {
+          "code": "function hasMultipleOf9(numbers) {\n  console.log(numbers.some((n) => n % 9 === 0));\n}",
+          "attendu": "echec",
+          "diagnostic": "return-vs-log"
+        }
+      ],
+      "explication": "Exercice 8 du TP. Avec les nombres du cours, la réponse est false : aucun n'est multiple de 9."
+    },
+    {
+      "id": "u08-b2",
+      "titre": "Que des nombres positifs",
+      "source": "TP Tableaux · nombres, exercice 9",
+      "notions": [
+        "every",
+        "comparaisons"
+      ],
+      "enonce": "À partir du tableau `numbers` : **indiquer si le tableau ne contient que des nombres positifs**.\n\nÉcris une fonction `allPositive(numbers)`. On considère 0 comme positif.",
+      "regles": [
+        "La structure de données initiale ne doit pas être modifiée (structure immutable).",
+        "Vos solutions doivent rester fonctionnelles même si le contenu du tableau initial diffère (tableau vide compris)."
+      ],
+      "donnees": {
+        "numbers": [
+          3,
+          14,
+          15,
+          92,
+          65,
+          35,
+          89,
+          79,
+          32,
+          38
+        ]
+      },
+      "depart": [
+        "function allPositive(numbers) {",
+        "  ",
+        "}",
+        "",
+        "console.log(allPositive(numbers));"
+      ],
+      "tests": {
+        "fonction": "allPositive",
+        "cas": [
+          {
+            "titre": "Données du cours",
+            "args": [
+              [
+                3,
+                14,
+                15,
+                92,
+                65,
+                35,
+                89,
+                79,
+                32,
+                38
+              ]
+            ],
+            "attendu": true
+          },
+          {
+            "titre": "Un négatif à la fin",
+            "args": [
+              [
+                3,
+                14,
+                -1
+              ]
+            ],
+            "attendu": false
+          },
+          {
+            "titre": "Avec zéro",
+            "args": [
+              [
+                0,
+                5
+              ]
+            ],
+            "attendu": true,
+            "siEchec": "0 est considéré comme positif ici : `n >= 0`."
+          },
+          {
+            "titre": "Tableau vide",
+            "args": [
+              []
+            ],
+            "attendu": true,
+            "siEchec": "Un tableau vide ne contient aucun négatif : la réponse est true (c'est ce que fait every)."
+          }
+        ]
+      },
+      "indices": [
+        "« Que des » = « tous » : relis la fiche [[every]].",
+        "Attention à 0 et au tableau vide.",
+        {
+          "code": "return numbers.every((n) => ___);"
+        }
+      ],
+      "solution": [
+        "function allPositive(numbers) {",
+        "  return numbers.every((n) => n >= 0);",
+        "}",
+        "",
+        "console.log(allPositive(numbers));"
+      ],
+      "erreursTypiques": [
+        {
+          "code": "function allPositive(numbers) {\n  return numbers.every((n) => n > 0);\n}",
+          "attendu": "echec",
+          "diagnostic": "contenu"
+        },
+        {
+          "code": "function allPositive(numbers) {\n  return numbers.some((n) => n >= 0);\n}",
+          "attendu": "echec"
+        },
+        {
+          "code": "function allPositive(numbers) {\n  return numbers.length > 0 && numbers.every((n) => n >= 0);\n}",
+          "attendu": "echec",
+          "diagnostic": "contenu"
+        }
+      ],
+      "explication": "Exercice 9 du TP : every s'arrête au premier négatif."
+    },
+    {
+      "id": "u08-b3",
+      "titre": "Tous les mots font 5 lettres",
+      "source": "TP Tableaux · chaînes, exercice 2",
+      "notions": [
+        "every",
+        "chaines"
+      ],
+      "enonce": "À partir du tableau `strings` : **indiquer si tous les mots font 5 lettres**.\n\nÉcris une fonction `allFiveLetters(strings)`.",
+      "regles": [
+        "La structure de données initiale ne doit pas être modifiée.",
+        "Vos solutions doivent rester fonctionnelles même si le contenu du tableau initial diffère."
+      ],
+      "donnees": {
+        "strings": [
+          "Sator",
+          "Arepo",
+          "Tenet",
+          "Opera",
+          "Rotas"
+        ]
+      },
+      "depart": [
+        "function allFiveLetters(strings) {",
+        "  ",
+        "}",
+        "",
+        "console.log(allFiveLetters(strings));"
+      ],
+      "tests": {
+        "fonction": "allFiveLetters",
+        "cas": [
+          {
+            "titre": "Données du cours",
+            "args": [
+              [
+                "Sator",
+                "Arepo",
+                "Tenet",
+                "Opera",
+                "Rotas"
+              ]
+            ],
+            "attendu": true
+          },
+          {
+            "titre": "Un mot plus long",
+            "args": [
+              [
+                "Sator",
+                "Radars"
+              ]
+            ],
+            "attendu": false
+          },
+          {
+            "titre": "Un mot plus court",
+            "args": [
+              [
+                "Ici",
+                "Sator"
+              ]
+            ],
+            "attendu": false
+          },
+          {
+            "titre": "Tableau vide",
+            "args": [
+              []
+            ],
+            "attendu": true
+          }
+        ]
+      },
+      "indices": [
+        "La longueur d'un mot : `.length` (unité 1).",
+        "Attention : `strings.length` compte les **mots**. Il faut la longueur de **chaque** mot : relis [[every]].",
+        {
+          "code": "return strings.every((word) => ___);"
+        }
+      ],
+      "solution": [
+        "function allFiveLetters(strings) {",
+        "  return strings.every((word) => word.length === 5);",
+        "}",
+        "",
+        "console.log(allFiveLetters(strings));"
+      ],
+      "erreursTypiques": [
+        {
+          "code": "function allFiveLetters(strings) {\n  return strings.length === 5;\n}",
+          "attendu": "echec"
+        },
+        {
+          "code": "function allFiveLetters(strings) {\n  return strings.every((word) => word.length >= 5);\n}",
+          "attendu": "echec"
+        },
+        {
+          "code": "function allFiveLetters(strings) {\n  return strings.some((word) => word.length === 5);\n}",
+          "attendu": "echec"
+        }
+      ],
+      "explication": "Exercice 2 du TP sur les chaînes. Attention : `strings.length` est le nombre de **mots**, `word.length` le nombre de **lettres** d'un mot."
+    }
+  ]
+}

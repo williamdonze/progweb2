@@ -220,8 +220,21 @@ function codeHTML(code, opts = {}){
   const ent = opts.entete ? lignesColorees(opts.entete).map(l => `<div class="l entete">${num ? `<span class="n"></span>` : ""}<span>${l.map(spanJeton).join("")}</span></div>`).join("") : "";
   return `<div class="code ${num ? "" : "sans-n"}" translate="no">${ent}${L.map((l, i) => `<div class="l ${(opts.surligne || []).includes(i + 1) ? "lu" : ""}" data-l="${i + 1}">${num ? `<span class="n">${i + 1}</span>` : ""}<span>${l.map(spanJeton).join("") || " "}</span></div>`).join("")}</div>`;
 }
+/* couleurs du terminal (codes ANSI, TP « showCard ») : \x1b[31;47m rouge sur blanc, \x1b[30;47m noir sur blanc, \x1b[0m normal */
+const ANSI_COUL = ["#1a1a1a", "#d22b2b", "#2e9e4b", "#c7a008", "#2f6fd0", "#b03fc0", "#1c9fa8", "#f2f2f2"];
+function ansiHTML(texte){
+  if (!texte.includes("\x1b[")) return esc(texte);
+  let st = {}, out = "";
+  for (const [i, m] of texte.split(/\x1b\[([\d;]*)m/).entries()) {
+    if (i % 2) { for (const c of (m || "0").split(";").map(Number)) { if (c === 0) st = {}; else if (c === 1) st.b = true; else if (c >= 30 && c <= 37) st.fg = ANSI_COUL[c - 30]; else if (c >= 40 && c <= 47) st.bg = ANSI_COUL[c - 40]; else if (c === 39) delete st.fg; else if (c === 49) delete st.bg; } continue; }
+    if (!m) continue;
+    const css = [st.fg && `color:${st.fg}`, st.bg && `background:${st.bg}`, st.b && "font-weight:800"].filter(Boolean).join(";");
+    out += css ? `<span style="${css}">${esc(m)}</span>` : esc(m);
+  }
+  return out;
+}
 function consoleHTML(logs, opts = {}){
-  const L = (logs || []).map(l => `<div class="cl">${esc(l)}</div>`).join("");
+  const L = (logs || []).map(l => `<div class="cl">${ansiHTML(l)}</div>`).join("");
   return `<div class="console" role="log" aria-label="Console">${opts.titre === false ? "" : `<div class="titre">Console</div>`}${L || `<div class="vide">${esc(opts.vide || "Rien n'a été affiché.")}</div>`}</div>`;
 }
 

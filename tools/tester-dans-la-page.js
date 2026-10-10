@@ -26,14 +26,15 @@ async function testerTout(filtreUnite){
         if (TYPES_CODE.has(q.type)) {
           const code = q.type === "trous" ? assembler(q.code, q.solution) : lignes(q.solution);
           const tableaux = q.donnees ? Object.entries(q.donnees).filter(([, v]) => Array.isArray(v)).map(([k]) => k) : [];
-          const r = await executer({ code, donnees:q.donnees || null, tests:q.tests, contexte:{ tableaux } });
+          const lancerQ = (c) => q.dom ? executerDom({ code:c, dom:q.dom, tests:q.tests, contexte:{ tableaux } }) : executer({ code:c, donnees:q.donnees || null, prelude:q.prelude ? lignes(q.prelude) : "", tests:q.tests, contexte:{ tableaux } });
+          const r = await lancerQ(code);
           stats.solutions++;
           if (!r.ok) erreurs.push(`${o} : la SOLUTION échoue → ${JSON.stringify({ erreur:r.erreur, diag:r.diagnostics, cas:r.cas.filter(c => !c.ok) }).slice(0, 500)}`);
           if (r.conseils?.length) avert.push(`${o} : la solution déclenche un conseil (${r.conseils.map(c => c.id).join(", ")})`);
           if (!q.erreursTypiques?.length) avert.push(`${o} : aucune erreur typique testée`);
           for (const [k, et] of (q.erreursTypiques || []).entries()) {
             const c2 = q.type === "trous" ? assembler(q.code, et.trous) : lignes(et.code);
-            const r2 = await executer({ code:c2, donnees:q.donnees || null, tests:q.tests, contexte:{ tableaux } });
+            const r2 = await lancerQ(c2);
             stats.erreursTypiques++;
             const aErreur = !!(r2.erreur || r2.cas?.some(c => c.erreur));
             const idsVus = [...(r2.diagnostics || []), ...(r2.conseils || [])].map(d => d.id);
@@ -70,6 +71,7 @@ async function testerTout(filtreUnite){
         if (q.type === "map-visuel") evalContenu(q.fonction);
         if (q.type === "reduce-pas") { if (!etapesReduce(q).length) erreurs.push(`${o} : aucune étape de reduce`); }
         if (q.type === "types-chaine") q.maillons.forEach((m, k) => evalContenu(q.depart + q.maillons.slice(0, k + 1).join("")));
+        if (q.type === "selecteur") { const doc = new DOMParser().parseFromString((await pageDom(q.dom)).html, "text/html"); let n = -1; try { n = doc.querySelectorAll(q.attendu).length; } catch(e) {} if (n < 0) erreurs.push(`${o} : sélecteur attendu invalide`); else if (q.nombre !== undefined && n !== q.nombre) erreurs.push(`${o} : le sélecteur attendu trouve ${n} éléments, pas ${q.nombre}`); }
         if (q.type === "objet") q.cles.forEach(k => { if (!q.bonnes[k]?.every(b => q.etiquettes.includes(b))) erreurs.push(`${o} : bonne étiquette absente pour ${k}`); });
         if (q.type === "fisher-yates" && q.tirages.some((j, k) => j < 0 || j > q.tableau.length - 1 - k)) erreurs.push(`${o} : tirage j hors de [0, i]`);
         if (q.type === "tri" && q.items.some(([, c]) => c < 0 || c >= q.categories.length)) erreurs.push(`${o} : catégorie inexistante`);

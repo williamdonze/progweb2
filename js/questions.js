@@ -13,7 +13,7 @@ const KIND_NAME = {
   "pointer-code":"Pointe dans le code", "pointer-tableau":"Pointe dans le tableau", bug:"Trouve le bug", predire:"Prédis le résultat",
   parsons:"Reconstitue le programme", "reduce-pas":"reduce pas à pas", "filtre-visuel":"Filtre visuel", "map-visuel":"Transformation map",
   objet:"Construis l'objet", "fisher-yates":"Mélange de Fisher–Yates", "types-chaine":"Suis les types", erreurs:"Traducteur d'erreurs",
-  trous:"Code à trous", corriger:"Corrige le code", ecrire:"Écris le code", boss:"Boss"
+  trous:"Code à trous", corriger:"Corrige le code", ecrire:"Écris le code", boss:"Boss", selecteur:"Sélecteur CSS"
 };
 const TYPES_CODE = new Set(["trous", "corriger", "ecrire", "boss"]);
 /* évalue une expression du CONTENU (jamais du code de l'élève) : condition d'un filtre, fonction d'un map… */
@@ -451,7 +451,7 @@ function resultatHTML(r){
 function exerciceCode(q, onChange){
   const trous = q.type === "trous";
   const depart = lignes(q.depart ?? (trous ? q.code : ""));
-  const entete = enteteAffichee(q.donnees);
+  const entete = [enteteAffichee(q.donnees), lignes(q.prelude || "")].filter(Boolean).join("\n");
   const el = h(`<div class="ex-code">${q.enonce ? `<div class="rich" style="margin-bottom:8px">${rich(q.enonce)}</div>` : ""}${q.regles?.length ? `<div class="aside tip" style="margin-top:0">${I.warn.replace("<svg", '<svg style="color:var(--teal)"')}<div><b class="t">Règles du cours</b><div class="rich">${rich(q.regles.map(r => "- " + r).join("\n"))}</div></div></div>` : ""}<div class="zone-code"></div><div class="ed-actions"><button type="button" class="btn small ghost" data-run>${I.play}Exécuter</button>${trous ? "" : `<button type="button" class="btn small ghost" data-reset>${I.reset}Recommencer</button>`}</div><div class="sortie"></div><div class="zone-indices"></div></div>`);
   let ed = null, champs = [];
   const zone = el.querySelector(".zone-code");
@@ -479,7 +479,16 @@ function exerciceCode(q, onChange){
   let essais = 0, verrou = false;
   el.querySelector("[data-run]").onclick = async (e) => {
     const b = e.currentTarget; b.disabled = true;
-    const r = await executer({ code: codeActuel(), donnees: q.donnees || null });
+    if (q.dom) {   // DOM : la page s'affiche, avec ton code ; tu cliques toi-même, la console se remplit
+      sortie.innerHTML = "";
+      const zonePage = h(`<div></div>`), cons = h(consoleHTML([], { vide:"Rien n'a été affiché pour l'instant." }));
+      sortie.append(h(`<p class="apercu-note">La page de l'exercice, avec ton code. Clique sur ses boutons pour essayer.</p>`), zonePage, cons);
+      const r = await apercuDom(zonePage, { code: codeActuel(), dom: q.dom, surLog: (t, g) => { cons.querySelector(".vide")?.remove(); const l = h(`<div class="cl ${g === "error" ? "err" : ""}"></div>`); l.innerHTML = ansiHTML(t); cons.appendChild(l); } });
+      b.disabled = false;
+      if (r.erreur) { sortie.appendChild(resultatHTML({ erreur:r.erreur })); ed?.marquer(r.erreur.ligne); }
+      return;
+    }
+    const r = await executer({ code: codeActuel(), donnees: q.donnees || null, prelude: q.prelude ? lignes(q.prelude) : "" });
     b.disabled = false;
     sortie.innerHTML = "";
     sortie.appendChild(h(consoleHTML(r.console, { vide:"Rien n'a été affiché. Pour voir un résultat : console.log(…)." })));
@@ -501,7 +510,8 @@ function exerciceCode(q, onChange){
     async check(){
       verrou = true; ed?.lectureSeule(true); champs.forEach(c => c.readOnly = true);
       essais++;
-      const r = await executer({ code: codeActuel(), donnees: q.donnees || null, tests: q.tests, contexte:{ tableaux } });
+      const r = q.dom ? await executerDom({ code: codeActuel(), dom: q.dom, tests: q.tests, contexte:{ tableaux } })
+        : await executer({ code: codeActuel(), donnees: q.donnees || null, prelude: q.prelude ? lignes(q.prelude) : "", tests: q.tests, contexte:{ tableaux } });
       if (r.timeout && q.tests?.siTropLong) r.erreur.message += " " + q.tests.siTropLong;
       sortie.innerHTML = "";
       sortie.appendChild(h(consoleHTML(r.console, { vide:"Rien n'a été affiché." })));
@@ -512,10 +522,44 @@ function exerciceCode(q, onChange){
       const rate = r.cas?.filter(c => !c.ok).length || 0;
       return {
         ok: r.ok, retry: !r.ok, essais,
-        detailHTML: r.ok ? `<p><b>Tous les tests passent${r.cas.length > 1 ? `, y compris avec d'autres données` : ""}.</b>${essais === 1 ? " Du premier coup !" : ""}</p>${(r.conseils || []).map(c => `<p>${richInline("Conseil : " + c.message)}</p>`).join("")}`
+        detailHTML: r.ok ? `<p><b>Tous les tests passent${r.cas.length > 1 && !q.dom ? `, y compris avec d'autres données` : ""}.</b>${essais === 1 ? " Du premier coup !" : ""}</p>${(r.conseils || []).map(c => `<p>${richInline("Conseil : " + c.message)}</p>`).join("")}`
           : `${premier ? `<p>${richInline(premier.message)}</p>` : ""}${rate ? `<p>${pluriel(rate, "test échoue", "tests échouent")} sur ${r.cas.length}. Le détail est sous ton code.</p>` : ""}`
       };
     }
   };
 }
+/* ---------------- écrire un sélecteur CSS (TP DOM) : la page surligne en direct ce qu'il sélectionne ---------------- */
+/* "dom": { "page": "cards" } ou { "html": [...] }, "attendu": "le sélecteur de référence" (comparé par les éléments sélectionnés, pas par le texte) */
+Q.selecteur = (q, onChange) => {
+  const el = h(`<div class="selecteur-zone"><iframe class="selecteur-page" title="Page de l'exercice"></iframe><label class="eyebrow" for="sel-css">Ton sélecteur CSS</label><input id="sel-css" class="saisie" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="ex. .deck .heart"><div class="selecteur-compte" aria-live="polite">Écris un sélecteur : les éléments trouvés s'entourent dans la page.</div></div>`);
+  const f = el.querySelector("iframe"), inp = el.querySelector("input"), compte = el.querySelector(".selecteur-compte");
+  let doc = null, locked = false;
+  documentDom(q.dom, false).then(html => { f.srcdoc = html.replace("</head>", "<style>.pw-trouve{outline:3px dashed #5B3FD9 !important;outline-offset:2px;background:#ECE8FC !important}</style></head>"); });
+  f.addEventListener("load", () => { doc = f.contentDocument; maj(); });
+  const trouver = sel => { try { return [...doc.querySelectorAll(sel)]; } catch(e) { return null; } };
+  const maj = () => {
+    if (!doc || locked) return;
+    doc.querySelectorAll(".pw-trouve").forEach(x => x.classList.remove("pw-trouve"));
+    const v = inp.value.trim();
+    if (!v) { compte.textContent = "Écris un sélecteur : les éléments trouvés s'entourent dans la page."; compte.classList.remove("ko"); onChange(); return; }
+    const els = trouver(v);
+    if (!els) { compte.textContent = "Sélecteur invalide (vérifie la syntaxe : . pour une classe, # pour un id, [ ] pour un attribut)."; compte.classList.add("ko"); onChange(); return; }
+    els.forEach(x => x.classList.add("pw-trouve"));
+    const cartes = els.filter(x => x.localName === "playing-card").length;
+    compte.classList.remove("ko");
+    compte.textContent = `${pluriel(els.length, "élément trouvé", "éléments trouvés")}${els.length !== cartes && cartes ? ` (dont ${cartes} carte${cartes > 1 ? "s" : ""} : les autres sont des éléments à l'intérieur des cartes ou ailleurs)` : ""}.`;
+    onChange();
+  };
+  inp.addEventListener("input", maj);
+  return { el, ready:() => !!doc && inp.value.trim() !== "" && !!trouver(inp.value.trim()),
+    resoudre(){ inp.value = q.attendu; maj(); },
+    check(){
+      locked = true; inp.readOnly = true;
+      const a = trouver(inp.value.trim()) || [], b = trouver(q.attendu);
+      const ok = a.length === b.length && a.every(x => b.includes(x));
+      inp.classList.add(ok ? "ok" : "ko");
+      return { ok, answer: `${q.attendu} (${pluriel(b.length, "élément")})` };
+    } };
+};
+
 Q.trous = exerciceCode; Q.corriger = exerciceCode; Q.ecrire = exerciceCode; Q.boss = exerciceCode;

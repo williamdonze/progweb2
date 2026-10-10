@@ -7,29 +7,13 @@
     "content/unites/u04-boucles.json",
     "content/unites/u05-tableaux.json",
     "content/unites/u06-parcourir.json",
-    "content/unites/u07-reduire.json"
+    "content/unites/u07-reduire.json",
+    "content/unites/u08-tester.json",
+    "content/unites/u09-extraire.json",
+    "content/unites/u10-trier.json",
+    "content/unites/u11-chaines.json"
   ],
   "aVenir": [
-    {
-      "titre": "Tester : some, every",
-      "resume": "TP Tableaux : au moins un multiple de 9, que des positifs, tous les mots font 5 lettres",
-      "icone": "?"
-    },
-    {
-      "titre": "Extraire et assembler : slice, spread, with",
-      "resume": "TP Tableaux : sans le premier, sans le dernier, pairs puis impairs, Lorem au début, Ipsum à la fin, radar au milieu",
-      "icone": "..."
-    },
-    {
-      "titre": "Trier : toSorted, localeCompare",
-      "resume": "TP Tableaux : le premier mot dans l'ordre alphabétique",
-      "icone": "a-z"
-    },
-    {
-      "titre": "Chaînes : includes, toLowerCase, split, join",
-      "resume": "TP Tableaux : les mots avec un r, le palindrome",
-      "icone": "\"\""
-    },
     {
       "titre": "Objets : le jeu de cartes",
       "resume": "TP Tableaux : carte, paquet, buildBaseDeck, compareRank, getHighestCard, displayRank, showCard",

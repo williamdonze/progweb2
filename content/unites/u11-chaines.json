@@ -1,0 +1,268 @@
+{
+  "id": "u11",
+  "titre": "Les chaînes",
+  "sousTitre": "TP Tableaux · chaînes 1, 8",
+  "objectif": "Chercher dans un texte, changer la casse, passer d'un texte à un tableau (split) et retour (join), renverser, et suivre les types dans un enchaînement.",
+  "icone": "\"\"",
+  "fiches": [
+    {
+      "id": "methodes-chaines",
+      "titre": "Les méthodes des chaînes",
+      "icone": "Aa",
+      "resume": "`toLowerCase()`, `toUpperCase()`, `includes(x)`, `indexOf(x)`, `trim()` : elles **retournent un nouveau texte** (une chaîne ne se modifie jamais).",
+      "texte": "- `\"Rotas\".toLowerCase()` → `\"rotas\"` ; `toUpperCase()` → `\"ROTAS\"`\n- `\"Rotas\".includes(\"r\")` → `false` (les majuscules comptent !)\n- `\"Rotas\".toLowerCase().includes(\"r\")` → `true`\n- `\"Opera\".indexOf(\"e\")` → 2 (-1 si absent)\n- `\"  kiwi \".trim()` → `\"kiwi\"`\n- `mot[0]`, `mot.length` : comme un tableau, mais en lecture seule.\n\nUne chaîne est **immuable** : `mot.toLowerCase()` ne change pas `mot`, il fabrique un nouveau texte. Il faut récupérer le résultat.",
+      "exemples": [
+        { "code": ["const mot = \"Rotas\";", "console.log(mot.includes(\"r\"), mot.toLowerCase().includes(\"r\"));", "mot.toUpperCase();", "console.log(mot);", "console.log(mot.toUpperCase());"] }
+      ],
+      "pieges": ["Oublier que `includes` respecte les majuscules.", "Appeler `mot.toLowerCase()` sans récupérer le résultat."]
+    },
+    {
+      "id": "split-join",
+      "titre": "split et join : texte ↔ tableau",
+      "icone": "⇄",
+      "resume": "`texte.split(sep)` coupe un texte en **tableau** ; `tab.join(sep)` recolle un tableau en **texte**.",
+      "analogie": "`split` **casse la tablette** de chocolat en carrés (un tableau) ; `join` les **recolle** en une tablette (un texte). Le séparateur dit où casser, ou quoi mettre entre les carrés.",
+      "texte": "- `\"kayak\".split(\"\")` → `[\"k\", \"a\", \"y\", \"a\", \"k\"]` (une lettre par case)\n- `\"le chat dort\".split(\" \")` → `[\"le\", \"chat\", \"dort\"]`\n- `[\"S\", \"a\"].join(\"\")` → `\"Sa\"` ; `[\"le\", \"chat\"].join(\" \")` → `\"le chat\"`\n- `tab.join()` sans argument met des **virgules**.\n\n`[...texte]` donne aussi le tableau des lettres.",
+      "exemples": [
+        { "code": ["console.log(\"kayak\".split(\"\"));", "console.log(\"le chat dort\".split(\" \"));", "console.log([\"Sator\", \"Arepo\"].join(\"\"));", "console.log([\"Sator\", \"Arepo\"].join());"] }
+      ],
+      "pieges": ["`join()` sans argument met des virgules entre les morceaux."]
+    },
+    {
+      "id": "renverser",
+      "titre": "Renverser : toReversed",
+      "icone": "⇆",
+      "resume": "`tab.toReversed()` retourne une copie à l'envers. Une chaîne n'a pas de toReversed : on la casse (`split`), on renverse, on recolle (`join`).",
+      "texte": "- `[1, 2, 3].toReversed()` → `[3, 2, 1]` (copie ; `reverse()` modifierait l'original)\n- Pour un texte : `\"Sator\".split(\"\").toReversed().join(\"\")` → `\"rotaS\"`\n\n**Palindrome** : un texte qui se lit pareil dans les deux sens (`\"kayak\"`, `\"radar\"`). On compare le texte et son inverse avec `===` (les chaînes se comparent par leur contenu, contrairement aux tableaux).",
+      "exemples": [
+        { "code": ["const mot = \"radar\";", "const inverse = mot.split(\"\").toReversed().join(\"\");", "console.log(inverse, mot === inverse);"] }
+      ]
+    }
+  ],
+  "lecons": [
+    {
+      "id": "u11-l1",
+      "titre": "Majuscules et recherche",
+      "duree": 5,
+      "notions": ["methodes-chaines", "chaines"],
+      "cartes": [
+        {
+          "titre": "Une chaîne, presque un tableau",
+          "texte": "Un texte a une longueur et des indices, comme un tableau. Mais on ne peut pas le modifier : ses méthodes **fabriquent** un nouveau texte.",
+          "code": ["const mot = \"Tenet\";", "console.log(mot.length, mot[0], mot.at(-1));", "console.log(mot.toUpperCase(), mot);"],
+          "fiche": "methodes-chaines"
+        },
+        {
+          "titre": "includes : y a-t-il ce morceau ?",
+          "texte": "`texte.includes(x)` répond true / false. Attention : **les majuscules comptent**.",
+          "code": ["console.log(\"Opera\".includes(\"r\"));", "console.log(\"Rotas\".includes(\"r\"));", "console.log(\"Rotas\".includes(\"R\"));"]
+        },
+        {
+          "titre": "Ignorer les majuscules",
+          "texte": "Pour chercher sans se soucier de la casse, on met d'abord tout en minuscules.",
+          "code": ["const mot = \"Rotas\";", "console.log(mot.toLowerCase().includes(\"r\"));"],
+          "astuce": "C'est la clé de l'exercice 1 des chaînes : « Rotas » contient bien un r… majuscule."
+        },
+        {
+          "titre": "Filtrer des mots",
+          "texte": "Combiné avec `filter` (unité 6) : garder les mots qui contiennent une lettre.",
+          "code": ["const fruits = [\"Kiwi\", \"pomme\", \"Mangue\"];", "console.log(fruits.filter((fruit) => fruit.toLowerCase().includes(\"m\")));"]
+        }
+      ],
+      "exercices": [
+        { "id": "u11-l1-e1", "type": "predire", "notions": ["methodes-chaines"], "question": "Que va afficher ce code ?", "code": ["console.log(\"Sator\".includes(\"s\"));"], "explication": "Le S de Sator est majuscule." },
+        { "id": "u11-l1-e2", "type": "predire", "notions": ["methodes-chaines"], "question": "Que va afficher ce code ?", "code": ["const mot = \"Arepo\";", "mot.toLowerCase();", "console.log(mot);"], "explication": "Le résultat de toLowerCase n'a pas été récupéré : mot n'a pas changé." },
+        { "id": "u11-l1-e3", "type": "filtre-visuel", "notions": ["methodes-chaines", "filter"], "question": "Quels mots `filter` garde-t-il ?", "tableau": ["Sator", "Arepo", "Tenet", "Opera", "Rotas"], "nom": "strings", "condition": "(w) => w.toLowerCase().includes(\"t\")", "explication": "En minuscules, Sator, Tenet et Rotas contiennent un t." },
+        { "id": "u11-l1-e4", "type": "qcm", "notions": ["methodes-chaines"], "question": "Que retourne `\"Opera\".indexOf(\"p\")` ?", "choix": ["1", "2", "true", "-1"], "bonne": 0, "mono": true, "explication": "O est à l'indice 0, p à l'indice 1." },
+        {
+          "id": "u11-l1-e5", "type": "ecrire", "notions": ["methodes-chaines", "filter"],
+          "question": "Écris `withLetterA(words)` qui retourne les mots contenant un **a**, minuscule ou majuscule.",
+          "depart": ["function withLetterA(words) {", "  ", "}", "", "console.log(withLetterA([\"Ananas\", \"kiwi\", \"mangue\"]));"],
+          "tests": { "fonction": "withLetterA", "cas": [ { "args": [["Ananas", "kiwi", "mangue"]], "attendu": ["Ananas", "mangue"] }, { "args": [["Abc", "xyz"]], "attendu": ["Abc"] }, { "titre": "tableau vide", "args": [[]], "attendu": [] } ] },
+          "indices": ["filter + une condition sur chaque mot.", "Pour ignorer la casse : toLowerCase avant includes.", { "code": "return words.filter((w) => w.___().includes(\"a\"));" }],
+          "solution": ["function withLetterA(words) {", "  return words.filter((w) => w.toLowerCase().includes(\"a\"));", "}", "", "console.log(withLetterA([\"Ananas\", \"kiwi\", \"mangue\"]));"],
+          "erreursTypiques": [ { "code": "function withLetterA(words) {\n  return words.filter((w) => w.includes(\"a\"));\n}", "attendu": "echec" }, { "code": "function withLetterA(words) {\n  return words.map((w) => w.toLowerCase().includes(\"a\"));\n}", "attendu": "echec", "diagnostic": "map-condition" } ],
+          "explication": "Le mot gardé reste tel quel (\"Ananas\" avec sa majuscule) : toLowerCase ne sert qu'à poser la question."
+        }
+      ]
+    },
+    {
+      "id": "u11-l2",
+      "titre": "split et join",
+      "duree": 5,
+      "notions": ["split-join"],
+      "cartes": [
+        {
+          "titre": "Casser la tablette",
+          "texte": "`split` coupe un texte en tableau. Le séparateur dit où couper : `\"\"` entre chaque lettre, `\" \"` à chaque espace.",
+          "code": ["console.log(\"Tenet\".split(\"\"));", "console.log(\"Sator Arepo Tenet\".split(\" \"));"],
+          "analogie": "`split` casse la tablette en carrés ; `join` les recolle.",
+          "fiche": "split-join"
+        },
+        {
+          "titre": "Recoller",
+          "texte": "`join(sep)` recolle un tableau en texte, en mettant `sep` entre les morceaux. `join(\"\")` colle sans rien ; `join()` met des virgules !",
+          "code": ["const strings = [\"Sator\", \"Arepo\"];", "console.log(strings.join(\"\"));", "console.log(strings.join(\" \"));", "console.log(strings.join());"]
+        },
+        {
+          "titre": "Un aller-retour",
+          "texte": "Texte → tableau (pour utiliser les méthodes de tableau) → texte.",
+          "code": ["const mot = \"kayak\";", "const lettres = mot.split(\"\");", "console.log(lettres.length, lettres.join(\"-\"));"]
+        }
+      ],
+      "exercices": [
+        { "id": "u11-l2-e1", "type": "predire", "notions": ["split-join"], "question": "Que va afficher ce code ?", "code": ["console.log(\"a,b,c\".split(\",\"));"], "explication": "Coupé à chaque virgule." },
+        { "id": "u11-l2-e2", "type": "predire", "notions": ["split-join"], "question": "Que va afficher ce code ?", "code": ["console.log([\"Ro\", \"tas\"].join(\"\"));"], "explication": "Recollé sans séparateur." },
+        { "id": "u11-l2-e3", "type": "predire", "notions": ["split-join"], "question": "Que va afficher ce code ?", "code": ["console.log([\"Ro\", \"tas\"].join());"], "explication": "Sans argument : des virgules." },
+        { "id": "u11-l2-e4", "type": "types-chaine", "notions": ["split-join", "enchainement"], "question": "Quel est le type après chaque maillon ?", "depart": "\"Sator Arepo\"", "maillons": [".split(\" \")", ".join(\"\")", ".length"], "explication": "split → tableau ; join → chaîne ; length → nombre." },
+        {
+          "id": "u11-l2-e5", "type": "ecrire", "notions": ["split-join", "map"],
+          "question": "Écris `initials(phrase)` qui retourne les premières lettres de chaque mot, collées (`\"Haute École Ingénierie\"` → `\"HÉI\"`).",
+          "depart": ["function initials(phrase) {", "  ", "}", "", "console.log(initials(\"Haute École Ingénierie\"));"],
+          "tests": { "fonction": "initials", "cas": [ { "args": ["Haute École Ingénierie"], "attendu": "HÉI" }, { "args": ["Programmation Web"], "attendu": "PW" }, { "args": ["seul"], "attendu": "s" } ] },
+          "indices": ["Trois étapes : couper en mots, garder la 1re lettre de chaque, recoller.", { "code": "return phrase.split(___).map((mot) => ___).join(___);" }],
+          "solution": ["function initials(phrase) {", "  return phrase.split(\" \").map((mot) => mot[0]).join(\"\");", "}", "", "console.log(initials(\"Haute École Ingénierie\"));"],
+          "erreursTypiques": [ { "code": "function initials(phrase) {\n  return phrase.split(\" \").map((mot) => mot[0]).join();\n}", "attendu": "echec" }, { "code": "function initials(phrase) {\n  return phrase.split(\" \").map((mot) => mot[0]);\n}", "attendu": "echec" } ],
+          "explication": "split → map → join : texte, tableau, tableau, texte."
+        }
+      ]
+    },
+    {
+      "id": "u11-l3",
+      "titre": "Renverser et palindromes",
+      "duree": 6,
+      "notions": ["renverser", "split-join", "enchainement"],
+      "cartes": [
+        {
+          "titre": "toReversed : une copie à l'envers",
+          "texte": "`toReversed()` retourne une copie renversée d'un **tableau** (`reverse()` modifierait l'original).",
+          "code": ["const t = Object.freeze([1, 2, 3]);", "console.log(t.toReversed(), t);"],
+          "fiche": "renverser"
+        },
+        {
+          "titre": "Un texte ne se renverse pas directement",
+          "texte": "Les chaînes n'ont pas de `toReversed`. On casse, on renverse, on recolle.",
+          "code": ["const mot = \"Sator\";", "console.log(mot.split(\"\").toReversed().join(\"\"));"]
+        },
+        {
+          "titre": "Suivre les types",
+          "texte": "Dans un enchaînement, chaque méthode s'applique au **résultat** de la précédente. Note le type à chaque étape :\n- `\"Kayak\"` : chaîne\n- `.toLowerCase()` : chaîne\n- `.split(\"\")` : **tableau**\n- `.toReversed()` : tableau\n- `.join(\"\")` : **chaîne**\n\nSi tu appelles `toReversed` sur une chaîne, ou `toLowerCase` sur un tableau : `… is not a function`.",
+          "fiche": "enchainement"
+        },
+        {
+          "titre": "Palindrome",
+          "texte": "Un palindrome se lit pareil dans les deux sens. On compare le texte et son inverse avec `===` (deux chaînes se comparent par leur contenu).",
+          "code": ["const mot = \"Kayak\".toLowerCase();", "const inverse = mot.split(\"\").toReversed().join(\"\");", "console.log(mot === inverse);"],
+          "astuce": "Le carré Sator (Sator Arepo Tenet Opera Rotas) est un célèbre palindrome latin."
+        }
+      ],
+      "exercices": [
+        { "id": "u11-l3-e1", "type": "types-chaine", "notions": ["enchainement", "renverser"], "question": "Quel est le type après chaque maillon ?", "depart": "\"Kayak\"", "maillons": [".toLowerCase()", ".split(\"\")", ".toReversed()", ".join(\"\")"], "explication": "Chaîne, tableau, tableau, chaîne." },
+        { "id": "u11-l3-e2", "type": "predire", "notions": ["renverser"], "question": "Que va afficher ce code ?", "code": ["console.log(\"Tenet\".split(\"\").toReversed().join(\"\"));"], "explication": "T-e-n-e-t à l'envers : teneT." },
+        { "id": "u11-l3-e3", "type": "bug", "notions": ["enchainement", "renverser"], "question": "Ce code plante. Pourquoi ?", "code": ["const mot = \"radar\";", "const inverse = mot.toReversed();", "console.log(inverse);"], "ligne": 2, "choix": ["Une chaîne n'a pas de toReversed : il faut d'abord split(\"\")", "Il faut `reverse`", "Il faut `let`", "radar est déjà un palindrome"], "bonne": 0, "explication": "toReversed est une méthode de tableau. Texte → tableau avec split." },
+        { "id": "u11-l3-e4", "type": "parsons", "notions": ["renverser", "split-join"], "question": "Reconstitue `isPalindromeWord(mot)`, insensible aux majuscules.", "lignes": ["function isPalindromeWord(mot) {", "  const m = mot.toLowerCase();", "  const inverse = m.split(\"\").toReversed().join(\"\");", "  return m === inverse;", "}"], "distracteurs": ["  const inverse = m.toReversed();"], "explication": "Minuscules, puis casser / renverser / recoller, puis comparer." },
+        {
+          "id": "u11-l3-e5", "type": "ecrire", "notions": ["renverser", "split-join"],
+          "question": "Écris `reverseWords(phrase)` qui renverse l'**ordre des mots** (`\"le chat dort\"` → `\"dort chat le\"`).",
+          "depart": ["function reverseWords(phrase) {", "  ", "}", "", "console.log(reverseWords(\"le chat dort\"));"],
+          "tests": { "fonction": "reverseWords", "cas": [ { "args": ["le chat dort"], "attendu": "dort chat le" }, { "args": ["Sator Arepo"], "attendu": "Arepo Sator" }, { "args": ["seul"], "attendu": "seul" } ], "interdit": ["reverse"] },
+          "indices": ["Couper aux espaces, renverser le tableau, recoller avec des espaces.", { "code": "return phrase.split(___).toReversed().join(___);" }],
+          "solution": ["function reverseWords(phrase) {", "  return phrase.split(\" \").toReversed().join(\" \");", "}", "", "console.log(reverseWords(\"le chat dort\"));"],
+          "erreursTypiques": [ { "code": "function reverseWords(phrase) {\n  return phrase.split(\"\").toReversed().join(\"\");\n}", "attendu": "echec" }, { "code": "function reverseWords(phrase) {\n  return phrase.split(\" \").toReversed().join();\n}", "attendu": "echec" } ],
+          "explication": "Le séparateur décide de ce qu'on renverse : les lettres (\"\") ou les mots (\" \")."
+        }
+      ]
+    }
+  ],
+  "jeux": [
+    {
+      "id": "u11-chaine",
+      "titre": "Chaîne ou tableau ?",
+      "description": "Suis les types dans les enchaînements de méthodes.",
+      "tours": 8,
+      "questions": [
+        { "id": "u11-j1-1", "type": "types-chaine", "notions": ["enchainement"], "question": "Type après chaque maillon ?", "depart": "[\"Sator\", \"Arepo\"]", "maillons": [".join(\"\")", ".toLowerCase()", ".split(\"\")", ".length"], "explication": "chaîne, chaîne, tableau, nombre." },
+        { "id": "u11-j1-2", "type": "types-chaine", "notions": ["enchainement"], "question": "Type après chaque maillon ?", "depart": "\"radar\"", "maillons": [".split(\"\")", ".toReversed()", ".join(\"\")", " === \"radar\""], "explication": "tableau, tableau, chaîne, booléen." },
+        { "id": "u11-j1-3", "type": "types-chaine", "notions": ["enchainement"], "question": "Type après chaque maillon ?", "depart": "\"le chat\"", "maillons": [".split(\" \")", ".map((m) => m.length)", ".includes(4)"], "explication": "tableau de mots, tableau de nombres, booléen." },
+        { "id": "u11-j1-4", "type": "predire", "notions": ["methodes-chaines"], "question": "Que va afficher ce code ?", "code": ["console.log(\"Opera\".toUpperCase());"], "explication": "Tout en majuscules." },
+        { "id": "u11-j1-5", "type": "predire", "notions": ["split-join"], "question": "Que va afficher ce code ?", "code": ["console.log(\"a-b-c\".split(\"-\").join(\"+\"));"], "explication": "On remplace les tirets par des +." },
+        { "id": "u11-j1-6", "type": "predire", "notions": ["renverser"], "question": "Que va afficher ce code ?", "code": ["console.log([\"Sator\", \"Arepo\"].toReversed().join(\" \"));"], "explication": "Les mots à l'envers, recollés." },
+        { "id": "u11-j1-7", "type": "predire", "notions": ["methodes-chaines"], "question": "Que va afficher ce code ?", "code": ["console.log(\"Rotas\".toLowerCase().includes(\"r\"));"], "explication": "En minuscules, rotas contient un r." },
+        { "id": "u11-j1-8", "type": "predire", "notions": ["split-join"], "question": "Que va afficher ce code ?", "code": ["console.log(\"abc\".split(\"\").length);"], "explication": "Trois lettres, trois cases." },
+        { "id": "u11-j1-9", "type": "qcm", "notions": ["enchainement"], "question": "`\"abc\".toReversed()` provoque :", "choix": ["TypeError : toReversed is not a function", "\"cba\"", "[\"c\", \"b\", \"a\"]", "undefined"], "bonne": 0, "explication": "toReversed n'existe que sur les tableaux." }
+      ]
+    }
+  ],
+  "quiz": {
+    "titre": "Quiz : les chaînes",
+    "questions": [
+      { "id": "u11-q1", "type": "predire", "notions": ["methodes-chaines"], "question": "Que va afficher ce code ?", "code": ["console.log(\"Rotas\".includes(\"r\"));"], "explication": "Le R est majuscule." },
+      { "id": "u11-q2", "type": "predire", "notions": ["split-join"], "question": "Que va afficher ce code ?", "code": ["console.log(\"Tenet\".split(\"\"));"], "explication": "Une lettre par case." },
+      { "id": "u11-q3", "type": "predire", "notions": ["split-join"], "question": "Que va afficher ce code ?", "code": ["console.log([\"Sator\", \"Arepo\", \"Tenet\", \"Opera\", \"Rotas\"].join(\"\").toLowerCase());"], "explication": "Tout collé, en minuscules." },
+      { "id": "u11-q4", "type": "types-chaine", "notions": ["enchainement"], "question": "Type après chaque maillon ?", "depart": "[\"Sa\", \"tor\"]", "maillons": [".join(\"\")", ".split(\"\")", ".toReversed()", ".join(\"\")"], "explication": "chaîne, tableau, tableau, chaîne." },
+      { "id": "u11-q5", "type": "qcm", "notions": ["renverser"], "question": "Comment renverser le texte `mot` ?", "choix": ["mot.split(\"\").toReversed().join(\"\")", "mot.toReversed()", "mot.reverse()", "[mot].toReversed()"], "bonne": 0, "mono": true, "explication": "Casser, renverser, recoller." },
+      { "id": "u11-q6", "type": "vf", "notions": ["methodes-chaines"], "question": "Après `mot.toUpperCase();`, la variable `mot` est en majuscules.", "bonne": false, "explication": "Les chaînes ne se modifient pas : il faut récupérer le résultat." },
+      { "id": "u11-q7", "type": "predire", "notions": ["renverser"], "question": "Que va afficher ce code ?", "code": ["const m = \"Elle\".toLowerCase();", "console.log(m === m.split(\"\").toReversed().join(\"\"));"], "explication": "elle à l'envers : elle." },
+      { "id": "u11-q8", "type": "bug", "notions": ["methodes-chaines"], "question": "Ce filtre oublie \"Rotas\". Pourquoi ?", "code": ["const strings = [\"Sator\", \"Tenet\", \"Rotas\"];", "const avecR = strings.filter((w) => w.includes(\"r\"));", "console.log(avecR);"], "ligne": 2, "choix": ["includes respecte les majuscules : il faut toLowerCase() avant", "Il faut map", "Il faut indexOf", "Il faut \"R\""], "bonne": 0, "explication": "w.toLowerCase().includes(\"r\") trouve r et R." },
+      { "id": "u11-q9", "type": "predire", "notions": ["split-join"], "question": "Que va afficher ce code ?", "code": ["console.log([1, 2, 3].join());"], "explication": "Sans argument : des virgules." },
+      { "id": "u11-q10", "type": "predire", "notions": ["methodes-chaines"], "question": "Que va afficher ce code ?", "code": ["console.log(\"Arepo\".indexOf(\"x\"));"], "explication": "Absent : -1." },
+      { "id": "u11-q11", "type": "filtre-visuel", "notions": ["methodes-chaines"], "question": "Quels mots `filter` garde-t-il ?", "tableau": ["Sator", "Arepo", "Tenet", "Opera", "Rotas"], "nom": "strings", "condition": "(w) => w.toLowerCase().includes(\"r\")", "explication": "Tous sauf Tenet." },
+      { "id": "u11-q12", "type": "predire", "notions": ["split-join", "map"], "question": "Que va afficher ce code ?", "code": ["console.log(\"a b\".split(\" \").map((x) => x.toUpperCase()).join(\"\"));"], "explication": "Révision de map : chaque mot en majuscules." },
+      { "id": "u11-q13", "type": "predire", "notions": ["reduce-concat", "split-join"], "question": "Que va afficher ce code ?", "code": ["const t = [\"Ro\", \"tas\"];", "console.log(t.reduce((acc, w) => acc + w, \"\") === t.join(\"\"));"], "explication": "Révision : reduce avec \"\" et join(\"\") donnent la même concaténation." },
+      { "id": "u11-q14", "type": "qcm", "notions": ["comparer-tableaux", "renverser"], "question": "Pour tester un palindrome, que compare-t-on avec `===` ?", "choix": ["deux chaînes (le texte et son inverse)", "deux tableaux de lettres", "deux longueurs", "deux nombres"], "bonne": 0, "explication": "`===` entre deux tableaux vaut toujours false (unité 5) : on compare des chaînes." },
+      { "id": "u11-q15", "type": "predire", "notions": ["renverser"], "question": "Que va afficher ce code ?", "code": ["console.log([\"Sator\", \"Arepo\", \"Tenet\", \"Opera\", \"Rotas\"].join(\"\").toLowerCase().split(\"\").toReversed().join(\"\"));"], "explication": "À l'envers… c'est le même texte : un palindrome." }
+    ]
+  },
+  "boss": [
+    {
+      "id": "u11-b1",
+      "titre": "Les mots contenant un r",
+      "source": "TP Tableaux · chaînes, exercice 1",
+      "notions": ["methodes-chaines", "filter"],
+      "enonce": "À partir du tableau `strings` : **retourner tous les mots contenant au moins un r**.\n\nÉcris une fonction `getWordsWithR(strings)`. Un R majuscule compte aussi (« Rotas » contient un r).",
+      "regles": ["La structure de données initiale ne doit pas être modifiée.", "Vos solutions doivent rester fonctionnelles même si le contenu du tableau initial diffère.", "Les mots gardés restent tels quels (avec leurs majuscules)."],
+      "donnees": { "strings": ["Sator", "Arepo", "Tenet", "Opera", "Rotas"] },
+      "depart": ["function getWordsWithR(strings) {", "  ", "}", "", "console.log(getWordsWithR(strings));"],
+      "tests": { "fonction": "getWordsWithR", "cas": [
+        { "titre": "Données du cours", "args": [["Sator", "Arepo", "Tenet", "Opera", "Rotas"]], "attendu": ["Sator", "Arepo", "Opera", "Rotas"], "siEchec": "« Rotas » commence par un R majuscule : il compte. Mets le mot en minuscules avant de chercher (mais garde le mot d'origine dans le résultat)." },
+        { "titre": "Autres données", "args": [["Rome", "Paris", "Lyon"]], "attendu": ["Rome", "Paris"] },
+        { "titre": "Aucun r", "args": [["kiwi", "ail"]], "attendu": [] },
+        { "titre": "Tableau vide", "args": [[]], "attendu": [] }
+      ] },
+      "indices": ["On garde certains mots sans les transformer : quelle méthode (unité 6) ?", "Pour ignorer les majuscules : relis la fiche [[methodes-chaines]].", { "code": "return strings.filter((word) => word.___().includes(___));" }],
+      "solution": ["function getWordsWithR(strings) {", "  return strings.filter((word) => word.toLowerCase().includes(\"r\"));", "}", "", "console.log(getWordsWithR(strings));"],
+      "erreursTypiques": [
+        { "code": "function getWordsWithR(strings) {\n  return strings.filter((word) => word.includes(\"r\"));\n}", "attendu": "echec", "diagnostic": "contenu" },
+        { "code": "function getWordsWithR(strings) {\n  return strings.map((word) => word.toLowerCase().includes(\"r\"));\n}", "attendu": "echec", "diagnostic": "map-condition" },
+        { "code": "function getWordsWithR(strings) {\n  return strings.map((word) => word.toLowerCase()).filter((word) => word.includes(\"r\"));\n}", "attendu": "echec" }
+      ],
+      "explication": "Exercice 1 du TP sur les chaînes. toLowerCase sert à **poser la question** ; le mot gardé est l'original."
+    },
+    {
+      "id": "u11-b2",
+      "titre": "Le palindrome",
+      "source": "TP Tableaux · chaînes, exercice 8",
+      "notions": ["renverser", "split-join", "methodes-chaines", "enchainement"],
+      "enonce": "À partir du tableau `strings` : **concaténer les chaînes dans l'ordre de leurs indices, convertir le résultat en minuscules, puis indiquer s'il forme un palindrome**, c'est-à-dire s'il se lit de la même manière dans les deux sens.\n\nÉcris une fonction `isPalindrome(strings)` qui retourne `true` ou `false`.",
+      "regles": ["La structure de données initiale ne doit pas être modifiée (pas de `reverse` sur un tableau gelé).", "Vos solutions doivent rester fonctionnelles même si le contenu du tableau initial diffère."],
+      "donnees": { "strings": ["Sator", "Arepo", "Tenet", "Opera", "Rotas"] },
+      "depart": ["function isPalindrome(strings) {", "  ", "}", "", "console.log(isPalindrome(strings));"],
+      "tests": { "fonction": "isPalindrome", "cas": [
+        { "titre": "Données du cours", "args": [["Sator", "Arepo", "Tenet", "Opera", "Rotas"]], "attendu": true, "siEchec": "Le carré Sator est un palindrome : satorarepotenetoperarotas. Pense aux minuscules (S et s)." },
+        { "titre": "Pas un palindrome", "args": [["Ab", "c"]], "attendu": false },
+        { "titre": "Palindrome en deux morceaux", "args": [["ka", "YAK"]], "attendu": true },
+        { "titre": "Un seul mot", "args": [["Radar"]], "attendu": true },
+        { "titre": "Tableau vide", "args": [[]], "attendu": true }
+      ], "interdit": ["reverse"] },
+      "indices": ["Trois étapes, dans l'ordre de l'énoncé : coller (join), minuscules, comparer avec l'inverse.", "Une chaîne n'a pas de toReversed : casse-la en lettres d'abord. Relis la fiche [[renverser]].", { "code": "const texte = strings.join(___).toLowerCase();\nconst inverse = texte.split(___).toReversed().join(___);\nreturn ___;" }],
+      "solution": ["function isPalindrome(strings) {", "  const text = strings.join(\"\").toLowerCase();", "  const reversed = text.split(\"\").toReversed().join(\"\");", "  return text === reversed;", "}", "", "console.log(isPalindrome(strings));"],
+      "erreursTypiques": [
+        { "code": "function isPalindrome(strings) {\n  const text = strings.join(\"\");\n  const reversed = text.split(\"\").toReversed().join(\"\");\n  return text === reversed;\n}", "attendu": "echec", "diagnostic": "contenu" },
+        { "code": "function isPalindrome(strings) {\n  const text = strings.join(\"\").toLowerCase();\n  return text === text.toReversed();\n}", "attendu": "erreur" },
+        { "code": "function isPalindrome(strings) {\n  return strings === strings.toReversed();\n}", "attendu": "echec" },
+        { "code": "function isPalindrome(strings) {\n  const text = strings.join().toLowerCase();\n  const reversed = text.split(\"\").toReversed().join(\"\");\n  return text === reversed;\n}", "attendu": "echec" }
+      ],
+      "explication": "Exercice 8 du TP : avec les 8 exercices sur les chaînes et les 10 sur les nombres, les deux premières parties du TP Tableaux sont faites."
+    }
+  ]
+}

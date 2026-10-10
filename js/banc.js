@@ -121,12 +121,16 @@ const TRADUCTIONS = [
     return `Tu utilises ${nomCode(n)}, mais aucune variable ni fonction ne porte ce nom.${proche ? ` Tu voulais peut-être dire ${nomCode(proche)} ? Les majuscules comptent.` : " Vérifie l'orthographe (majuscules comprises)."} Si tu l'as créée dans une fonction, elle n'existe qu'entre les { } de cette fonction.`;
   }],
   [/Cannot access '(.+)' before initialization/, m => `Tu utilises ${nomCode(m[1])} avant la ligne qui la crée. En JavaScript, on crée d'abord (const / let), on utilise ensuite : déplace la déclaration plus haut.`],
+  [/^(.+)\.(addEventListener|classList) is not a function$|^(.+)\.addEventListener is not a function$/, m => `addEventListener s'appelle sur UN élément (querySelector). Sur une collection (querySelectorAll), parcours-la avec forEach.`],
+  [/^(.+)\.map is not a function$/, m => `${nomCode(".map()")} n'existe pas sur ${nomCode(m[1])}. Si c'est le résultat de querySelectorAll (une NodeList), convertis-la d'abord en tableau : [...collection]. Sinon, vérifie que c'est bien un tableau.`],
   [/^(.+)\.(\w+) is not a function$/, m => {
     const tab = ["map","filter","forEach","reduce","some","every","slice","toSorted","flatMap","find","findIndex","join","includes","with","toReversed","at","indexOf"];
     if (tab.includes(m[2])) return `${nomCode("." + m[2] + "()")} n'existe pas sur ${nomCode(m[1])} : ce n'est pas le type attendu (un tableau, une chaîne ?). Vérifie ce que contient ${nomCode(m[1])} à ce moment-là, et l'orthographe de la méthode.`;
     return `${nomCode(m[1] + "." + m[2])} n'est pas une fonction. Vérifie le nom de la méthode (majuscules comprises : toLowerCase, pas tolowercase) et le type de ${nomCode(m[1])}.`;
   }],
   [/^(.+) is not a function$/, m => `${nomCode(m[1])} n'est pas une fonction : on ne peut pas mettre des parenthèses après. Vérifie le nom, et que ce n'est pas un nombre, une chaîne ou un tableau.`],
+  [/Cannot read properties of null \(reading '(addEventListener|classList|click|textContent|querySelector|querySelectorAll|cloneNode|replaceChildren|removeAttribute)'\)/, m => `querySelector n'a trouvé aucun élément (il a renvoyé null), donc ${nomCode("." + m[1])} est impossible. Vérifie le sélecteur : # pour un id, . pour une classe, et l'orthographe exacte (select-hearts…).`],
+  [/Cannot read properties of undefined \(reading '(add|remove|toggle|contains)'\)/, m => `${nomCode(".classList." + m[1])} sur quelque chose qui n'a pas de classList : souvent une **collection** (querySelectorAll) au lieu d'un seul élément. Parcours la collection avec forEach et applique classList à chaque élément.`],
   [/Cannot read properties of (undefined|null) \(reading '(.+)'\)/, m => `Tu lis ${nomCode("." + m[2])} sur quelque chose qui vaut ${m[1]}. Causes fréquentes : un indice trop grand (le dernier indice est length - 1), une fonction qui ne retourne rien (il manque return), ou une variable mal nommée.`],
   [/Cannot set properties of (undefined|null) \(setting '(.+)'\)/, m => `Tu modifies ${nomCode("." + m[2])} sur quelque chose qui vaut ${m[1]}. Vérifie la variable placée avant le point.`],
   [/Assignment to constant variable/, () => `Tu modifies une variable créée avec const. Une const ne change jamais : utilise let si la valeur doit évoluer, ou crée une nouvelle variable.`],
@@ -202,6 +206,7 @@ const LIBELLE_INTERDIT = {
 };
 function chercherUsage(nu, nom){
   if (nom === "=>") return /=>/.exec(nu);
+  if (nom === "classList" || nom === "length") return new RegExp(`\\.\\s*${nom}\\b`).exec(nu);   // propriétés : pas de parenthèses
   if (nom === "function" || nom === "return" || nom === "if") return new RegExp(`\\b${nom}\\b`).exec(nu);
   if (nom === "for" || nom === "while") return new RegExp(`\\b${nom}\\s*\\(`).exec(nu);
   if (nom.includes(".")) return new RegExp(nom.replace(".", "\\s*\\.\\s*") + "\\b").exec(nu);
@@ -255,7 +260,10 @@ function analyseStatique(code, tests = {}, contexte = {}){
     const debut = m.index + m[0].length; let prof = 1, i = debut;
     while (i < nu.length && prof) { if (nu[i] === "{") prof++; else if (nu[i] === "}") prof--; i++; }
     const corps = nu.slice(debut, i - 1);
-    if (!/\breturn\b/.test(corps) && !/console\s*\.\s*log/.test(corps) && /\S/.test(corps) && !/^\s*\w+\s*:/.test(corps)) {
+    // seulement pour les fonctions dont on attend un résultat (map, filter, reduce…) : un écouteur d'événement n'a pas besoin de return
+    const avant = nu.slice(Math.max(0, m.index - 120), m.index);
+    const attendResultat = /\.\s*(map|filter|reduce|some|every|find|findIndex|flatMap|toSorted)\s*\(\s*(?:\([^()]*\)|\w+)\s*$/.test(avant);
+    if (attendResultat && !/\breturn\b/.test(corps) && /\S/.test(corps) && !/^\s*\w+\s*:/.test(corps)) {
       const l = ligneDe(code, m.index);
       conseils.push({ id:"accolades-sans-return", ligne:l, message: `Ligne ${l} : avec des accolades après =>, la fonction ne retourne rien tant qu'il n'y a pas de return. Écris soit (x) => x * 2, soit (x) => { return x * 2; }.` });
     }
@@ -305,7 +313,7 @@ function diagnostiquer(cas, obtenu, logs, code, contexte){
     return d("map-condition", `Tu obtiens des true / false : c'est ce que fait map avec une condition (il transforme chaque œuf en réponse à la question). Pour GARDER les éléments qui répondent oui, c'est filter.`);
   if (entree && Array.isArray(obtenu) && Array.isArray(att) && att.length !== entree.length && obtenu.length === entree.length && /\.\s*map\s*\(/.test(nu))
     return d("map-longueur", `map garde toujours la même longueur : ${entree.length} œufs entrent, ${entree.length} œufs sortent. Pour en garder seulement certains, c'est filter.`);
-  if (entree && Array.isArray(obtenu) && Array.isArray(att) && att.length === entree.length && obtenu.length < entree.length && /\.\s*filter\s*\(/.test(nu))
+  if (entree && Array.isArray(obtenu) && Array.isArray(att) && att.length === entree.length && obtenu.length < entree.length && att.some(x => !entree.some(e => egal(e, x))) && /\.\s*filter\s*\(/.test(nu))
     return d("filter-transforme", `filter garde ou jette des éléments, il ne les transforme pas. Pour transformer chaque élément (même longueur), c'est map.`);
   if (typeof att === "string" && typeof obtenu === "string" && obtenu.length > att.length && obtenu.endsWith(att) && /\.\s*reduce\s*\(/.test(nu))
     return d("depart-texte", `Ton résultat commence par ${nomCode(obtenu.slice(0, obtenu.length - att.length))} en trop : c'est la valeur de départ du reduce. Pour coller des textes, le porte-monnaie commence vide : "" (une chaîne vide).`);
@@ -324,14 +332,16 @@ function enteteDonnees(donnees){
   if (!donnees) return "";
   return Object.entries(donnees).map(([k, v]) => `const ${k} = __donnees[${JSON.stringify(k)}];`).join("\n");
 }
+/* code « déjà écrit » exécuté avant celui de l'élève (constantes du cours, fonction d'un boss précédent) */
+let PRELUDE = "";
 /* exécute code (+ entête) une fois ; renvoie { lire(nom), logs, erreur } */
-function lancer(code, donnees, decalage){
+function lancer(code, donnees){
   const logs = [];
   let cible = logs;
   const ecrire = (genre) => (...args) => { if (cible.length < 400) cible.push(args.length ? args.map((a, i) => formater(a, 0)).join(" ") : ""); if (genre === "error") cible.err = true; };
   const faux = { log: ecrire("log"), info: ecrire("log"), warn: ecrire("warn"), error: ecrire("error"), table: ecrire("log"), debug: ecrire("log") };
   const entete = enteteDonnees(donnees);
-  const corps = `"use strict";\n${entete ? entete + "\n" : ""}${code}\n;return (__n) => eval(__n);`;
+  const corps = `"use strict";\n${entete ? entete + "\n" : ""}${PRELUDE ? PRELUDE + "\n" : ""}${code}\n;return (__n) => eval(__n);`;
   const don = donnees ? Object.fromEntries(Object.entries(donnees).map(([k, v]) => [k, gelProfond(copieProfonde(v))])) : {};
   let lire = null, erreur = null;
   try {
@@ -349,7 +359,7 @@ function ligneErreur(err, decalage){
   return l >= 1 ? l : null;
 }
 function decrireErreur(err, code, donnees){
-  const decalage = 3 + (donnees ? Object.keys(donnees).length : 0);   // « function anonymous(…) { », ligne vide, "use strict", entête
+  const decalage = 3 + (donnees ? Object.keys(donnees).length : 0) + (PRELUDE ? PRELUDE.split("\n").length : 0);   // « function anonymous(…) { », ligne vide, "use strict", entête, prélude
   const ctx = { noms: [...new Set(jetons(code).filter(j => j.t === "id" || j.t === "fn").map(j => j.v))].concat(donnees ? Object.keys(donnees) : []) };
   let ligne = err && err.name === "SyntaxError" ? null : ligneErreur(err, decalage);
   let message = traduireErreur(err, ctx);
@@ -363,8 +373,9 @@ function decrireErreur(err, code, donnees){
 }
 
 /* executerTout({ code, donnees, tests, contexte }) : lance le code, puis chaque cas de test */
-function executerTout({ code, donnees, tests, contexte = {} }){
+function executerTout({ code, donnees, prelude, tests, contexte = {} }){
   const t0 = Date.now();
+  PRELUDE = prelude || "";
   const res = { ok:false, console:[], erreur:null, cas:[], diagnostics:[], conseils:[], duree:0 };
   const libre = lancer(code, donnees);
   res.console = libre.logs;
@@ -392,7 +403,26 @@ function executerTout({ code, donnees, tests, contexte = {} }){
       // argsCode : arguments écrits en JavaScript, évalués dans le code de l'élève (ex. "[square, 2]" pour passer une fonction)
       let args;
       if (cas.argsCode) { try { args = run.lire(cas.argsCode); } catch(e) { r.ok = false; r.erreur = decrireErreur(e, code, don); res.cas.push(r); return; } }
-      else { args = copieProfonde(cas.args || []); gelProfond(args); }
+      else { args = copieProfonde(cas.args || []); if (!cas.modifiable) gelProfond(args); }   // "modifiable": la fonction a le droit de modifier son argument (shuffleInPlace)
+      if (cas.melange) {   // mélange équitable ? on compte les ordres obtenus sur de nombreux essais
+        const { tableau, essais = 24000, tolerance = 0.06 } = cas.melange;   // 24 000 essais : un mélange naïf (j entre 0 et la fin à chaque tour) s’écarte de 11 %, le hasard de moins de 4 %
+        const compte = new Map(); let faute = null;
+        for (let k = 0; k < essais && !faute; k++) {
+          const t = tableau.slice();
+          try { fn(t); } catch(e) { r.erreur = decrireErreur(e, code, don); r.ok = false; break; }
+          if (t.length !== tableau.length || [...t].sort().join() !== [...tableau].sort().join()) faute = `Après le mélange, le tableau ne contient plus les mêmes éléments (${enCode(t)}). Un mélange échange des éléments, il n'en ajoute ni n'en retire.`;
+          const cle = t.join(","); compte.set(cle, (compte.get(cle) || 0) + 1);
+        }
+        const fact = n => n <= 1 ? 1 : n * fact(n - 1), nbOrdres = fact(tableau.length), moyen = essais / nbOrdres;
+        if (!r.erreur && !faute) {
+          if (compte.size === 1 && compte.has(tableau.join(","))) faute = `Le tableau reçu n'est jamais mélangé. La fonction doit le modifier **sur place** (échanger ses éléments), pas en fabriquer un autre.`;
+          else if (compte.size < nbOrdres) faute = `Sur ${essais} mélanges de ${enCode(tableau)}, seulement ${compte.size} ordres différents sur ${nbOrdres} possibles apparaissent. Pour chaque i (du dernier jusqu'à 1), j doit pouvoir valoir n'importe quel indice de 0 à i **compris** : Math.floor(Math.random() * (i + 1)).`;
+          else if ([...compte.values()].some(v => Math.abs(v - moyen) > tolerance * moyen)) faute = `Le mélange n'est pas équitable : sur ${essais} essais, certains ordres sortent bien plus souvent que d'autres (attendu : environ ${Math.round(moyen)} fois chacun). Avec Fisher–Yates, j est tiré entre 0 et i, pas entre 0 et la fin du tableau.`;
+        }
+        if (faute) { r.ok = false; r.details.push(faute); }
+        r.appel = `${nomFn}(${enCode(tableau)}) × ${essais}`;
+        res.cas.push(r); return;
+      }
       const logsAppel = []; run.rediriger(logsAppel);
       if (cas.repetitions) {   // fonction au hasard : propriétés sur de nombreux tirages
         const vus = new Set(); let faute = null;
