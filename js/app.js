@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   ProgWeb 2 — sessions, parcours, défi du jour, théorie, console, profil, démarrage.
+   Moteur de cours façon Duolingo — sessions, parcours, défi du jour, théorie, console, profil, démarrage.
    ===================================================================== */
 
 /* ---------------- runner de session ---------------- */
@@ -26,7 +26,7 @@ function runSession(steps, opts){
   let idx = 0, answered = 0, correct = 0, bonus = 0, current = null, sheet = null, sheetObs = null, retried = new Set(), results = [], occupe = false;
   const qTotal = steps.filter(s => s.kind === "q").length;
   nettoyerSession = () => { current?.cleanup?.(); current = null; sheetObs?.disconnect(); };
-  ses.querySelector("[data-quit]").onclick = () => confirmBox("Quitter la session ?", "Les XP de cette session seront perdus. Ton code en cours reste gardé en brouillon.", "Quitter", () => { closeSession(); render(); });
+  ses.querySelector("[data-quit]").onclick = () => confirmBox("Quitter la session ?", "Les XP de cette session seront perdus. Ton travail en cours reste gardé en brouillon.", "Quitter", () => { closeSession(); render(); });
 
   let pMax = 0;
   function progress(fait = 0){ pMax = Math.max(pMax, Math.min(1, (idx + fait) / Math.max(total, queue.length))); bar.style.width = (pMax * 100) + "%"; count.textContent = !qTotal ? "" : queue[idx]?.retry ? "reprise" : `${Math.min(answered, qTotal)}/${qTotal}`; }
@@ -40,7 +40,7 @@ function runSession(steps, opts){
     if (st.kind === "carte") {
       const c = st.carte;
       const art = h(`<article class="lcard">${c.illu ? `<div class="illu">${illu(c.illu, c)}</div>` : ""}<h2>${richInline(c.titre)}</h2><div class="rich">${rich(c.texte || "")}</div></article>`);
-      if (c.code) art.appendChild(c.executable === false ? h(`<div>${codeHTML(lignes(c.code))}</div>`) : blocExecutable(lignes(c.code), { donnees:c.donnees, dom:c.dom }));
+      if (c.code) art.appendChild(c.executable === false || !aModule("code-js") ? h(`<div>${codeHTML(lignes(c.code))}</div>`) : blocExecutable(lignes(c.code), { donnees:c.donnees, dom:c.dom }));
       if (c.apres) art.appendChild(h(`<div class="rich">${rich(c.apres)}</div>`));
       if (c.analogie) art.appendChild(h(`<div class="aside analogie">${I.egg.replace("<svg", '<svg style="color:var(--gold-deep)"')}<div><b class="t">L'image à retenir</b><div class="rich">${rich(c.analogie)}</div></div></div>`));
       if (c.astuce) art.appendChild(h(`<div class="aside tip">${I.bulb.replace("<svg", '<svg style="color:var(--teal)"')}<div><b class="t">Bon à savoir</b><div class="rich">${rich(c.astuce)}</div></div></div>`));
@@ -155,7 +155,7 @@ function startGame(u, gid){
     const xp = r.correct * 3 + (first ? 15 : 5); gainXP(xp);
     if (g.badge && r.correct >= (g.seuilBadge ?? r.total)) award(g.badge);
     const great = r.correct >= Math.ceil(r.total * .8);
-    return { title: great ? "Bien vu !" : "Partie terminée", text: great ? `${r.correct} sur ${r.total} : tu lis le code comme un livre.` : `${r.correct} sur ${r.total}. Rejoue autant que tu veux, l'ordre change.`, xp, retry:() => startGame(u, gid), mood: great ? "wow" : "happy" };
+    return { title: great ? "Bien vu !" : "Partie terminée", text: great ? `${r.correct} sur ${r.total} : ${APP.textes.jeuReussi || "tu as l'œil !"}` : `${r.correct} sur ${r.total}. Rejoue autant que tu veux, l'ordre change.`, xp, retry:() => startGame(u, gid), mood: great ? "wow" : "happy" };
   }});
 }
 function startQuiz(u){
@@ -174,6 +174,7 @@ function startQuiz(u){
 }
 function startBoss(u, bid){
   const b = u.boss.find(x => x.id === bid);
+  if (b.questions) return startEtude(u, b);
   runSession([{ kind:"q", q:b }], { title:b.titre || "Boss", onEnd:r => {
     const res = r.results[0] || {};
     if (!r.correct) return { title:"Le boss résiste", text:"Pas grave : relis la fiche, refais un exercice de la leçon, puis reviens. Ton brouillon est gardé.", xp:0, retry:() => startBoss(u, bid), mood:"sad" };
@@ -184,6 +185,21 @@ function startBoss(u, bid){
   }});
 }
 
+/* boss « étude de cas » : un scénario (cartes), puis une série de questions ; réussi à partir du seuil de validation */
+function startEtude(u, b){
+  const cartes = b.cartes || [{ titre: b.titre, texte: b.enonce || "" }];
+  const steps = [...cartes.map(c => ({ kind:"carte", carte:c })), ...b.questions.map(q => ({ kind:"q", q }))];
+  runSession(steps, { title:b.titre || "Étude de cas", onEnd:r => {
+    const seuil = b.seuil ?? D.config.seuilValidation ?? .8;
+    const pct = r.total ? r.correct / r.total : 1;
+    if (pct < seuil) return { title:"Le boss résiste", text:`${r.correct} sur ${r.total} : il en faut ${Math.ceil(seuil * r.total)}. Relis les fiches, puis retente : les questions sont les mêmes, mais tu les vois autrement maintenant.`, xp:r.correct * 2, retry:() => startEtude(u, b), mood:"sad" };
+    const first = !ST.boss[b.id]?.fait;
+    ST.boss[b.id] = { fait: ST.boss[b.id]?.fait || todayStr(), essais:1, indices:0, score: Math.max(ST.boss[b.id]?.score || 0, Math.round(pct * 100)) };
+    const xp = first ? 30 + r.correct * 3 : 5; gainXP(xp); checkBadges(); save();
+    return { title: first ? "Boss vaincu !" : "Boss rejoué", text:`${r.correct} sur ${r.total}. ${b.source ? `C'est le niveau attendu dans le cours (${b.source}).` : "Tu sais l'appliquer à un vrai cas."}`, xp, confetti:first, mood:"wow" };
+  }});
+}
+
 /* ---------------- défi du jour : notions dues, erreurs récentes, puis révisions ---------------- */
 function toutesLesQuestions(){
   const out = [];
@@ -191,11 +207,12 @@ function toutesLesQuestions(){
     u.lecons.forEach(l => l.exercices.forEach(q => out.push({ q, u, ouvert:!!ST.done[l.id] })));
     u.jeux.forEach(g => g.questions.forEach(q => out.push({ q, u, ouvert:!!ST.done[`jeu:${g.id}`] })));
     u.quiz.questions.forEach(q => out.push({ q, u, ouvert:!!ST.quiz[u.id] }));
+    u.boss.filter(b => b.questions).forEach(b => b.questions.forEach(q => out.push({ q, u, ouvert:!!ST.boss[b.id]?.fait })));
   }
   return out;
 }
 function buildDaily(){
-  const t = todayStr(); const rnd = seeded("progweb2-" + t);
+  const t = todayStr(); const rnd = seeded(APP.cle + "-" + t);
   const tout = toutesLesQuestions();
   const ouvertes = tout.filter(x => x.ouvert).map(x => x.q);
   const byId = Object.fromEntries(tout.map(x => [x.q.id, x.q]));
@@ -226,12 +243,12 @@ let VIEW = "home";
 function go(v){ VIEW = v; render(); window.scrollTo(0, 0); }
 function shell(){
   if (document.getElementById("topbar")) return;
-  document.body.insertBefore(h(`<header class="topbar" id="topbar"><div class="wrap"><button class="brand" data-go="home" aria-label="ProgWeb 2, accueil">${I.logo}ProgWeb 2</button><div class="stats" id="stats"></div></div></header>`), $app);
+  document.body.insertBefore(h(`<header class="topbar" id="topbar"><div class="wrap"><button class="brand" data-go="home" aria-label="${esc(APP.nom)}, accueil">${I.logo}${esc(APP.nom)}</button><div class="stats" id="stats"></div></div></header>`), $app);
   document.body.appendChild(h(`<nav class="tabbar" aria-label="Navigation"><div class="wrap">
     <button class="tab" data-go="home">${I.home}Parcours</button>
     <button class="tab" data-go="defi">${I.star}Défi</button>
     <button class="tab" data-go="theorie">${I.book}Théorie</button>
-    <button class="tab" data-go="console">${I.terminal}Console</button>
+    ${aModule("code-js") ? `<button class="tab" data-go="console">${I.terminal}Console</button>` : ""}
     <button class="tab" data-go="profil">${I.user}Profil</button></div></nav>`));
   document.addEventListener("click", e => { const g = e.target.closest("[data-go]"); if (g) go(g.dataset.go); });
 }
@@ -244,7 +261,7 @@ function renderTop(){
 function render(){
   shell(); renderTop();
   $app.innerHTML = "";
-  const v = { home:viewHome, defi:viewDefi, theorie:viewTheorie, console:viewConsole, profil:viewProfil }[VIEW] || viewHome;
+  const v = { home:viewHome, defi:viewDefi, theorie:viewTheorie, console: aModule("code-js") ? viewConsole : null, profil:viewProfil }[VIEW] || viewHome;
   $app.appendChild(v());
 }
 
@@ -253,7 +270,7 @@ const COULEURS_UNITE = [["var(--prim-btn)","var(--prim-deep)"],["#0E7C86","#0853
 function viewHome(){
   const el = h(`<main class="wrap"></main>`);
   const s = streakNow();
-  const greet = !ST.xp ? "Salut ! Je suis Coco. On part de zéro et on va jusqu'aux exercices de ton cours. Première leçon : cinq minutes." : s ? `Série de ${s} jour${s > 1 ? "s" : ""}. On garde le rythme ?` : "Content de te revoir ! Une petite leçon pour relancer la série ?";
+  const greet = !ST.xp ? `Salut ! Je suis ${APP.mascotte.nom}. ${APP.accroche} Première leçon : cinq minutes.` : s ? `Série de ${s} jour${s > 1 ? "s" : ""}. On garde le rythme ?` : "Content de te revoir ! Une petite leçon pour relancer la série ?";
   el.appendChild(h(`<div class="home-hero">${mascot("happy")}<div class="bubble">${esc(greet)}</div></div>`));
   const done = ST.daily[todayStr()] !== undefined;
   const dues = notionsDues().filter(n => FICHES[n]);
@@ -418,7 +435,8 @@ function preparerUnite(u, i){
   u.lecons.forEach(l => { l.cartes = l.cartes || []; l.exercices = l.exercices || []; l.exercices.forEach((q, k) => q.id = q.id || `${l.id}-e${k}`); });
   u.jeux.forEach(g => g.questions.forEach((q, k) => q.id = q.id || `${g.id}-${k}`));
   u.quiz.questions.forEach((q, k) => q.id = q.id || `${u.id}-quiz-${k}`);
-  u.boss.forEach(b => b.type = "boss");
+  // boss de code (type "boss") ou « étude de cas » : "questions" (cours sans code), précédées d'une carte avec l'énoncé
+  u.boss.forEach(b => { if (b.questions) b.questions.forEach((q, k) => q.id = q.id || `${b.id}-${k}`); else b.type = "boss"; });
   for (const f of u.fiches) FICHES[f.id] = { ...f, unite:u };
   if (!u.parcours) u.parcours = [...u.lecons.map(l => l.id), ...u.jeux.map(g => `jeu:${g.id}`), "quiz", ...u.boss.map(b => `boss:${b.id}`)];
 }
@@ -426,6 +444,7 @@ async function boot(){
   $app.innerHTML = `<main class="wrap" style="text-align:center;padding-top:80px">${mascot("happy")}<p style="font-weight:800;color:var(--muted)">Chargement des unités…</p></main>`;
   try {
     D.config = await getJSON("content/config.json");
+    appliquerApp(D.config.app);
     D.unites = await Promise.all(D.config.unites.map(getJSON));
   } catch(err) {
     $app.innerHTML = `<main class="wrap" style="padding-top:60px"><h2>Le contenu n'a pas pu être chargé</h2>

@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   ProgWeb 2 — éditeur de code maison (aucune dépendance).
+   Moteur de cours — éditeur de code maison (aucune dépendance).
    Technique de l'« éditeur à calque » : un <textarea> au texte transparent, posé exactement
    sur un <pre> qui affiche le même texte coloré. Le textarea garde tout le comportement natif
    (clavier du téléphone, sélection, copier-coller, annuler), le <pre> ne fait que l'affichage.

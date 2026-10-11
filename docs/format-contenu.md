@@ -4,11 +4,11 @@ Tout le contenu pédagogique est dans `content/`. Le moteur (`js/`) ne contient 
 
 ```
 content/
-  config.json            Sommaire des unités (ordre du parcours), rangs, badges, seuil de validation, unités « bientôt »
+  config.json            Identité de l'appli (app), modules, sommaire des unités, rangs, badges, seuil de validation
   unites/
-    u01-bases.json       Une unité = un fichier
-    u02-operateurs.json
-    …
+    u01-….json           Une unité = un fichier
+    u02-….json
+  pages/                 Pages web des exercices DOM (module « dom ») : nom.html (contenu du <body>) + nom.css
 ```
 
 Après chaque modification : `python3 tools/valider-contenu.py` (rapide, sans navigateur), puis `python3 tools/tester-exercices.py` (exécute réellement chaque solution et chaque erreur typique).
@@ -19,6 +19,22 @@ Après chaque modification : `python3 tools/valider-contenu.py` (rapide, sans na
 
 ```jsonc
 {
+  "app": {
+    "nom": "ProgWeb 2",                          // nom court : barre du haut, onglet, appli installée
+    "nomLong": "ProgWeb 2 — apprendre le JavaScript",   // nom complet de l'appli installée (facultatif)
+    "description": "Apprendre le JavaScript en jouant…",  // une phrase (moteurs de recherche, installation)
+    "cle": "progweb2",                           // minuscules et tirets : nomme la sauvegarde. NE PLUS LA CHANGER une fois publié
+    "langue": "fr",
+    "accroche": "On part de zéro et on va jusqu'aux exercices de ton cours.",   // première bulle de la mascotte
+    "mascotte": { "nom": "Coco", "cadre": ["{", "}"], "corps": "#FFF6E4", "bord": "#E3C98F" },
+                                                 // cadre : ["{", "}"] (accolades dessinées), deux textes courts (["<?", "?>"], ["$", "_"]), ou []
+    "couleurs": {                                // facultatif : jetons de css/app.css à remplacer, en clair et en sombre
+      "clair":  { "--prim": "#0E7C86", "--prim-btn": "#0E7C86", "--prim-deep": "#08535A", "--prim-ink": "#0B5E66", "--prim-soft": "#DDF3F4" },
+      "sombre": { "--prim": "#3FC1CC", "--prim-btn": "#178F99", "--prim-deep": "#0B5E66", "--prim-ink": "#7FDDE4", "--prim-soft": "#0F3236" }
+    },
+    "textes": { "jeuReussi": "tu lis le code comme un livre." },   // petites phrases propres au cours (facultatif)
+    "modules": ["code-js", "dom"]                // voir le tableau ci-dessous ; [] pour un cours sans code
+  },
   "seuilValidation": 0.8,                       // 80 % au quiz pour ouvrir l'unité suivante
   "unites": ["content/unites/u01-bases.json", …], // ordre du parcours ; GitHub Pages ne sait pas lister un dossier, d'où cette liste
   "aVenir": [{ "titre": "…", "resume": "…", "icone": "…" }],   // cartes « Bientôt » en bas de l'accueil
@@ -27,7 +43,19 @@ Après chaque modification : `python3 tools/valider-contenu.py` (rapide, sans na
 }
 ```
 
-Les badges « unité validée » et « boss vaincus » sont **générés automatiquement** pour chaque unité : rien à ajouter.
+Les badges « unité validée » et « boss vaincus » sont **générés automatiquement** pour chaque unité : rien à ajouter. Les badges `premier-pas`, `theoricien`, `sans-faute`, `defi`, `sans-indice`, `serie-3`, `serie-7`, `serie-30` (et, avec du code, `premier-coup`, `codeur`, `chasseur-bugs`) sont attribués par le moteur : garde leurs `id`, change librement leur nom et leur description.
+
+Après avoir changé la section `app` : `python3 tools/configurer.py` (titre de la page, appli installée, nom du cache, icônes dessinées d'après la mascotte).
+
+**Les modules** (`app.modules`) : les types d'exercices qui exécutent du code ne sont permis que si leur module est activé (le validateur le vérifie).
+
+| module | ce qu'il ajoute |
+|---|---|
+| (aucun) | tous les types « sans code » (§ 6), les fiches, les jeux, les quiz, les boss « étude de cas » (§ 7) |
+| `code-js` | exercices de JavaScript exécutés dans un Web Worker (`trous`, `corriger`, `ecrire`, boss de code), types qui évaluent du JavaScript (`reduce-pas`, `filtre-visuel`, `map-visuel`, `types-chaine`, `fisher-yates`, `pointer-tableau`, `objet`, `predire` sans réponse écrite), boutons « Exécuter » des cartes et des fiches, onglet **Console** |
+| `dom` | pages web (`content/pages/`) : type `selecteur`, exercices et exemples avec `"dom"` (iframe isolée) |
+
+Ajouter un module (PHP, terminal simulé…) : voir `docs/modules.md`.
 
 **Ne jamais perdre la progression** : la sauvegarde est indexée par les identifiants (`id`) des unités, leçons, questions et boss, jamais par leur position. On peut ajouter, déplacer, insérer des unités sans risque. En revanche, **ne change jamais l'`id` d'un élément existant**. Une unité déjà ouverte par l'élève le reste, même si une unité est insérée avant elle.
 
@@ -297,7 +325,23 @@ Les erreurs JavaScript sont traduites en français (`x is not defined`, `Cannot 
 
 ## 7. Les boss (exercices du cours)
 
-Un boss est un exercice de code (`ecrire`) avec, en plus :
+Deux sortes de boss.
+
+**Étude de cas** (tout cours, même sans code) : un scénario, puis une série de questions de n'importe quel type. Réussi à partir de `seuil` (par défaut `seuilValidation`) ; il se rejoue autant qu'on veut, et ses questions entrent dans le défi du jour une fois réussi.
+
+```jsonc
+{
+  "id": "u03-b1",
+  "titre": "Le persona de l'agence",
+  "source": "Travail pratique 2 : création d'un persona",     // ce que le boss prépare dans le cours
+  "notions": ["persona", "besoins"],
+  "enonce": "Le scénario, affiché sur une carte avant les questions.",   // ou "cartes": [ … ] (plusieurs cartes, format des leçons)
+  "questions": [ { "id": "u03-b1-q1", "type": "tri", … }, … ],      // 4 questions ou plus
+  "seuil": 0.8                                                       // facultatif
+}
+```
+
+**Boss de code** (module `code-js`) : un exercice de code (`ecrire`) avec, en plus :
 
 ```jsonc
 {

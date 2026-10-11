@@ -1,5 +1,5 @@
 /* =====================================================================
-   ProgWeb 2 — harnais du bac à sable DOM. Exécuté DANS l'iframe isolée (sandbox="allow-scripts", sans
+   Moteur de cours — harnais du bac à sable DOM. Exécuté DANS l'iframe isolée (sandbox="allow-scripts", sans
    allow-same-origin : la page de l'appli et la sauvegarde sont hors d'atteinte), après banc.js.
    Reçoit { type:"lancer", code, tests } de la page parente, exécute le code de l'élève comme un module,
    joue les étapes des tests (clics, scripts), vérifie le DOM et renvoie le résultat.

@@ -17,7 +17,7 @@ async function testerTout(filtreUnite){
     u.lecons.forEach(l => l.exercices.forEach(q => questions.push([q, l.id])));
     u.jeux.forEach(g => g.questions.forEach(q => questions.push([q, g.id])));
     u.quiz.questions.forEach(q => questions.push([q, "quiz"]));
-    u.boss.forEach(q => questions.push([q, "boss"]));
+    u.boss.forEach(b => b.questions ? b.questions.forEach(q => questions.push([q, b.id])) : questions.push([b, "boss"]));   // étude de cas : ses questions
     for (const [q, lieu] of questions) {
       stats.questions++;
       const o = ou(q, lieu);
@@ -46,7 +46,8 @@ async function testerTout(filtreUnite){
           }
           continue;
         }
-        if (q.type === "predire") {
+        if (q.type === "predire" && !aModule("code-js") && q.reponse !== undefined) stats.predictions++;   // cours sans code : la réponse écrite fait foi
+        else if (q.type === "predire") {
           const r = await executer({ code:lignes(q.code) });
           stats.predictions++;
           const sortie = r.console.join("\n");
@@ -81,8 +82,8 @@ async function testerTout(filtreUnite){
     }
     // exemples des cartes et des fiches
     const exemples = [];
-    u.lecons.forEach(l => l.cartes.forEach((c, k) => { if (c.code && c.executable !== false) exemples.push([`${l.id} carte ${k + 1}`, lignes(c.code), c.erreurVoulue, c.donnees, c.dom]); }));
-    u.fiches.forEach(f => (f.exemples || []).forEach((ex, k) => exemples.push([`fiche ${f.id} ex ${k + 1}`, lignes(ex.code), ex.erreurVoulue || /erreur/i.test(ex.titre || ""), null, ex.dom])));
+    u.lecons.forEach(l => l.cartes.forEach((c, k) => { if (c.code && c.executable !== false && aModule("code-js")) exemples.push([`${l.id} carte ${k + 1}`, lignes(c.code), c.erreurVoulue, c.donnees, c.dom]); }));
+    if (aModule("code-js")) u.fiches.forEach(f => (f.exemples || []).forEach((ex, k) => exemples.push([`fiche ${f.id} ex ${k + 1}`, lignes(ex.code), ex.erreurVoulue || /erreur/i.test(ex.titre || ""), null, ex.dom])));
     for (const [lieu, code, voulue, donnees, dom] of exemples) {
       const r = dom ? await executerDom({ code, dom }) : await executer({ code, donnees: donnees || null });
       stats.exemples++;

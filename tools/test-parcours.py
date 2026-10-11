@@ -4,7 +4,7 @@ chaque leçon, jeu, quiz et boss de chaque unité, dans l'ordre du parcours (le 
 Chaque question est remplie par son resoudre() (la bonne réponse calculée par le moteur), puis vérifiée par le
 vrai bouton « Vérifier » : une feuille rouge signale une incohérence entre une question et son corrigé.
 
-Vérifie aussi : le parcours « faux puis corrigé » d'un exercice de code (feuille rouge, Corriger, puis vert),
+Vérifie aussi (module code-js) : le parcours « faux puis corrigé » d'un exercice de code (feuille rouge, Corriger, puis vert) ;
 la sauvegarde (XP, unités validées, boss), le défi du jour, les vues Théorie, Console et Profil.
 
 Usage : python3 tools/test-parcours.py [--captures] [--largeur 390]
@@ -75,34 +75,29 @@ try:
         if args.captures:
             pg.screenshot(path=str(CAP / "00-accueil.png"))
 
-        # 1. un exercice de code raté puis corrigé (u01-l1, exercice « Bonjour ProgWeb »)
-        pg.click(".node-wrap.has-start .node")
-        while True:
-            pg.wait_for_selector(".lcard, [data-check]")
-            if pg.query_selector(".lcard"):
-                pg.click("[data-next]"); continue
-            if pg.query_selector(".editeur textarea"):
-                break
-            pg.evaluate("async () => { await window.__q.resoudre(); }"); pg.click("[data-check]"); pg.wait_for_selector(".sheet"); pg.click("[data-cont]")
-        pg.fill(".editeur textarea", 'console.log(Bonjour ProgWeb);')
-        pg.click("[data-check]")
-        pg.wait_for_selector(".sheet.ko [data-fix]")
-        texte = pg.inner_text(".sheet")
-        if "guillemets" not in texte:
-            problemes.append(f"code faux : le message n'explique pas les guillemets → {texte[:200]}")
-        if args.captures:
-            pg.screenshot(path=str(CAP / "code-faux-feuille.png"))
-        pg.click("[data-fix]")
-        if args.captures:
-            pg.screenshot(path=str(CAP / "code-faux-detail.png"), full_page=True)
-        pg.fill(".editeur textarea", 'console.log("Bonjour ProgWeb");')
-        pg.click("[data-check]")
-        pg.wait_for_selector(".sheet.ok", timeout=8000)
-        pg.click("[data-cont]")
-        jouer_session(pg, "u01-l1 (suite)")
+        code_js = pg.evaluate("() => aModule('code-js')")
+        # 1. module « code-js » : un exercice de code raté puis corrigé (exercice de démonstration, indépendant du contenu)
+        if code_js:
+            pg.evaluate("""() => runSession([{ kind:'q', q:{ type:'ecrire', id:'demo-code', question:'Affiche Bonjour le monde', depart:[''],
+                tests:{ cas:[{ sortie:['Bonjour le monde'] }] }, indices:['console.log'], solution:['console.log("Bonjour le monde");'], explication:'demo' } }], { title:'démo', onEnd:() => ({}) })""")
+            pg.wait_for_selector(".editeur textarea")
+            pg.fill(".editeur textarea", 'console.log(Bonjour le monde);')
+            pg.click("[data-check]")
+            pg.wait_for_selector(".sheet.ko [data-fix]")
+            texte = pg.inner_text(".sheet")
+            if "guillemets" not in texte:
+                problemes.append(f"code faux : le message n'explique pas les guillemets → {texte[:200]}")
+            if args.captures:
+                pg.screenshot(path=str(CAP / "code-faux-feuille.png"))
+            pg.click("[data-fix]")
+            pg.fill(".editeur textarea", 'console.log("Bonjour le monde");')
+            pg.click("[data-check]")
+            pg.wait_for_selector(".sheet.ok", timeout=8000)
+            pg.click("[data-cont]"); pg.click("[data-done]")
+            pg.wait_for_selector(".node")
 
         # 2. tout le parcours, nœud après nœud
-        sessions = 0
+        sessions = -1
         while pg.query_selector(".node-wrap.has-start .node"):
             label = pg.inner_text(".node-wrap.has-start .node-label").split("\n")[0]
             pg.click(".node-wrap.has-start .node")
@@ -141,25 +136,27 @@ try:
         pg.click("[data-cont]"); pg.click("[data-done]")
 
         # 4. les autres vues
-        for vue in ["theorie", "console", "profil", "defi"]:
+        for vue in ["theorie"] + (["console"] if code_js else []) + ["profil", "defi"]:
             pg.click(f'.tab[data-go="{vue}"]')
             pg.wait_for_timeout(150)
             if args.captures:
                 pg.screenshot(path=str(CAP / f"vue-{vue}.png"), full_page=True)
         pg.click('.tab[data-go="theorie"]')
         pg.click(".fiche-lien")
-        pg.wait_for_selector(".drawer [data-run]")
-        pg.click(".drawer [data-run]")
-        pg.wait_for_selector(".drawer .console")
+        pg.wait_for_selector(".drawer [data-close]")
+        if pg.query_selector(".drawer [data-run]"):
+            pg.click(".drawer [data-run]")
+            pg.wait_for_selector(".drawer .console")
         if args.captures:
             pg.screenshot(path=str(CAP / "fiche.png"))
         pg.click(".drawer [data-close]")
-        pg.click('.tab[data-go="console"]')
-        pg.fill(".editeur textarea", "const fruits = [\"kiwi\"];\nfruits.forEach((fruits) => console.log(fruit));")
-        pg.click("main [data-run]")
-        pg.wait_for_selector("main .diag")
-        if "fruit" not in pg.inner_text("main .resultat"):
-            problemes.append("console libre : l'erreur n'est pas expliquée")
+        if code_js:
+            pg.click('.tab[data-go="console"]')
+            pg.fill(".editeur textarea", "const fruits = [\"kiwi\"];\nfruits.forEach((fruits) => console.log(fruit));")
+            pg.click("main [data-run]")
+            pg.wait_for_selector("main .diag")
+            if "fruit" not in pg.inner_text("main .resultat"):
+                problemes.append("console libre : l'erreur n'est pas expliquée")
         # 5. la sauvegarde survit à un rechargement
         xp = pg.evaluate("() => ST.xp")
         pg.reload(); pg.wait_for_selector(".node")

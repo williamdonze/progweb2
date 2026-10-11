@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   ProgWeb 2 — bac à sable DOM (TP « Manipulation du DOM »).
+   Moteur de cours — bac à sable DOM (TP « Manipulation du DOM »).
    Le Web Worker n'a pas de DOM : ici, le code de l'élève tourne dans une <iframe sandbox="allow-scripts">
    qui contient la page de l'exercice (content/pages/*.html + .css, ou du HTML écrit dans l'exercice).
    - executerDom({ code, dom, tests }) : iframe cachée, joue les tests, renvoie un résultat au format de executerTout ;

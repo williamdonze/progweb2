@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   ProgWeb 2 — banc d'essai du code.
+   Moteur de cours — banc d'essai du code.
    Ce fichier est chargé à la fois :
    - par la page (coloration, affichage des valeurs, comparaisons, analyse statique) ;
    - par le Web Worker js/worker.js, qui exécute le code de l'élève et ses tests (fonction executerTout).

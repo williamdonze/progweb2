@@ -1,11 +1,32 @@
 "use strict";
 /* =====================================================================
-   ProgWeb 2 — socle : utilitaires, icônes, mascotte, sauvegarde, progression,
+   Moteur de cours façon Duolingo — socle : utilitaires, icônes, mascotte, sauvegarde, progression,
    toasts, modale, texte enrichi, affichage du code, exécution dans le bac à sable.
    Aucun contenu pédagogique ici : tout est dans content/.
    ===================================================================== */
 
-const SAVE_KEY = "progweb2-sauvegarde-v1";
+/* identité de l'appli : section "app" de content/config.json (voir docs/format-contenu.md § 1) */
+const APP = {
+  nom: "Mon cours", cle: "mon-cours", accroche: "On part de zéro et on va jusqu'aux exercices de ton cours.",
+  mascotte: { nom: "Coco", cadre: ["{", "}"], corps: "#FFF6E4", bord: "#E3C98F" },
+  modules: [], couleurs: {}, textes: {},
+};
+let SAVE_KEY = "mon-cours-sauvegarde-v1";
+const aModule = m => APP.modules.includes(m);
+function appliquerApp(cfg = {}){
+  Object.assign(APP, cfg, { mascotte: { ...APP.mascotte, ...(cfg.mascotte || {}) }, textes: { ...APP.textes, ...(cfg.textes || {}) } });
+  SAVE_KEY = `${APP.cle}-sauvegarde-v1`;
+  document.title = APP.nom;
+  document.documentElement.lang = APP.langue || "fr";
+  // couleurs : { "clair": { "--prim": "#…" }, "sombre": { … } } ; les jetons non cités gardent leur valeur de css/app.css
+  const bloc = o => Object.entries(o || {}).map(([k, v]) => `${k.startsWith("--") ? k : "--" + k}:${v}`).join(";");
+  const { clair, sombre } = APP.couleurs || {};
+  if (clair || sombre) {
+    const st = document.getElementById("couleurs-app") || document.head.appendChild(Object.assign(document.createElement("style"), { id:"couleurs-app" }));
+    st.textContent = `${clair ? `:root{${bloc(clair)}}` : ""}${sombre ? `@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){${bloc(sombre)}}}:root[data-theme="dark"]{${bloc(sombre)}}` : ""}`;
+  }
+  I.logo = logoSVG();
+}
 const D = { unites: [] };   // données chargées : config + unités (dans l'ordre du sommaire)
 let ST;                     // état du joueur
 const $app = document.getElementById("app");
@@ -57,22 +78,33 @@ const I = {
 };
 const ICON_BY_NAME = { etoile:I.star, flamme:I.flame, medaille:I.medal, trophee:I.trophy, boss:I.boss, oeuf:I.egg, livre:I.book, cible:I.target, accolades:I.braces, porte:I.wallet, bug:I.bug, terminal:I.terminal, melange:I.shuffle };
 
-/* mascotte : Coco, un œuf entre deux accolades (la boîte d'œufs du cours) */
-function mascot(mood = "happy"){
+/* mascotte (config.app.mascotte) : un œuf souriant dans un « cadre » propre au cours :
+   ["{", "}"] (accolades dessinées, cours de code), deux textes quelconques (["<?", "?>"], ["$", "_"]…), ou [] (pas de cadre) */
+const ACCOLADES = [`M22 18c-9 0-12 5-12 12v18c0 6-3 10-8 12 5 2 8 6 8 12v18c0 7 3 12 12 12`, `M98 18c9 0 12 5 12 12v18c0 6 3 10 8 12-5 2-8 6-8 12v18c0 7-3 12-12 12`];
+function cadreSVG(couleur){
+  const c = APP.mascotte.cadre || [];
+  if (!c.length) return "";
+  if (c[0] === "{" && c[1] === "}") return ACCOLADES.map(d => `<path d="${d}" stroke="${couleur}" stroke-width="7" fill="none" stroke-linecap="round"/>`).join("");
+  const t = (x, txt, a) => `<text x="${x}" y="72" text-anchor="${a}" font-family="JetBrains Mono, ui-monospace, monospace" font-weight="800" font-size="${txt.length > 2 ? 22 : txt.length > 1 ? 28 : 40}" fill="${couleur}">${esc(txt)}</text>`;
+  return t(14, c[0] || "", "middle") + t(106, c[1] || "", "middle");
+}
+function mascot(mood = "happy", couleur = "var(--prim)"){
+  const m = APP.mascotte;
   const mouth = mood === "sad" ? `<path d="M51 84q9-7 18 0" stroke="#2a2340" stroke-width="3.5" fill="none" stroke-linecap="round"/>`
     : mood === "wow" ? `<ellipse cx="60" cy="83" rx="6" ry="7" fill="#2a2340"/>`
     : `<path d="M49 79q11 11 22 0" stroke="#2a2340" stroke-width="3.5" fill="#fff" stroke-linecap="round"/>`;
   return `<svg class="mascot" viewBox="0 0 120 120" aria-hidden="true">
-    <path d="M22 18c-9 0-12 5-12 12v18c0 6-3 10-8 12 5 2 8 6 8 12v18c0 7 3 12 12 12" stroke="var(--prim)" stroke-width="7" fill="none" stroke-linecap="round"/>
-    <path d="M98 18c9 0 12 5 12 12v18c0 6 3 10 8 12-5 2-8 6-8 12v18c0 7-3 12-12 12" stroke="var(--prim)" stroke-width="7" fill="none" stroke-linecap="round"/>
-    <path d="M60 12c17 0 30 30 30 56a30 30 0 0 1-60 0c0-26 13-56 30-56z" fill="#FFF6E4" stroke="#E3C98F" stroke-width="3"/>
+    ${cadreSVG(couleur)}
+    <path d="M60 12c17 0 30 30 30 56a30 30 0 0 1-60 0c0-26 13-56 30-56z" fill="${m.corps}" stroke="${m.bord}" stroke-width="3"/>
     <ellipse cx="48" cy="36" rx="6" ry="9" fill="#fff" opacity=".9"/>
     <circle cx="49" cy="64" r="7" fill="#fff" stroke="#2a2340" stroke-width="1.5"/><circle cx="71" cy="64" r="7" fill="#fff" stroke="#2a2340" stroke-width="1.5"/>
     <circle cx="50.5" cy="65" r="3.6" fill="#2a2340"/><circle cx="72.5" cy="65" r="3.6" fill="#2a2340"/>
     <circle cx="40" cy="76" r="5" fill="#ff9fb4" opacity=".6"/><circle cx="80" cy="76" r="5" fill="#ff9fb4" opacity=".6"/>
     ${mouth}</svg>`;
 }
-I.logo = `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M9 6c-3 0-4 2-4 4v6c0 2-1 3.5-3 4 2 .5 3 2 3 4v6c0 2 1 4 4 4M31 6c3 0 4 2 4 4v6c0 2 1 3.5 3 4-2 .5-3 2-3 4v6c0 2-1 4-4 4" stroke="var(--prim)" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M20 6c6 0 10 9 10 17a10 10 0 0 1-20 0c0-8 4-17 10-17z" fill="#FFF6E4" stroke="#E3C98F" stroke-width="1.6"/><circle cx="16.5" cy="22" r="1.8" fill="#2a2340"/><circle cx="23.5" cy="22" r="1.8" fill="#2a2340"/><path d="M16.5 27q3.5 3 7 0" stroke="#2a2340" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>`;
+/* petit logo de la barre du haut : la mascotte, sans les joues */
+const logoSVG = () => mascot("happy").replace('class="mascot"', 'class="logo"').replace(/<circle cx="(40|80)" cy="76"[^>]*\/>/g, "");
+I.logo = logoSVG();
 
 /* ---------------- sauvegarde ---------------- */
 // La progression est indexée par des identifiants explicites (jamais par position) : ajouter du contenu ne perd rien.
@@ -308,7 +340,7 @@ function ficheHTML(f){
   if (f.texte) el.appendChild(h(`<div class="rich" style="margin-top:14px">${rich(f.texte)}</div>`));
   for (const ex of f.exemples || []) {
     if (ex.titre) el.appendChild(h(`<h3>${richInline(ex.titre)}</h3>`));
-    el.appendChild(blocExecutable(lignes(ex.code), { dom: ex.dom }));
+    el.appendChild(aModule("code-js") && ex.executable !== false ? blocExecutable(lignes(ex.code), { dom: ex.dom }) : h(`<div>${codeHTML(lignes(ex.code))}</div>`));
     if (ex.note) el.appendChild(h(`<div class="rich" style="font-size:15px">${rich(ex.note)}</div>`));
   }
   if (f.pieges?.length) el.appendChild(h(`<div class="aside piege">${I.warn.replace("<svg", '<svg style="color:var(--ko)"')}<div><b class="t">Pièges classiques</b><div class="rich">${rich(f.pieges.map(p => "- " + p).join("\n"))}</div></div></div>`));

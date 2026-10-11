@@ -10,8 +10,14 @@ URL = f"http://localhost:{PORT}/"
 def serveur():
     """Lance `python3 -m http.server` sur PORT s'il ne tourne pas déjà. Renvoie le processus (ou None)."""
     with socket.socket() as s:
-        if s.connect_ex(("localhost", PORT)) == 0:
-            return None
+        occupe = s.connect_ex(("localhost", PORT)) == 0
+    if occupe:   # un serveur tourne déjà : est-ce bien celui de CE cours ? (plusieurs cours peuvent utiliser le même port)
+        import urllib.request
+        try: distant = urllib.request.urlopen(URL + "content/config.json", timeout=3).read()
+        except Exception: distant = b""
+        if distant != (RACINE / "content/config.json").read_bytes():
+            raise RuntimeError(f"le port {PORT} est occupé par un autre site : arrête-le, ou lance avec PORT=8790 python3 tools/…")
+        return None
     proc = subprocess.Popen([sys.executable, "-m", "http.server", str(PORT)], cwd=RACINE,
                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     for _ in range(50):

@@ -23,14 +23,23 @@ TYPES = {
     "ecrire": ["question", "tests", "solution"], "boss": ["titre", "enonce", "tests", "solution", "indices"],
 }
 CODE = {"trous", "corriger", "ecrire", "boss"}
+# types qui exécutent ou évaluent du JavaScript : ils demandent le module « code-js » ; les pages web, le module « dom »
+MODULES_CONNUS = {"code-js", "dom"}
+TYPES_CODE_JS = CODE | {"reduce-pas", "filtre-visuel", "map-visuel", "types-chaine", "fisher-yates", "pointer-tableau", "objet"}
 lignes = lambda c: "\n".join(c) if isinstance(c, list) else str(c or "")
 
 try:
     config = json.loads((RACINE / "content/config.json").read_text(encoding="utf-8"))
 except Exception as e:
     print("✖ content/config.json illisible :", e); sys.exit(1)
-for k in ["seuilValidation", "unites", "rangs", "badges"]:
+for k in ["app", "seuilValidation", "unites", "rangs", "badges"]:
     if k not in config: E(f"config.json : champ « {k} » manquant")
+APP = config.get("app", {})
+for k in ["nom", "cle", "description"]:
+    if not APP.get(k): E(f"config.json : app.{k} manquant")
+if APP.get("cle") and not re.fullmatch(r"[a-z0-9-]+", APP["cle"]): E("config.json : app.cle en minuscules, chiffres et tirets (elle nomme la sauvegarde : ne plus la changer ensuite)")
+MODULES = set(APP.get("modules", []))
+for m in MODULES - MODULES_CONNUS: E(f"config.json : module inconnu « {m} » (connus : {', '.join(sorted(MODULES_CONNUS))})")
 
 unites, ids_q, ids_fiche, ids_unite, ids_badge = [], {}, {}, set(), set()
 for b in config.get("badges", []):
@@ -52,6 +61,11 @@ for chemin in config.get("unites", []):
 def verifier_question(q, ou):
     t = q.get("type")
     if t not in TYPES: E(f"{ou} : type inconnu « {t} »"); return
+    if t in TYPES_CODE_JS and "code-js" not in MODULES and not (t == "predire"):
+        E(f"{ou} : le type « {t} » demande le module « code-js » (config.app.modules)")
+    if t == "predire" and q.get("reponse") is None and not q.get("choix") and "code-js" not in MODULES:
+        E(f"{ou} : « predire » sans réponse écrite exécute du JavaScript : module « code-js », ou donne « reponse »")
+    if (t == "selecteur" or q.get("dom")) and "dom" not in MODULES: E(f"{ou} : page web (dom) : il faut le module « dom »")
     qid = q.get("id")
     if not qid: E(f"{ou} : pas d'id (obligatoire : il sert à la sauvegarde)")
     elif qid in ids_q: E(f"{ou} : id « {qid} » déjà utilisé ({ids_q[qid]})")
@@ -102,7 +116,16 @@ for chemin, u in unites:
     qs = u.get("quiz", {}).get("questions", [])
     if not 12 <= len(qs) <= 20: W(f"{nom} : quiz de {len(qs)} questions (15 à 18 conseillé)")
     for q in qs: verifier_question(q, f"{nom} · quiz")
-    for b in u.get("boss", []): verifier_question({**b, "type": "boss"}, f"{nom} · boss")
+    for b in u.get("boss", []):
+        if "questions" in b:   # étude de cas (cours sans code) : un scénario puis des questions de n'importe quel type
+            ou = f"{nom} · boss {b.get('id')}"
+            if not b.get("id") or not b.get("titre"): E(f"{ou} : un boss a besoin d'un id et d'un titre")
+            if not b.get("enonce") and not b.get("cartes"): E(f"{ou} : étude de cas sans énoncé (enonce ou cartes)")
+            if len(b["questions"]) < 4: W(f"{ou} : étude de cas de moins de 4 questions")
+            if not b.get("source"): W(f"{ou} : boss sans « source » (quel exercice ou quel attendu du cours ?)")
+            for q in b["questions"]: verifier_question(q, ou)
+        else:
+            verifier_question({**b, "type": "boss"}, f"{nom} · boss")
     connus = ids_l | {f"jeu:{g['id']}" for g in u.get("jeux", [])} | {"quiz"} | {f"boss:{b['id']}" for b in u.get("boss", [])}
     for step in u.get("parcours", []):
         if step not in connus: E(f"{nom} : étape de parcours inconnue « {step} »")

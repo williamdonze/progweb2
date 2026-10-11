@@ -1,6 +1,6 @@
 /* Service worker de ProgWeb 2 : appli installable et utilisable hors connexion.
    Réseau d'abord (le contenu est toujours le plus récent quand on est en ligne), copie en cache pour le hors-ligne. */
-const CACHE = "progweb2-v4";
+const CACHE = "progweb2-v5";
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", e => e.waitUntil(
   caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())

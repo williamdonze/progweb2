@@ -8,6 +8,7 @@ Site pédagogique façon **Duolingo** pour apprendre le JavaScript **de zéro** 
 - `content/pages/cards.html` et `cards.css` sont les fichiers du prof (TP DOM). `cards.html` ne garde que le contenu du `<body>` : `js/dom.js` fournit le `<head>` et injecte le CSS.
 - Source des énoncés : pages du cours enregistrées le 10 octobre 2026, copiées dans `docs/cours/` (tp1-fonctions, tp2-tableaux, tp3-dom). Les boss reprennent les énoncés tels quels.
 - 23 types d'exercices (dont 4 avec du code exécuté et testé), éditeur de code mobile, deux bacs à sable (Web Worker pour le JavaScript, iframe isolée avec la page du TP pour le DOM), console qui comprend les couleurs ANSI, tests automatiques, diagnostics et erreurs JavaScript traduits en français.
+- **Moteur** : celui du modèle `williamdonze/cours-duolingo-template` (mis à jour le 11 octobre 2026). L'identité de l'appli est dans `content/config.json` → `app` ; sa `cle` (`progweb2`) nomme la sauvegarde des élèves : **ne jamais la changer**. Pour récupérer une nouvelle version du moteur : `/mettre-a-jour-moteur` ; une amélioration du moteur faite ici se reporte d'abord dans le modèle (`docs/modules.md`).
 - Gamification de Pampre : XP, 7 rangs, badges, série de jours, défi du jour, graphique 7 jours. **Pas de vies**, volontairement (choix de l'élève).
 - Répétition espacée **par notion** (boîtes de Leitner), fiches de théorie consultables partout, console libre.
 - Sauvegarde `localStorage` (`progweb2-sauvegarde-v1`), export / import par code, thème clair / sombre, appli installable (PWA, hors connexion).
@@ -35,13 +36,15 @@ js/dom.js                  Bac à sable DOM : page du TP dans une <iframe sandbo
 js/dom-harnais.js          Chargé DANS l'iframe (après banc.js) : exécute le code de l'élève comme module, joue les étapes des tests
 js/questions.js            Moteur d'exercices : Q[type] pour les 23 types
 js/app.js                  runSession, lancement des leçons / jeux / quiz / boss, défi du jour, vues, démarrage
-content/config.json        Sommaire des unités (ordre), rangs, badges, unités « bientôt »
+content/config.json        app (nom, clé de sauvegarde, mascotte, modules code-js et dom), sommaire des unités, rangs, badges
 content/unites/uNN-*.json  Une unité par fichier : fiches, leçons, jeux, quiz, boss
 content/pages/             Pages web des exercices DOM (cards.html = contenu du <body>, cards.css)
 tools/                     Tests et outils (voir « Tests »)
 docs/format-contenu.md     LA référence du format du contenu (tous les types, les tests, les diagnostics)
 docs/programme.md          Programme, correspondance unités ↔ exercices du cours, difficultés ciblées
 docs/plan.md               Plan initial validé par l'élève
+docs/modules.md            Les modules du moteur (code-js, dom) et comment en ajouter
+.claude/skills/            /nouveau-cours, /mettre-a-jour-moteur (venues du modèle)
 manifest.webmanifest, sw.js, icones/   Appli installable, hors connexion (changer CACHE dans sw.js pour vider les copies)
 ```
 
@@ -101,7 +104,7 @@ python3 tools/tester-exercices.py       # dans Chromium, avec le vrai bac à sab
 python3 tools/test-parcours.py          # parcours complet : toutes les leçons, jeux, quiz et boss, dans l'ordre, par l'interface ;
                                         # code faux puis corrigé, Fisher–Yates en vrais clics, défi du jour, vues, sauvegarde
                                         # (--captures : une capture par type d'exercice dans tools/captures/, non versionné)
-python3 tools/build-icones.py           # régénère icones/
+python3 tools/configurer.py             # après un changement de config.app : index.html, manifest, sw.js, icônes
 ```
 
 GitHub Actions (`.github/workflows/tests.yml`) lance les trois tests à chaque push.

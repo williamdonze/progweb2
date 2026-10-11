@@ -1,4 +1,29 @@
 {
+  "app": {
+    "nom": "ProgWeb 2",
+    "nomLong": "ProgWeb 2 — apprendre le JavaScript",
+    "description": "Apprendre le JavaScript en jouant, de zéro jusqu'aux exercices du cours de programmation web : leçons courtes, exercices de code testés, défi du jour.",
+    "cle": "progweb2",
+    "langue": "fr",
+    "accroche": "On part de zéro et on va jusqu'aux exercices de ton cours.",
+    "mascotte": {
+      "nom": "Coco",
+      "cadre": [
+        "{",
+        "}"
+      ],
+      "corps": "#FFF6E4",
+      "bord": "#E3C98F"
+    },
+    "couleurs": {},
+    "textes": {
+      "jeuReussi": "tu lis le code comme un livre."
+    },
+    "modules": [
+      "code-js",
+      "dom"
+    ]
+  },
   "seuilValidation": 0.8,
   "unites": [
     "content/unites/u01-bases.json",

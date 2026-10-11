@@ -1,4 +1,4 @@
-/* ProgWeb 2 — styles. Reprend la mise en page de Pampre : appli mobile centrée (colonne 680 px), barre haute de stats,
+/* Moteur de cours façon Duolingo — styles. Reprend la mise en page de Pampre : appli mobile centrée (colonne 680 px), barre haute de stats,
    onglets en bas, parcours en zigzag ; sessions plein écran avec feuille de correction qui monte du bas.
    Toute couleur est un jeton défini dans les TROIS blocs : clair, sombre système, sombre forcé. */
 :root{
@@ -91,7 +91,7 @@ code,kbd{font-family:var(--f-code);font-size:.92em}
 .topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:2px solid var(--line)}
 .topbar .wrap{display:flex;align-items:center;gap:12px;height:60px}
 .brand{display:flex;align-items:center;gap:8px;min-height:44px;font-family:var(--f-display);font-weight:800;font-size:23px;color:var(--prim-ink);background:none;border:0;padding:0;letter-spacing:-.01em;white-space:nowrap}
-.brand svg{width:32px;height:32px}
+.brand svg{width:32px;height:32px;flex:none}
 .stats{margin-left:auto;display:flex;gap:6px;align-items:center;min-width:0}
 @media (max-width:360px){.topbar .wrap{gap:6px}.stats{gap:2px}.stat{padding:4px 5px}.brand{font-size:19px;gap:6px}.brand svg{width:26px;height:26px}}
 .stat{display:flex;align-items:center;gap:4px;white-space:nowrap;min-height:44px;font-weight:800;font-size:15px;padding:4px 8px;border-radius:12px;font-variant-numeric:tabular-nums;background:none;border:0}
@@ -106,7 +106,7 @@ code,kbd{font-family:var(--f-code);font-size:.92em}
 
 /* ---------- onglets du bas ---------- */
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--paper);border-top:2px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
-.tabbar .wrap{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;height:64px;align-items:center}
+.tabbar .wrap{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;height:64px;align-items:center}
 .tab{display:flex;flex-direction:column;align-items:center;gap:2px;border:2px solid transparent;background:none;border-radius:14px;padding:6px 2px;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;min-height:52px}
 .tab svg{width:26px;height:26px}
 .tab[aria-current="page"]{color:var(--prim-ink);background:var(--prim-soft);border-color:color-mix(in srgb,var(--prim) 30%,transparent)}

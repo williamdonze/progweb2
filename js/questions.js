@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   ProgWeb 2 — moteur d'exercices.
+   Moteur de cours — moteur d'exercices.
    Contrat d'un type (repris de Pampre) :
      Q.monType = (q, onChange) => ({ el, ready(), check(), key?, cleanup?, reouvrir?, resoudre? })
    - check() verrouille, marque juste/faux et renvoie { ok, answer?, detail?, retry? } (ou une promesse pour le code) ;
