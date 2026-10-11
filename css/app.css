@@ -134,9 +134,17 @@ main{padding-block:20px 110px}
 
 /* ---------- accueil ---------- */
 .home-hero{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;margin-bottom:18px}
+/* taille par défaut ; centrée par son conteneur (text-align, justify-items), jamais par des marges automatiques (elles écrasent l'en-tête du profil) */
+.mascot{width:96px;height:96px;flex:none;vertical-align:middle}
+.chargement{text-align:center;padding-top:80px}
+.chargement .mascot{width:120px;height:120px;animation:pop .6s cubic-bezier(.3,1.6,.5,1)}
+.chargement p{font-weight:800;color:var(--muted);margin-top:12px}
 .home-hero .mascot{width:84px;height:84px}
 .bubble{position:relative;background:var(--paper);border:2px solid var(--line);border-radius:18px;padding:12px 14px;font-weight:700}
-.bubble::before{content:"";position:absolute;left:-10px;top:24px;width:16px;height:16px;background:var(--paper);border-left:2px solid var(--line);border-bottom:2px solid var(--line);transform:rotate(45deg)}
+/* pointe de la bulle : deux triangles (le contour, puis le fond par-dessus), sans carré tourné qui laisse des marches à la jonction */
+.bubble::before,.bubble::after{content:"";position:absolute;border-style:solid;border-color:transparent;border-left-width:0}
+.bubble::before{left:-12px;top:22px;border-width:10px 12px 10px 0;border-right-color:var(--line)}
+.bubble::after{left:-9px;top:24.5px;border-width:7.5px 9px 7.5px 0;border-right-color:var(--paper)}
 .daily{display:flex;gap:14px;align-items:center;margin-bottom:28px}
 .daily .ico{flex:none;width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:var(--gold-soft);color:var(--gold-deep)}
 .daily .ico svg{width:32px;height:32px}
@@ -144,6 +152,17 @@ main{padding-block:20px 110px}
 .daily h3{font-size:19px}
 .daily p{color:var(--muted);font-size:14px}
 .daily.done .ico{background:var(--ok-soft);color:var(--ok-deep)}
+.daily.projet .ico{background:var(--prim-soft);color:var(--prim-ink)}
+/* ---------- projet : critères à cocher ---------- */
+.criteres{display:grid;gap:10px;margin-bottom:28px}
+.critere{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:start;background:var(--paper);border:2px solid var(--line);border-radius:16px;padding:12px}
+.critere p{font-weight:700;line-height:1.45}
+.critere .note{font-weight:600;margin-top:6px}
+.coche{width:44px;height:44px;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:transparent;display:grid;place-items:center}
+.coche svg{width:28px;height:28px;opacity:0}
+.critere.fait{border-color:var(--ok)}
+.critere.fait .coche{border-color:var(--ok);color:var(--ok)}
+.critere.fait .coche svg{opacity:1}
 @media (max-width:360px){.daily{flex-wrap:wrap}.daily .txt{flex:1 1 calc(100% - 66px)}.daily .btn{flex:1 1 100%}}
 
 .unit{margin-bottom:36px}
@@ -154,6 +173,24 @@ main{padding-block:20px 110px}
 .unit-head .uico{margin-left:auto;flex:none;width:54px;height:54px;display:grid;place-items:center;font-family:var(--f-code);font-weight:800;font-size:20px;background:rgba(255,255,255,.16);border-radius:16px}
 .unit-head .uico svg{width:30px;height:30px}
 .unit.locked .unit-head{--u:var(--locked);--ud:var(--locked-deep);color:var(--muted)}
+/* replier une unité : clic sur la bannière */
+.unit:not(.locked) .unit-head{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.unit-head:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.unit-head .avancement{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-size:13px;font-weight:800;background:rgba(255,255,255,.18);border-radius:999px;padding:3px 6px 3px 10px}
+.unit-head .avancement > svg{width:15px;height:15px;color:#fff}
+.unit-head .avancement > svg circle{fill:rgba(255,255,255,.3)}
+.unit-head .chevron{display:grid;place-items:center;transition:transform .2s}
+.unit-head .chevron svg{width:16px;height:16px}
+.unit.repliee .unit-head .chevron{transform:rotate(-90deg)}
+.unit.repliee .path{display:none}
+.unit.repliee{margin-bottom:16px}
+.unit.repliee .unit-head p{display:none}
+/* bouton « Reprendre » : ramène à l'étape en cours */
+.aller-courant{position:fixed;z-index:15;right:max(16px,calc((100vw - 680px) / 2 + 16px));bottom:calc(80px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:6px;min-height:48px;padding:0 18px 0 14px;border:0;border-radius:999px;background:var(--prim-btn);color:var(--on-prim);font:inherit;font-weight:800;font-size:15px;text-transform:uppercase;letter-spacing:.04em;box-shadow:0 4px 0 var(--prim-deep),0 8px 20px rgba(0,0,0,.18);animation:pop .3s ease}
+.aller-courant[hidden]{display:none}
+.aller-courant svg{width:20px;height:20px;transition:transform .2s}
+.aller-courant.haut svg{transform:rotate(180deg)}
+.aller-courant:active{transform:translateY(3px);box-shadow:0 1px 0 var(--prim-deep)}
 .unit.locked .unit-head h2{color:var(--muted)}
 .unit-note{text-align:center;color:var(--muted);font-weight:700;font-size:14px;padding:18px 8px 0}
 .path{display:flex;flex-direction:column;align-items:center;gap:18px;padding-top:56px}
@@ -171,7 +208,10 @@ main{padding-block:20px 110px}
 .node-label{margin-top:12px;font-weight:800;font-size:14px;text-align:center;max-width:170px;line-height:1.25}
 .node-wrap.locked .node-label{color:var(--muted)}
 .node-wrap .start{position:absolute;top:-44px;background:var(--paper);color:var(--prim-ink);border:2px solid var(--line);border-radius:12px;padding:4px 12px;font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;animation:bob 1.6s ease-in-out infinite}
-.node-wrap .start::after{content:"";position:absolute;left:50%;bottom:-8px;width:12px;height:12px;background:var(--paper);border-right:2px solid var(--line);border-bottom:2px solid var(--line);transform:translateX(-50%) rotate(45deg)}
+/* pointe de l'étiquette : deux triangles (contour, puis fond), comme la bulle de la mascotte */
+.node-wrap .start::before,.node-wrap .start::after{content:"";position:absolute;left:50%;transform:translateX(-50%);border-style:solid;border-color:transparent;border-bottom-width:0}
+.node-wrap .start::before{bottom:-10px;border-width:10px 8px 0;border-top-color:var(--line)}
+.node-wrap .start::after{bottom:-7.4px;border-width:7.4px 5.9px 0;border-top-color:var(--paper)}
 @keyframes bob{50%{transform:translateY(-4px)}}
 .node-wrap.has-start{margin-top:32px}
 .revisions{display:flex;gap:10px;align-items:center;margin-top:-12px;margin-bottom:22px;padding:12px 14px}
@@ -240,6 +280,16 @@ main{padding-block:20px 110px}
 .t-fn{color:var(--sy-fn)}
 .t-prop{color:var(--sy-prop)}
 .t-op,.t-ponct{color:var(--sy-op)}
+.t-var{color:var(--sy-prop)}
+.t-tag{color:var(--sy-fn)}
+/* exercices de code en plusieurs fichiers (PHP…) : fichiers déjà écrits, nom du fichier, aperçu de la page produite */
+.fichier-fourni{border:2px solid var(--code-line);border-radius:14px;margin:8px 0;background:var(--code-bg)}
+.fichier-fourni summary{cursor:pointer;min-height:44px;display:flex;align-items:center;gap:8px;padding:0 12px;font-weight:700}
+.fichier-fourni summary svg,.nom-fichier svg{width:18px;height:18px;flex:none;color:var(--muted)}
+.fichier-fourni .code{margin:0 8px 8px;border-width:0}
+.nom-fichier{display:flex;align-items:center;gap:6px;margin:10px 0 -6px;font-size:14px;color:var(--muted)}
+.apercu-page{margin:10px 0}
+.apercu-page iframe{display:block;width:100%;height:260px;border:2px solid var(--code-line);border-radius:14px;background:#fff}
 .console{font-family:var(--f-code);font-size:14px;background:#14121F;color:#E8E4F5;border-radius:14px;padding:10px 12px;margin:10px 0;min-height:44px;overflow-x:auto}
 .console .cl{white-space:pre;display:flex;gap:8px;line-height:1.55}
 .console .cl::before{content:"›";color:#7C7896;flex:none}
@@ -505,6 +555,21 @@ textarea.save{width:100%;min-height:110px;border:2px solid var(--line);border-ra
 @media (min-width:640px){.modal-bg{place-items:center}.modal{border-radius:24px}}
 .modal h3{font-size:22px}
 .modal .row-btns .btn{flex:1}
+/* appli sur l'écran d'accueil : fenêtre et mode d'emploi */
+.inst-tete{display:flex;gap:12px;align-items:center}
+.inst-tete .mascot{width:64px;height:64px;margin:0}
+.etapes{list-style:none;padding:0;margin:0;display:grid;gap:12px;counter-reset:etape}
+.etapes li{counter-increment:etape;display:grid;grid-template-columns:32px 1fr;gap:10px;align-items:start;line-height:1.45}
+.etapes li::before{content:counter(etape);width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--prim-btn);color:var(--on-prim);font-weight:800}
+.pic{display:inline-grid;place-items:center;width:26px;height:26px;margin:0 2px;vertical-align:-7px;border:1.5px solid var(--line);border-radius:7px;background:var(--paper);color:var(--prim-ink)}
+.pic svg{width:17px;height:17px}
+.autres{font-size:14px;color:var(--muted)}
+.autres summary{font-weight:800;color:var(--ink);cursor:pointer;min-height:44px;display:flex;align-items:center}
+.autres .etapes{margin-bottom:8px}
+.autres dl{margin:4px 0 0;display:grid;gap:8px}
+.autres dt{font-weight:800;color:var(--ink)}
+.autres dd{margin:0}
+.lien-discret{background:none;border:0;color:var(--muted);font:inherit;font-size:14px;font-weight:700;text-decoration:underline;min-height:44px;justify-self:center}
 
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 /* code à trous : champs dans le code */

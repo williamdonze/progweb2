@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Applique la section "app" de content/config.json aux fichiers statiques, que le navigateur lit AVANT le JavaScript :
-index.html (titre, description, icône de l'onglet), manifest.webmanifest (nom de l'appli installée), sw.js (nom du cache),
-et régénère icones/ à partir de la mascotte. À lancer après chaque changement de la section "app".
+index.html (titre, description, icône de l'onglet, écran de chargement), manifest.webmanifest (nom de l'appli installée), sw.js (nom du cache),
+et régénère icones/ à partir de la mascotte, puis le README du cours (tools/generer-readme.py). À lancer après chaque changement de la section "app".
 
 Usage : python3 tools/configurer.py [--sans-icones]"""
 import argparse, json, re, sys, urllib.parse
@@ -41,6 +41,8 @@ t = remplacer(p, r'<html lang=".*?">', f'<html lang="{app.get("langue", "fr")}">
 t = remplacer(p, r"<noscript>.*?</noscript>", f'<noscript><p style="padding:20px">{esc(app["nom"])} a besoin de JavaScript pour fonctionner.</p></noscript>', t)
 if svg:
     t = remplacer(p, r'<link rel="icon" href=".*?">', f'<link rel="icon" href="data:image/svg+xml,{urllib.parse.quote(svg, safe=" =:/,")}">', t)
+    # écran de chargement : la mascotte du cours dès la première image, avant même le JavaScript
+    t = remplacer(p, r"<!--chargement-->.*?<!--/chargement-->", f'<!--chargement--><main class="wrap chargement">{svg}<p>Chargement…</p></main><!--/chargement-->', t)
 p.write_text(t, encoding="utf-8"); print("✓ index.html")
 
 # 3. manifest.webmanifest
@@ -53,3 +55,10 @@ p = RACINE / "sw.js"; t = p.read_text(encoding="utf-8")
 v = re.search(r'const CACHE = "[^"]*-v(\d+)";', t)
 t = remplacer(p, r'const CACHE = "[^"]*";', f'const CACHE = "{app["cle"]}-v{int(v.group(1)) + 1 if v else 1}";', t)
 p.write_text(t, encoding="utf-8"); print("✓ sw.js")
+
+# 5. la mascotte en image (hero du README) et le README du cours
+if svg:
+    (RACINE / "icones/mascotte.svg").write_text(svg.replace('class="mascot" ', '') + "\n", encoding="utf-8"); print("✓ icones/mascotte.svg")
+import runpy, sys as _sys
+_sys.argv = ["generer-readme.py"]
+runpy.run_path(str(RACINE / "tools/generer-readme.py"), run_name="__main__")

@@ -5,17 +5,18 @@
 - chaque question « prédire » : la bonne réponse est bien ce que le code affiche ;
 - chaque exemple de carte ou de fiche s'exécute sans erreur.
 
-Usage : python3 tools/tester-exercices.py [--unite u05] [--avertissements]
+Usage : python3 tools/tester-exercices.py [--unite u05] [--avertissements] [--exemple php]
 Code de sortie 1 s'il y a une erreur.
 """
 import argparse, json, sys
 from pathlib import Path
 from playwright.sync_api import sync_playwright
-from outils import serveur, navigateur, URL, RACINE
+from outils import serveur, navigateur, exemple, URL, RACINE
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--unite", help="ne tester qu'une unité (ex. u05)")
 ap.add_argument("--avertissements", action="store_true", help="afficher aussi les avertissements")
+ap.add_argument("--exemple", help="tester une unité d'exemple de tools/exemples/ (php, java…) au lieu du contenu")
 args = ap.parse_args()
 
 proc = serveur()
@@ -25,6 +26,7 @@ try:
         pg = b.new_page()
         erreurs_page = []
         pg.on("pageerror", lambda e: erreurs_page.append(str(e)))
+        exemple(pg, args.exemple)
         pg.goto(URL + "?test")
         pg.wait_for_function("typeof D !== 'undefined' && D.unites.length > 0 && document.querySelector('.node, h2')", timeout=15000)
         pg.add_script_tag(path=str(RACINE / "tools" / "tester-dans-la-page.js"))

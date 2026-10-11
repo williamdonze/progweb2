@@ -160,8 +160,8 @@ function zonesDuCode(code){
       morceaux.push({ t:rest.slice(a + 1, b), cible:true }); rest = rest.slice(b + 1);
     }
     for (const m of morceaux) {
-      if (m.cible) { const id = zones.length; zones.push({ texte:m.t, cible:true }); out += `<span class="z" data-z="${id}" role="button" tabindex="0">${jetons(m.t).map(spanJeton).join("")}</span>`; }
-      else for (const j of jetons(m.t)) {
+      if (m.cible) { const id = zones.length; zones.push({ texte:m.t, cible:true }); out += `<span class="z" data-z="${id}" role="button" tabindex="0">${LANG.jetons(m.t).map(spanJeton).join("")}</span>`; }
+      else for (const j of LANG.jetons(m.t)) {
         if (j.t === "ws") { out += esc(j.v); continue; }
         const id = zones.length; zones.push({ texte:j.v, cible:false });
         out += `<span class="z" data-z="${id}" role="button" tabindex="0">${spanJeton(j)}</span>`;
@@ -239,15 +239,15 @@ Q.predire = (q, onChange) => {
     return inner;
   }
   // toujours une zone de texte : on ne sait pas d'avance combien de lignes la console affichera (appels répétés, boucles)
-  const nbLog = (lignes(q.code).match(/console\.log\(/g) || []).length;
+  const nbLog = (lignes(q.code).match(LANG.reAffichage) || []).length;
   const rows = q.lignesReponse || Math.min(6, Math.max(1, nbLog, (q.reponse || "").split("\n").length));
-  const el = h(`<div>${codeHTML(lignes(q.code))}<label class="eyebrow" for="pred">Ce qui s'affiche${rows > 1 ? " (une ligne par affichage)" : ""}</label><textarea id="pred" class="saisie" rows="${rows}" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off"></textarea><p class="note">${q.aide ? richInline(q.aide) : "Écris exactement ce que la console afficherait, une ligne par affichage. Les espaces autour des virgules ne comptent pas."}</p></div>`);
+  const el = h(`<div>${codeHTML(lignes(q.code))}<label class="eyebrow" for="pred">Ce qui s'affiche${rows > 1 ? " (une ligne par affichage)" : ""}</label><textarea id="pred" class="saisie" rows="${rows}" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off"></textarea><p class="note">${q.aide ? richInline(q.aide) : `Écris exactement ce que ${esc(LANG.ecran)} afficherait, une ligne par affichage. Les espaces autour des virgules ne comptent pas.`}</p></div>`);
   const inp = el.querySelector(".saisie");
   inp.addEventListener("input", onChange);
   inp.addEventListener("keydown", e => { if (e.key === "Enter") e.stopPropagation(); });
   const attendu = async () => {
     if (q.reponse !== undefined) return [q.reponse, ...(q.accepte || [])];
-    const r = await executer({ code: lignes(q.code) });
+    const r = await executer({ code: lignes(q.code), ...champsExec(q) });
     return [r.console.join("\n"), ...(q.accepte || [])];
   };
   return { el, ready:() => inp.value.trim() !== "",
@@ -417,7 +417,7 @@ Q["types-chaine"] = (q, onChange) => {
    Données du cours en entête (lecture seule), éditeur, bouton Exécuter (console seule),
    Vérifier (tests sur plusieurs jeux de données), 3 indices progressifs. Jamais de solution affichée.
    ===================================================================== */
-const enteteAffichee = d => d ? Object.entries(d).map(([k, v]) => `const ${k} = ${v && typeof v === "object" ? `Object.freeze(${enCode(v)})` : enCode(v)};`).join("\n") : "";
+const enteteAffichee = d => LANG.enteteDonnees(d);   // les données du cours, écrites dans le langage du cours
 const TROU = /_{3,}/g;
 function indicesHTML(q){
   if (!q.indices?.length) return null;
@@ -452,7 +452,10 @@ function exerciceCode(q, onChange){
   const trous = q.type === "trous";
   const depart = lignes(q.depart ?? (trous ? q.code : ""));
   const entete = [enteteAffichee(q.donnees), lignes(q.prelude || "")].filter(Boolean).join("\n");
-  const el = h(`<div class="ex-code">${q.enonce ? `<div class="rich" style="margin-bottom:8px">${rich(q.enonce)}</div>` : ""}${q.regles?.length ? `<div class="aside tip" style="margin-top:0">${I.warn.replace("<svg", '<svg style="color:var(--teal)"')}<div><b class="t">Règles du cours</b><div class="rich">${rich(q.regles.map(r => "- " + r).join("\n"))}</div></div></div>` : ""}<div class="zone-code"></div><div class="ed-actions"><button type="button" class="btn small ghost" data-run>${I.play}Exécuter</button>${trous ? "" : `<button type="button" class="btn small ghost" data-reset>${I.reset}Recommencer</button>`}</div><div class="sortie"></div><div class="zone-indices"></div></div>`);
+  prechargerLangage();
+  // fichiers déjà écrits (projet en plusieurs fichiers : PHP…) et nom du fichier de l'élève
+  const fournis = Object.entries(q.fichiers || {}).map(([nom, c]) => `<details class="fichier-fourni"><summary>${I.book}<code>${esc(nom)}</code> <span class="muted">déjà écrit</span></summary>${codeHTML(lignes(c))}</details>`).join("");
+  const el = h(`<div class="ex-code">${q.enonce ? `<div class="rich" style="margin-bottom:8px">${rich(q.enonce)}</div>` : ""}${q.regles?.length ? `<div class="aside tip" style="margin-top:0">${I.warn.replace("<svg", '<svg style="color:var(--teal)"')}<div><b class="t">Règles du cours</b><div class="rich">${rich(q.regles.map(r => "- " + r).join("\n"))}</div></div></div>` : ""}${fournis}${q.fichier ? `<div class="nom-fichier">${I.book}<code>${esc(q.fichier)}</code></div>` : ""}<div class="zone-code"></div><div class="ed-actions"><button type="button" class="btn small ghost" data-run>${I.play}Exécuter</button>${trous ? "" : `<button type="button" class="btn small ghost" data-reset>${I.reset}Recommencer</button>`}</div><div class="sortie"></div><div class="zone-indices"></div></div>`);
   let ed = null, champs = [];
   const zone = el.querySelector(".zone-code");
   if (trous) {
@@ -488,12 +491,13 @@ function exerciceCode(q, onChange){
       if (r.erreur) { sortie.appendChild(resultatHTML({ erreur:r.erreur })); ed?.marquer(r.erreur.ligne); }
       return;
     }
-    const r = await executer({ code: codeActuel(), donnees: q.donnees || null, prelude: q.prelude ? lignes(q.prelude) : "" });
+    const r = await executer({ code: codeActuel(), donnees: q.donnees || null, prelude: q.prelude ? lignes(q.prelude) : "", ...champsExec(q) });
     b.disabled = false;
     sortie.innerHTML = "";
-    sortie.appendChild(h(consoleHTML(r.console, { vide:"Rien n'a été affiché. Pour voir un résultat : console.log(…)." })));
-    if (r.erreur) { sortie.appendChild(resultatHTML({ erreur:r.erreur })); ed?.marquer(r.erreur.ligne); }
-    else if (r.conseils?.length) sortie.appendChild(resultatHTML({ conseils:r.conseils }));
+    sortie.appendChild(h(consoleHTML(r.console, { vide:`Rien n'a été affiché. Pour voir un résultat : ${LANG.afficher}` })));
+    if (r.page) sortie.appendChild(apercuPageHTML(r.page));
+    if (r.erreur) { sortie.appendChild(resultatHTML({ erreur:r.erreur, conseils:r.conseils })); ed?.marquer(r.erreur.ligne); }
+    else if (r.conseils?.length) { sortie.appendChild(resultatHTML({ conseils:r.conseils })); ed?.marquer(r.conseils.find(c => c.avertissement)?.ligne || null); }
   };
   el.querySelector("[data-reset]")?.addEventListener("click", () => confirmBox("Recommencer ?", "Ton code actuel sera remplacé par le code de départ.", "Recommencer", () => { ed.definir(depart); delete ST.brouillons[q.id]; save(); sortie.innerHTML = ""; onChange(); }, false));
   return {
@@ -511,10 +515,11 @@ function exerciceCode(q, onChange){
       verrou = true; ed?.lectureSeule(true); champs.forEach(c => c.readOnly = true);
       essais++;
       const r = q.dom ? await executerDom({ code: codeActuel(), dom: q.dom, tests: q.tests, contexte:{ tableaux } })
-        : await executer({ code: codeActuel(), donnees: q.donnees || null, prelude: q.prelude ? lignes(q.prelude) : "", tests: q.tests, contexte:{ tableaux } });
+        : await executer({ code: codeActuel(), donnees: q.donnees || null, prelude: q.prelude ? lignes(q.prelude) : "", tests: q.tests, contexte:{ tableaux }, ...champsExec(q) });
       if (r.timeout && q.tests?.siTropLong) r.erreur.message += " " + q.tests.siTropLong;
       sortie.innerHTML = "";
       sortie.appendChild(h(consoleHTML(r.console, { vide:"Rien n'a été affiché." })));
+      if (r.page) sortie.appendChild(apercuPageHTML(r.page));
       sortie.appendChild(resultatHTML(r));
       ed?.marquer(r.erreur?.ligne || r.cas?.find(c => c.erreur?.ligne)?.erreur.ligne || (r.diagnostics || []).find(d => d.ligne)?.ligne || null);
       if (r.ok) { ST.stats.codes++; if (essais === 1) ST.stats.premierCoup++; delete ST.brouillons[q.id]; save(); }

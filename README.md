@@ -1,89 +1,50 @@
-# ProgWeb 2
+<p align="center"><img src="icones/mascotte.svg" width="150" alt="Coco, la mascotte de ProgWeb 2"></p>
+<h1 align="center">ProgWeb 2</h1>
+<p align="center"><b>Apprendre le JavaScript en jouant, de zéro jusqu'aux exercices du cours de programmation web : leçons courtes, exercices de code testés, défi du jour.</b></p>
+<p align="center"><a href="https://williamdonze.github.io/progweb2/"><b>Ouvrir l'appli →</b></a></p>
 
-Apprendre le JavaScript en jouant, de zéro jusqu'aux exercices du cours *Prog. Web* : leçons courtes, analogies (la boîte d'œufs, le porte-monnaie, le cuisinier), exercices interactifs, **code exécuté et testé dans le navigateur**, erreurs expliquées en français, défi du jour et répétition espacée. Sur le modèle de [Pampre](https://github.com/williamdonze/pampre).
+Une appli façon Duolingo pour réviser le cours : leçons de cinq minutes, exercices interactifs, XP, séries de jours, badges, défi du jour et révisions espacées (les notions ratées reviennent vite, les autres de plus en plus rarement). Elle s'installe sur le téléphone et marche hors connexion ; la progression reste dans le navigateur.
 
-- **23 types d'exercices** : pointer dans le code, pointer dans un tableau, trouver le bug, prédire l'affichage, choisir la méthode, classer, reconstituer un programme, reduce pas à pas, filtre et map visuels, traducteur d'erreurs, construire un objet, Fisher–Yates, suivre les types, écrire un sélecteur CSS (la page surligne ce qu'il trouve)… et du vrai code : à trous, à corriger, à écrire.
-- **Les boss** sont les exercices du cours, testés avec d'autres données (tableau vide, nombres négatifs…), avec 3 indices progressifs et **jamais la solution**.
-- Tout le cours est couvert : **TP Fonctions, TP Tableaux (nombres, chaînes, jeu de cartes) et TP DOM**, en 15 unités.
-- Ton code tourne dans un bac à sable isolé (Web Worker, ou la vraie page du TP DOM dans une iframe isolée), avec une console qui comprend les couleurs du terminal, un délai maximum contre les boucles infinies, et des messages qui expliquent l'erreur : « Ta fonction montre le plat par la fenêtre (console.log) au lieu de le tendre (return) ».
+**15 unités · 64 leçons · 711 questions · 75 fiches de théorie · 46 boss** (les exercices du cours).
 
-Programme et correspondance avec les TP (Fonctions, Tableaux, DOM) : [docs/programme.md](docs/programme.md).
+## Les unités
 
-## Lancer sur ton ordinateur
+| | Unité | Ce que tu sauras faire | Boss |
+|---|---|---|---|
+| 1 | **Les bases**<br><sub>Premiers pas</sub> | Afficher, ranger des valeurs dans des variables, reconnaître les types. | Préparation au TP 1 |
+| 2 | **Les opérateurs**<br><sub>Calculer et comparer</sub> | Calculer, tester pair / impair, comparer avec ===, combiner avec && et \|\|, choisir avec le ternaire. | Préparation au TP 2 |
+| 3 | **Les fonctions**<br><sub>TP 1 : Fonctions · exercices 1, 2, 3, 8, 10</sub> | Créer, appeler, retourner (et pas seulement afficher), écrire des fonctions fléchées. | TP Fonctions · exercice 1<br>TP Fonctions · exercice 2<br>TP Fonctions · exercice 3<br>TP Fonctions · exercice 8<br>TP Fonctions · exercice 10 |
+| 4 | **Les boucles**<br><sub>TP 1 : Fonctions · exercices 4, 5, 6, 7, 9</sub> | Répéter avec for, compter de 2 en 2 ou à l'envers, filtrer avec un if, compter, sortir plus tôt, recevoir autant d'arguments qu'on veut. | TP Fonctions · exercice 4<br>TP Fonctions · exercice 5<br>TP Fonctions · exercice 6<br>TP Fonctions · exercice 7<br>TP Fonctions · exercice 9 |
+| 5 | **Les tableaux**<br><sub>La boîte d'œufs</sub> | Créer un tableau, lire une case par son indice, utiliser length et le dernier indice, ne jamais modifier l'original. | Préparation au TP 2 (chaînes, exercice 5) |
+| 6 | **Parcourir et transformer**<br><sub>TP 2 : Tableaux · forEach, map, filter</sub> | Parcourir un tableau avec forEach, le transformer avec map, en garder une partie avec filter. | TP Tableaux · nombres, exercice 1<br>TP Tableaux · nombres, exercice 2<br>TP Tableaux · nombres, exercice 3 |
+| 7 | **Réduire : reduce**<br><sub>TP 2 : Tableaux · somme, maximum, concaténation</sub> | Comprendre l'accumulateur (le porte-monnaie), choisir la valeur de départ, calculer une somme, un maximum, une concaténation. | TP Tableaux · nombres, exercice 6<br>TP Tableaux · nombres, exercice 7<br>TP Tableaux · chaînes, exercice 6 |
+| 8 | **Tester : some, every**<br><sub>TP Tableaux · nombres 8, 9 · chaînes 2</sub> | Répondre par oui ou non à une question sur tout un tableau : au moins un ? tous ? Et chercher un élément. | TP Tableaux · nombres, exercice 8<br>TP Tableaux · nombres, exercice 9<br>TP Tableaux · chaînes, exercice 2 |
+| 9 | **Extraire et assembler**<br><sub>TP Tableaux · nombres 4, 5, 10 · chaînes 3, 4, 5</sub> | Couper un tableau avec slice, sortir les œufs avec le spread ..., remplacer une case avec with, sans jamais toucher l'original. | TP Tableaux · nombres, exercice 4<br>TP Tableaux · nombres, exercice 5<br>TP Tableaux · nombres, exercice 10<br>TP Tableaux · chaînes, exercice 3<br>TP Tableaux · chaînes, exercice 4<br>TP Tableaux · chaînes, exercice 5 |
+| 10 | **Trier**<br><sub>TP Tableaux · chaînes 7</sub> | Trier sans modifier l'original avec toSorted, écrire un comparateur, comparer des mots avec localeCompare. | TP Tableaux · chaînes, exercice 7 |
+| 11 | **Les chaînes**<br><sub>TP Tableaux · chaînes 1, 8</sub> | Chercher dans un texte, changer la casse, passer d'un texte à un tableau (split) et retour (join), renverser, et suivre les types dans un enchaînement. | TP Tableaux · chaînes, exercice 1<br>TP Tableaux · chaînes, exercice 8 |
+| 12 | **Objets : le jeu de cartes**<br><sub>TP Tableaux · jeu de cartes 1, 2, 5, 6, 7</sub> | Représenter une carte par un objet et le paquet par un tableau d'objets, construire les 52 cartes avec flatMap, comparer des cartes, les afficher en couleur dans le terminal. | TP Tableaux · jeu de cartes, exercice 1<br>TP Tableaux · jeu de cartes, exercice 2<br>TP Tableaux · jeu de cartes, exercice 5<br>TP Tableaux · jeu de cartes, exercice 6<br>TP Tableaux · jeu de cartes, exercice 7 (1re partie)<br>TP Tableaux · jeu de cartes, exercice 7 (2e partie) |
+| 13 | **Mélanger et tirer**<br><sub>TP Tableaux · jeu de cartes 3, 4, 5, 6, 7</sub> | Échanger deux cases, tirer un indice au hasard, mélanger un paquet avec Fisher–Yates, tirer des cartes sans toucher au paquet d'origine, jouer une main complète. | TP Tableaux · jeu de cartes, exercice 3<br>TP Tableaux · jeu de cartes, exercice 4<br>TP Tableaux · jeu de cartes, exercice 5 (2e partie)<br>TP Tableaux · jeu de cartes, exercices 6 et 7 (fin) |
+| 14 | **DOM : sélectionner**<br><sub>TP DOM · exercices 1 à 3</sub> | Trouver des éléments de la page avec querySelector et querySelectorAll, écrire des sélecteurs CSS (id, classe, OU, attribut, :not), ajouter et retirer des classes avec classList, réagir à un clic. | TP DOM · exercice 1<br>TP DOM · exercices 2 et 3 (boutons A à C)<br>TP DOM · exercices 2 et 3 (boutons D à F) |
+| 15 | **DOM : tirer une main**<br><sub>TP DOM · exercices 4 à 6</sub> | Convertir une NodeList en tableau, cloner des éléments avec leurs enfants, retirer un attribut, remplacer le contenu d'un conteneur en une opération, et assembler tout le TP DOM. | TP DOM · exercices 4, 5 et 6<br>TP DOM · exercices 1 à 6 |
 
-```bash
-python3 -m http.server 8765
-```
+## Sur ton téléphone
 
-Puis ouvre http://localhost:8765/. (Un double-clic sur `index.html` ne suffit pas : le contenu et le bac à sable ont besoin d'un serveur.)
+Ouvre [l'appli](https://williamdonze.github.io/progweb2/) sur ton téléphone : après la première leçon, Coco te montre comment l'ajouter à l'écran d'accueil (iPhone : Partager → « Sur l'écran d'accueil » ; Android : « Installer »). Le mode d'emploi est aussi dans Profil.
 
-## Mettre en ligne (GitHub Pages)
+## Compléter le cours
 
-1. Fusionne la branche de travail dans `main`.
-2. Sur GitHub : **Settings → Pages → Build and deployment → Deploy from a branch**, choisis `main` et `/ (root)`, puis **Save**.
-3. Le site est en ligne après une minute environ à l'adresse `https://williamdonze.github.io/progweb2/`.
+- **Nouveaux supports** (slides, énoncés, PDF) : dépose-les dans `supports/` (sur GitHub : *Add file → Upload files*), puis, dans une session Claude Code sur ce dépôt, tape **`/ajouter-supports`**. Claude propose les nouvelles unités, tu valides, il les écrit et les teste.
+- **Améliorations du moteur** : **`/mettre-a-jour-moteur`** reprend la dernière version du modèle sans toucher au contenu.
 
-Sur téléphone, le site s'ajoute à l'écran d'accueil comme une appli (plein écran, utilisable hors connexion).
-
-## Ajouter des exercices
-
-Tout le contenu est dans `content/` : **une unité = un fichier JSON**, listé dans `content/config.json`. Le moteur n'a jamais besoin d'être modifié pour ajouter du contenu, et ta progression n'est jamais perdue (elle est enregistrée par identifiant).
-
-Exemple complet d'un exercice de code :
-
-```json
-{
-  "id": "u05-l2-e7",
-  "type": "ecrire",
-  "notions": ["map"],
-  "question": "Écris `getPrixSoldes(prix)` qui **retourne** un nouveau tableau où chaque prix est divisé par 2.",
-  "depart": ["function getPrixSoldes(prix) {", "  ", "}", "", "console.log(getPrixSoldes([10, 25, 4]));"],
-  "tests": {
-    "fonction": "getPrixSoldes",
-    "cas": [
-      { "args": [[10, 25, 4]], "attendu": [5, 12.5, 2] },
-      { "titre": "tableau vide", "args": [[]], "attendu": [] }
-    ],
-    "obligatoire": ["map"]
-  },
-  "indices": ["Même longueur, éléments transformés : `map`.", "Le paramètre est un prix : `p`.", { "code": "return prix.map((___) => ___);" }],
-  "solution": ["function getPrixSoldes(prix) {", "  return prix.map((p) => p / 2);", "}"],
-  "erreursTypiques": [
-    { "code": "function getPrixSoldes(prix) {\n  prix.map((p) => p / 2);\n}", "attendu": "echec", "diagnostic": "sans-return" }
-  ],
-  "explication": "Affichée après la réussite."
-}
-```
-
-Et un exercice sans code :
-
-```json
-{ "id": "u04-l2-e1", "type": "pointer-tableau", "notions": ["indice"], "question": "Touche `fruits[1]`.", "tableau": ["pomme", "kiwi", "mangue"], "nom": "fruits", "bonnes": [1], "explication": "Indice 1 : la deuxième case." }
-```
-
-La référence complète (tous les types, les tests, les diagnostics, les fiches, les leçons) : **[docs/format-contenu.md](docs/format-contenu.md)**.
-
-### Quand le prof publie un nouveau TP
-
-Donne simplement le lien (ou le texte de la page) à Claude Code : la marche à suivre est dans [CLAUDE.md](CLAUDE.md) (« Procédure : voici la nouvelle page de TP »). En résumé :
-
-1. lire la page et lister les exercices ;
-2. repérer les **nouvelles notions** par rapport aux unités existantes ;
-3. créer les leçons et les fiches de théorie de ces notions, avec plusieurs types d'exercices ;
-4. créer les **boss** à partir des exercices du prof, avec tests, indices progressifs, jamais la solution ;
-5. ajouter l'unité dans `content/config.json` et vérifier que tous les tests passent.
-
-## Tests
+## Pour développer
 
 ```bash
-pip install playwright && playwright install chromium   # une fois
-python3 tools/valider-contenu.py     # structure du contenu
-python3 tools/tester-exercices.py    # chaque solution passe, chaque erreur typique est détectée avec le bon message
-python3 tools/test-parcours.py       # toute l'appli, leçon après leçon, comme un élève
+python3 -m http.server 8765        # puis http://localhost:8765/
+python3 tools/valider-contenu.py && python3 tools/tester-exercices.py && python3 tools/test-parcours.py
 ```
 
-## Continuer avec Claude Code
+Le contenu est en JSON dans `content/` (une unité par fichier), le format dans `docs/format-contenu.md`, le programme dans `docs/programme.md`.
 
-Ouvre ce dossier dans Claude Code : `CLAUDE.md` explique tout le projet. Exemple de demande :
+---
 
-> Voici la page du TP suivant : https://chabloz.eu/progweb/… Crée les unités correspondantes en suivant la procédure de CLAUDE.md.
+<p align="center"><sub>Créé à partir du <a href="https://github.com/williamdonze/cours-duolingo-template">modèle de cours façon Duolingo</a> de <a href="https://github.com/williamdonze">William Donzé</a>.</sub></p>

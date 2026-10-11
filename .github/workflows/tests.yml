@@ -23,3 +23,11 @@ jobs:
         run: python3 tools/tester-exercices.py
       - name: Parcours complet
         run: python3 tools/test-parcours.py
+      - name: Langages d'exemple (PHP exécuté, Java sans exécution ; dépôt du modèle seulement)
+        if: hashFiles('tools/exemples/php/unite.json') != ''
+        run: |
+          for x in php java; do
+            python3 tools/valider-contenu.py --exemple $x
+            python3 tools/tester-exercices.py --exemple $x
+            python3 tools/test-parcours.py --exemple $x
+          done

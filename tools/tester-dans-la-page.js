@@ -26,7 +26,7 @@ async function testerTout(filtreUnite){
         if (TYPES_CODE.has(q.type)) {
           const code = q.type === "trous" ? assembler(q.code, q.solution) : lignes(q.solution);
           const tableaux = q.donnees ? Object.entries(q.donnees).filter(([, v]) => Array.isArray(v)).map(([k]) => k) : [];
-          const lancerQ = (c) => q.dom ? executerDom({ code:c, dom:q.dom, tests:q.tests, contexte:{ tableaux } }) : executer({ code:c, donnees:q.donnees || null, prelude:q.prelude ? lignes(q.prelude) : "", tests:q.tests, contexte:{ tableaux } });
+          const lancerQ = (c) => q.dom ? executerDom({ code:c, dom:q.dom, tests:q.tests, contexte:{ tableaux } }) : executer({ code:c, donnees:q.donnees || null, prelude:q.prelude ? lignes(q.prelude) : "", tests:q.tests, contexte:{ tableaux }, ...champsExec(q) });
           const r = await lancerQ(code);
           stats.solutions++;
           if (!r.ok) erreurs.push(`${o} : la SOLUTION échoue → ${JSON.stringify({ erreur:r.erreur, diag:r.diagnostics, cas:r.cas.filter(c => !c.ok) }).slice(0, 500)}`);
@@ -37,7 +37,7 @@ async function testerTout(filtreUnite){
             const r2 = await lancerQ(c2);
             stats.erreursTypiques++;
             const aErreur = !!(r2.erreur || r2.cas?.some(c => c.erreur));
-            const idsVus = [...(r2.diagnostics || []), ...(r2.conseils || [])].map(d => d.id);
+            const idsVus = [...(r2.diagnostics || []), ...(r2.conseils || []), r2.erreur, ...(r2.cas || []).map(c => c.erreur)].filter(d => d && d.id).map(d => d.id);
             const resume = r2.erreur ? `erreur « ${r2.erreur.message.slice(0, 120)} »` : `diagnostics [${idsVus.join(", ")}] ; ${r2.cas.filter(c => !c.ok).length} cas ratés`;
             if (r2.ok && et.attendu !== "conseil") erreurs.push(`${o} : l'erreur typique n°${k + 1} PASSE les tests (elle devrait échouer) : ${c2.replace(/\n/g, " ⏎ ")}`);
             else if (et.attendu === "erreur" && !aErreur) erreurs.push(`${o} : l'erreur typique n°${k + 1} devait provoquer une erreur JS, mais : ${resume}`);
@@ -46,9 +46,9 @@ async function testerTout(filtreUnite){
           }
           continue;
         }
-        if (q.type === "predire" && !aModule("code-js") && q.reponse !== undefined) stats.predictions++;   // cours sans code : la réponse écrite fait foi
+        if (q.type === "predire" && !aCode()) stats.predictions++;   // code non exécuté : la réponse écrite (ou le choix) fait foi
         else if (q.type === "predire") {
-          const r = await executer({ code:lignes(q.code) });
+          const r = await executer({ code:lignes(q.code), ...champsExec(q) });
           stats.predictions++;
           const sortie = r.console.join("\n");
           if (r.erreur && !q.erreurVoulue) erreurs.push(`${o} : le code à prédire plante (${r.erreur.message})`);
@@ -62,7 +62,7 @@ async function testerTout(filtreUnite){
           if (new Set(q.choix).size !== q.choix.length) erreurs.push(`${o} : choix en double`);
         }
         if (q.type === "qcm" && q.code && q.verifierSortie) {
-          const r = await executer({ code:lignes(q.code) });
+          const r = await executer({ code:lignes(q.code), ...champsExec(q) });
           if (norm(r.console.join("\n")) !== norm(q.choix[q.bonne])) erreurs.push(`${o} : le bon choix ne correspond pas à la sortie (${r.console.join(" ⏎ ")})`);
         }
         if (q.type === "bug") { const n = lignes(q.code).split("\n").length; if (!(q.ligne >= 1 && q.ligne <= n)) erreurs.push(`${o} : ligne du bug hors du code`); }
@@ -82,13 +82,15 @@ async function testerTout(filtreUnite){
     }
     // exemples des cartes et des fiches
     const exemples = [];
-    u.lecons.forEach(l => l.cartes.forEach((c, k) => { if (c.code && c.executable !== false && aModule("code-js")) exemples.push([`${l.id} carte ${k + 1}`, lignes(c.code), c.erreurVoulue, c.donnees, c.dom]); }));
-    if (aModule("code-js")) u.fiches.forEach(f => (f.exemples || []).forEach((ex, k) => exemples.push([`fiche ${f.id} ex ${k + 1}`, lignes(ex.code), ex.erreurVoulue || /erreur/i.test(ex.titre || ""), null, ex.dom])));
-    for (const [lieu, code, voulue, donnees, dom] of exemples) {
-      const r = dom ? await executerDom({ code, dom }) : await executer({ code, donnees: donnees || null });
+    u.lecons.forEach(l => l.cartes.forEach((c, k) => { if (c.code && c.executable !== false && aCode()) exemples.push([`${l.id} carte ${k + 1}`, lignes(c.code), c.erreurVoulue, c.donnees, c.dom, c]); }));
+    if (aCode()) u.fiches.forEach(f => (f.exemples || []).forEach((ex, k) => { if (ex.executable !== false) exemples.push([`fiche ${f.id} ex ${k + 1}`, lignes(ex.code), ex.erreurVoulue || /erreur/i.test(ex.titre || ""), null, ex.dom, ex]); }));
+    for (const [lieu, code, voulue, donnees, dom, src] of exemples) {
+      const r = dom ? await executerDom({ code, dom }) : await executer({ code, donnees: donnees || null, ...champsExec(src) });
       stats.exemples++;
-      if (r.erreur && !voulue) erreurs.push(`${u.id} · ${lieu} : l'exemple plante (${r.erreur.message.slice(0, 120)})`);
-      if (!r.erreur && voulue) avert.push(`${u.id} · ${lieu} : erreur annoncée mais le code ne plante pas`);
+      const avertissement = (r.conseils || []).find(c => c.avertissement);   // un avertissement du langage (PHP : Warning) compte comme une erreur
+      const plante = r.erreur || avertissement;
+      if (plante && !voulue) erreurs.push(`${u.id} · ${lieu} : l'exemple plante (${plante.message.slice(0, 120)})`);
+      if (!plante && voulue) avert.push(`${u.id} · ${lieu} : erreur annoncée mais le code ne plante pas`);
     }
     // liens [[fiche]] dans les textes
     const texte = JSON.stringify(u);

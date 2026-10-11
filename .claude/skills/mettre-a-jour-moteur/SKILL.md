@@ -1,19 +1,40 @@
 ---
 name: mettre-a-jour-moteur
-description: Met à jour le moteur d'une appli de cours (js/, css/, tools/…) avec la dernière version du modèle cours-duolingo-template, sans toucher au contenu ni à la progression des élèves. À utiliser quand l'élève dit « /mettre-a-jour-moteur », « mets à jour le moteur », ou veut récupérer dans un cours une amélioration faite dans le modèle ou dans un autre cours.
+description: Récupère dans l'appli d'un cours la dernière version du moteur du modèle cours-duolingo-template (corrections, nouvelles fonctions, compétences), sans toucher au contenu du cours. À utiliser quand l'élève tape « /mettre-a-jour-moteur » ou demande de récupérer les améliorations du modèle.
 ---
 
-# Mettre à jour le moteur
+# Mettre à jour le moteur d'un cours
 
-Le moteur vit dans le modèle `williamdonze/cours-duolingo-template` ; chaque cours en a une copie. Cette procédure recopie le moteur du modèle dans le cours. Le **contenu** du cours (`content/`, `docs/programme.md`, `docs/cours/`, CLAUDE.md, README) ne change pas.
+Le dépôt d'un cours est une copie du modèle à une date donnée ; ce qui a été amélioré depuis dans le modèle n'y est pas. `tools/mettre-a-jour-moteur.py` recopie le moteur (`js/`, `css/`, `tools/`, compétences, docs du format, `CLAUDE.md` sauf « Ce cours ») ; le contenu (`content/`, `docs/cours/`, `docs/programme.md`) n'est jamais touché.
 
-## Étapes
+Si ce dépôt n'a pas encore l'outil (cours créé avant lui), récupère-le d'abord : `curl -sL https://raw.githubusercontent.com/williamdonze/cours-duolingo-template/main/tools/mettre-a-jour-moteur.py -o tools/mettre-a-jour-moteur.py` (ou copie-le depuis un clone du modèle).
 
-1. **Le modèle sur la machine** : s'il n'est pas déjà cloné, ajoute le dépôt `williamdonze/cours-duolingo-template` à la session et clone-le (par exemple dans `/home/user/cours-duolingo-template`). Mets-le à jour (`git pull`).
-2. **Une amélioration faite dans ce cours ?** Si `js/`, `css/` ou `tools/` du cours contiennent des changements absents du modèle (comparer avec `diff -r`), reporte-les d'abord dans le modèle (avec un exemple dans l'unité catalogue, la doc, et les tests du modèle au vert), sinon la mise à jour les effacerait. En cas de doute, demande à l'élève.
-3. **La section `app`** : `content/config.json` du cours doit avoir une section `app` (docs/format-contenu.md § 1). Si elle manque (cours créé avant le modèle), ajoute-la. **La `cle` doit reprendre l'ancienne clé de sauvegarde** (dans l'ancien `js/base.js` : `SAVE_KEY = "xxx-sauvegarde-v1"` → `"cle": "xxx"`), sinon l'élève perd sa progression. Reprends aussi le nom, la mascotte, les textes propres au cours, et active les modules qu'il utilise (`code-js`, `dom`…).
-4. **Voir ce qui va changer** : depuis le dossier du modèle, `python3 tools/mettre-a-jour-moteur.py /chemin/du/cours --essai`.
-5. **Mettre à jour** : la même commande sans `--essai`. Elle copie `js/`, `css/`, `tools/`, `index.html`, `docs/format-contenu.md`, `docs/modules.md`, le workflow des tests et les compétences ; elle garde le nom de cache de `sw.js`.
-6. **Configurer** : dans le dossier du cours, `python3 tools/configurer.py` (titre, appli installée, nouveau nom de cache pour que les téléphones prennent la nouvelle version, icônes).
-7. **Tester** : les trois tests du cours, tous verts. Un échec vient souvent d'un contenu qui utilisait une ancienne forme : corrige le contenu (ou le moteur, puis reporte la correction dans le modèle).
-8. **Vérifier à l'œil** l'accueil et un exercice (nom, mascotte, couleurs, onglets), puis commiter et pousser le cours. Mets à jour la section « Ce cours » de son CLAUDE.md si l'architecture décrite a changé.
+## 1. Préparer
+
+- `git status` doit être propre (sinon : commiter ou mettre de côté d'abord).
+- Repère les **modifications propres au cours** dans les fichiers communs, qui seraient écrasées : `git log --oneline -- js css tools index.html` (les commits après le premier). Exemples : un module ajouté (`js/php.js` et ses branchements dans `js/base.js`, `js/questions.js`), une mascotte dessinée dans `js/base.js`, un diagnostic dans `js/banc.js`.
+- `python3 tools/mettre-a-jour-moteur.py --essai` : liste des fichiers nouveaux, mis à jour, et propres au cours (gardés).
+
+## 2. Décider avec l'élève
+
+S'il y a des modifications propres au cours dans des fichiers communs, explique-les en une phrase chacune et propose, dans l'ordre :
+1. **les reporter dans le modèle** (le mieux : tous les cours en profitent, et la prochaine mise à jour ne les écrasera plus) — c'est un travail dans le dépôt du modèle, à faire avant ;
+2. sinon, **les réappliquer** après la mise à jour (à refaire à chaque fois) ;
+3. ou **ne pas mettre à jour** ces fichiers-là.
+
+Si le modèle sait déjà faire la même chose autrement (par exemple une mascotte du catalogue au lieu d'un dessin dans `js/base.js`), propose de passer à sa façon de faire : un champ dans `config.json` au lieu de code.
+
+## 3. Mettre à jour
+
+```bash
+python3 tools/mettre-a-jour-moteur.py
+python3 tools/configurer.py          # identité du cours dans index.html, manifeste, cache, icônes, README
+git diff --stat && git diff js/      # ce qui a changé ; les lignes « - » propres au cours sont à réappliquer (étape 2)
+python3 tools/valider-contenu.py && python3 tools/tester-exercices.py && python3 tools/test-parcours.py
+```
+
+Si le validateur signale des erreurs nouvelles (un champ devenu obligatoire, un format qui a changé), corrige le contenu en suivant `docs/format-contenu.md`, sans changer aucun `id`.
+
+## 4. Terminer
+
+Commite (« Moteur mis à jour depuis le modèle, version … » : la version est dans `docs/version-moteur.txt`), pousse, et résume à l'élève les nouveautés visibles dans l'appli.

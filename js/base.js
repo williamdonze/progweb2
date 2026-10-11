@@ -16,6 +16,8 @@ const aModule = m => APP.modules.includes(m);
 function appliquerApp(cfg = {}){
   Object.assign(APP, cfg, { mascotte: { ...APP.mascotte, ...(cfg.mascotte || {}) }, textes: { ...APP.textes, ...(cfg.textes || {}) } });
   SAVE_KEY = `${APP.cle}-sauvegarde-v1`;
+  // langage du code (js/langages.js) : config.app.langage, sinon celui du module de code activé, sinon JavaScript
+  LANG = LANGAGES[APP.langage] || Object.values(LANGAGES).find(l => l.module && l.module !== "code-js" && aModule(l.module)) || LANGAGES.js;
   document.title = APP.nom;
   document.documentElement.lang = APP.langue || "fr";
   // couleurs : { "clair": { "--prim": "#…" }, "sombre": { … } } ; les jetons non cités gardent leur valeur de css/app.css
@@ -74,42 +76,143 @@ const I = {
   wallet:`<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="14" rx="3" fill="currentColor"/><path d="M4 6l11-3 2 3" fill="currentColor" opacity=".6"/><rect x="15" y="11" width="7" height="4" rx="2" fill="rgba(255,255,255,.6)"/></svg>`,
   bug:`<svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="14" rx="5.5" ry="7" fill="currentColor"/><circle cx="12" cy="6" r="3" fill="currentColor"/><path d="M6 10l-3-2M18 10l3-2M6 15H2M18 15h4M7 19l-3 2M17 19l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 9v12" stroke="rgba(0,0,0,.3)" stroke-width="1.4"/></svg>`,
   shuffle:`<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h4l10 10h4M3 17h4l3-3M14 10l3-3h4M18 4l3 3-3 3M18 14l3 3-3 3"/></svg>`,
+  phone:`<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M10.5 18.5h3"/><path d="M12 7v6M9 10h6" stroke-width="2.6"/></svg>`,
+  partager:`<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9H6v12h12V9h-2M12 3v12M8 7l4-4 4 4"/></svg>`,
+  ajouter:`<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8.5v7M8.5 12h7"/></svg>`,
+  points:`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2.2" fill="currentColor"/><circle cx="12" cy="12" r="2.2" fill="currentColor"/><circle cx="12" cy="19" r="2.2" fill="currentColor"/></svg>`,
+  pointsH:`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="2.2" fill="currentColor"/><circle cx="12" cy="12" r="2.2" fill="currentColor"/><circle cx="19" cy="12" r="2.2" fill="currentColor"/></svg>`,
+  chevron:`<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>`,
+  menu:`<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>`,
   reset:`<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 3-6.2M4 4v4h4"/></svg>`
 };
 const ICON_BY_NAME = { etoile:I.star, flamme:I.flame, medaille:I.medal, trophee:I.trophy, boss:I.boss, oeuf:I.egg, livre:I.book, cible:I.target, accolades:I.braces, porte:I.wallet, bug:I.bug, terminal:I.terminal, melange:I.shuffle };
 
-/* mascotte (config.app.mascotte) : un œuf souriant dans un « cadre » propre au cours :
-   ["{", "}"] (accolades dessinées, cours de code), deux textes quelconques (["<?", "?>"], ["$", "_"]…), ou [] (pas de cadre) */
+/* ---------------- mascotte (config.app.mascotte, voir docs/format-contenu.md § 1) ----------------
+   Une forme du catalogue (MASCOTTES : œuf, éléphant, chouette, renard, goutte, livre), un accessoire facultatif (ACCESSOIRES),
+   un « cadre » facultatif pour les cours de code (["{", "}"] dessinées, ou deux textes courts : ["<?", "?>"], ["$", "_"]),
+   ou un dessin libre (mascotte.fichier : un SVG avec des groupes id="humeur-happy", "humeur-sad", "humeur-wow").
+   Humeurs : happy, sad, wow. Couleurs : corps, bord, accent (oreilles, ailes, dos du livre…). */
+const ENCRE = "#2a2340";
 const ACCOLADES = [`M22 18c-9 0-12 5-12 12v18c0 6-3 10-8 12 5 2 8 6 8 12v18c0 7 3 12 12 12`, `M98 18c9 0 12 5 12 12v18c0 6 3 10 8 12-5 2-8 6-8 12v18c0 7-3 12-12 12`];
-function cadreSVG(couleur){
+function cadreSVG(couleur, detoure = false){
   const c = APP.mascotte.cadre || [];
   if (!c.length) return "";
   if (c[0] === "{" && c[1] === "}") return ACCOLADES.map(d => `<path d="${d}" stroke="${couleur}" stroke-width="7" fill="none" stroke-linecap="round"/>`).join("");
-  const t = (x, txt, a) => `<text x="${x}" y="72" text-anchor="${a}" font-family="JetBrains Mono, ui-monospace, monospace" font-weight="800" font-size="${txt.length > 2 ? 22 : txt.length > 1 ? 28 : 40}" fill="${couleur}">${esc(txt)}</text>`;
+  const contour = detoure ? ` stroke="var(--bg, #FAF7F0)" stroke-width="5" paint-order="stroke" stroke-linejoin="round"` : "";
+  const t = (x, txt, a) => `<text x="${x}" y="${detoure ? 108 : 72}" text-anchor="${a}" font-family="JetBrains Mono, ui-monospace, monospace" font-weight="800" font-size="${txt.length > 2 ? 22 : txt.length > 1 ? 28 : 40}" fill="${couleur}"${contour}>${esc(txt)}</text>`;
   return t(14, c[0] || "", "middle") + t(106, c[1] || "", "middle");
 }
+// une bouche à l'échelle s, centrée en (x, y)
+function boucheSVG(mood, x, y, s = 1){
+  if (mood === "sad") return `<path d="M${x - 9 * s} ${y + 5 * s}q${9 * s} ${-7 * s} ${18 * s} 0" stroke="${ENCRE}" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
+  if (mood === "wow") return `<ellipse cx="${x}" cy="${y + 4 * s}" rx="${6 * s}" ry="${7 * s}" fill="${ENCRE}"/>`;
+  return `<path d="M${x - 11 * s} ${y}q${11 * s} ${11 * s} ${22 * s} 0" stroke="${ENCRE}" stroke-width="3.5" fill="#fff" stroke-linecap="round"/>`;
+}
+// yeux, joues (class="joue" : retirées du petit logo) et bouche, aux points d'ancrage de la forme
+function visageSVG(f, mood){
+  const r = f.rOeil || 7, rj = f.rJoue || 5;
+  const yeux = f.yeux.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" stroke="${ENCRE}" stroke-width="1.5"/><circle cx="${x + r * .21}" cy="${y + 1}" r="${r * .52}" fill="${ENCRE}"/>`).join("");
+  const joues = f.joues.map(([x, y]) => `<circle class="joue" cx="${x}" cy="${y}" r="${rj}" fill="#ff9fb4" opacity=".6"/>`).join("");
+  const bouche = typeof f.bouche === "function" ? f.bouche(mood) : boucheSVG(mood, ...f.bouche);
+  return yeux + joues + bouche;
+}
+// chaque forme : son dessin (sous le visage), ses points d'ancrage (yeux, joues, bouche [x, y, échelle]),
+// le sommet de la tête (chapeaux), les tempes [x gauche, x droite, y] (lunettes, casque) et le cou (nœud)
+const MASCOTTES = {
+  oeuf: {
+    dessin: m => `<path d="M60 12c17 0 30 30 30 56a30 30 0 0 1-60 0c0-26 13-56 30-56z" fill="${m.corps}" stroke="${m.bord}" stroke-width="3"/><ellipse cx="48" cy="36" rx="6" ry="9" fill="#fff" opacity=".9"/>`,
+    yeux: [[49, 64], [71, 64]], joues: [[40, 76], [80, 76]], bouche: [60, 79], sommet: [60, 12], tempes: [31, 89, 62], cou: [60, 95],
+  },
+  elephant: {   // tête ronde, grandes oreilles, trompe ; le cadre passe devant les oreilles, détouré de la couleur du fond
+    dessin: m => {
+      const oreille = (cx, sens) => `<path d="M${cx} 40c${sens * 22}-8 ${sens * 30} 14 ${sens * 24} 36c${-sens * 3} 10 ${-sens * 12} 14 ${-sens * 20} 8z" fill="${m.accent || m.oreilles || m.corps}" stroke="${m.bord}" stroke-width="3" stroke-linejoin="round"/>`;
+      return `${oreille(40, -1)}${oreille(80, 1)}<circle cx="60" cy="62" r="29" fill="${m.corps}" stroke="${m.bord}" stroke-width="3"/><ellipse cx="49" cy="42" rx="7" ry="5" fill="#fff" opacity=".45"/>
+        <path d="M60 70c0 14 0 24 9 27c5 1.5 8-1 7-5" stroke="${m.bord}" stroke-width="12" fill="none" stroke-linecap="round"/><path d="M60 70c0 14 0 24 9 27c5 1.5 8-1 7-5" stroke="${m.corps}" stroke-width="6.5" fill="none" stroke-linecap="round"/>`;
+    },
+    yeux: [[49, 58], [71, 58]], rOeil: 6.5, joues: [[40, 76], [80, 76]], rJoue: 4.5, sommet: [60, 33], tempes: [32, 88, 56], cou: [60, 92],
+    bouche: mood => mood === "sad" ? `<path d="M41 85q6-5 12 0" stroke="${ENCRE}" stroke-width="3" fill="none" stroke-linecap="round"/>`
+      : mood === "wow" ? `<ellipse cx="47" cy="84" rx="4.5" ry="5.5" fill="${ENCRE}"/>`
+      : `<path d="M40 80q7 8 14 2" stroke="${ENCRE}" stroke-width="3" fill="#fff" stroke-linecap="round"/>`,
+    cadreDevant: true,
+  },
+  chouette: {
+    dessin: m => `<path d="M33 36l-7-20 20 10zM87 36l7-20-20 10z" fill="${m.accent || m.bord}" stroke="${m.bord}" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M60 22c20 0 32 16 32 40v14c0 18-14 28-32 28s-32-10-32-28V62c0-24 12-40 32-40z" fill="${m.corps}" stroke="${m.bord}" stroke-width="3"/>
+      <ellipse cx="60" cy="88" rx="17" ry="13" fill="#fff" opacity=".4"/><path d="M50 86q4 3 8 0M62 86q4 3 8 0M56 94q4 3 8 0" stroke="${m.bord}" stroke-width="2" fill="none" stroke-linecap="round" opacity=".6"/>
+      <circle cx="47" cy="58" r="12" fill="#fff" opacity=".55"/><circle cx="73" cy="58" r="12" fill="#fff" opacity=".55"/>`,
+    yeux: [[47, 58], [73, 58]], rOeil: 7.5, joues: [[36, 72], [84, 72]], rJoue: 4.5, sommet: [60, 22], tempes: [29, 91, 58], cou: [60, 101],
+    // l'humeur se lit dans le bec : fermé (happy), ouvert (wow), fermé sous des sourcils froncés (sad)
+    bouche: mood => { const bec = `fill="#F2A93B" stroke="#B9741B" stroke-width="1.5" stroke-linejoin="round"`;
+      if (mood === "wow") return `<path d="M54 67h12l-6 5z" ${bec}/><path d="M55 74h10l-5 6z" ${bec}/><path d="M55.5 72.5h9" stroke="${ENCRE}" stroke-width="2"/>`;
+      return `<path d="M54 67l6 9 6-9z" ${bec}/>` + (mood === "sad" ? `<path d="M38 45l14 4M82 45l-14 4" stroke="${ENCRE}" stroke-width="3" stroke-linecap="round"/>` : ""); },
+  },
+  renard: {
+    dessin: m => `<path d="M60 100c-20 0-34-14-34-34 0-10 3-20 8-28l-4-24 20 12c3-1 7-1 10-1s7 0 10 1l20-12-4 24c5 8 8 18 8 28 0 20-14 34-34 34z" fill="${m.corps}" stroke="${m.bord}" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M35 32l-2-11 10 7zM85 32l2-11-10 7z" fill="${m.accent || "#fff"}" opacity=".8"/>
+      <path d="M60 100c-13 0-23-8-25-21 7 5 15 5 25-3 10 8 18 8 25 3-2 13-12 21-25 21z" fill="#fff" opacity=".92"/>
+      <ellipse cx="60" cy="79" rx="4.5" ry="3.2" fill="${ENCRE}"/>`,
+    yeux: [[47, 62], [73, 62]], rOeil: 6.5, joues: [[38, 74], [82, 74]], rJoue: 4.5, bouche: [60, 86, .55], sommet: [60, 30], tempes: [28, 92, 60], cou: [60, 99],
+  },
+  goutte: {
+    dessin: m => `<path d="M60 10c10 18 32 38 32 60a32 32 0 0 1-64 0c0-22 22-42 32-60z" fill="${m.corps}" stroke="${m.bord}" stroke-width="3" stroke-linejoin="round"/><ellipse cx="46" cy="52" rx="5" ry="9" fill="#fff" opacity=".8" transform="rotate(20 46 52)"/>`,
+    yeux: [[49, 68], [71, 68]], joues: [[40, 80], [80, 80]], bouche: [60, 83], sommet: [60, 26], tempes: [30, 90, 66], cou: [60, 99],
+  },
+  livre: {
+    dessin: m => `<rect x="34" y="94" width="56" height="8" rx="3" fill="#fff" stroke="${m.bord}" stroke-width="2.5"/>
+      <rect x="30" y="16" width="60" height="82" rx="8" fill="${m.corps}" stroke="${m.bord}" stroke-width="3"/>
+      <path d="M38 17.5v79" stroke="${m.accent || m.bord}" stroke-width="6" opacity=".7"/>
+      <rect x="50" y="28" width="30" height="8" rx="3" fill="#fff" opacity=".6"/>`,
+    yeux: [[54, 60], [76, 60]], rOeil: 6.5, joues: [[47, 72], [83, 72]], rJoue: 4.5, bouche: [65, 75, .8], sommet: [62, 16], tempes: [31, 91, 58], cou: [62, 104],
+  },
+};
+// accessoires : dessinés aux points d'ancrage de la forme ; « chapeau » : la mascotte rétrécit un peu pour lui faire de la place
+const ACCESSOIRES = {
+  lunettes: { dessin: (f, c) => { const r = (f.rOeil || 7) + 3.5, [[x1, y], [x2]] = f.yeux, [tg, td] = f.tempes;
+    return `<g fill="none" stroke="${ENCRE}" stroke-width="2.5" stroke-linecap="round"><circle cx="${x1}" cy="${y}" r="${r}"/><circle cx="${x2}" cy="${y}" r="${r}"/><path d="M${x1 + r} ${y - 1}q${(x2 - x1 - 2 * r) / 2} -4 ${x2 - x1 - 2 * r} 0M${x1 - r} ${y - 1}L${tg + 1} ${y - 4}M${x2 + r} ${y - 1}L${td - 1} ${y - 4}"/></g>`; } },
+  mortier: { chapeau: true, dessin: (f, c) => { const [x, y] = f.sommet;
+    return `<path d="M${x - 13} ${y - 2}v7c0 3 6 5 13 5s13-2 13-5v-7" fill="${ENCRE}"/><path d="M${x - 26} ${y - 6}L${x} ${y - 16}L${x + 26} ${y - 6}L${x} ${y + 4}z" fill="${ENCRE}"/><path d="M${x} ${y - 6}L${x + 20} ${y - 2}v13" stroke="#F2B705" stroke-width="2" fill="none"/><circle cx="${x + 20}" cy="${y + 12}" r="3" fill="#F2B705"/>`; } },
+  toque: { chapeau: true, dessin: (f, c) => { const [x, y] = f.sommet;
+    return `<g fill="#fff" stroke="${ENCRE}" stroke-width="2"><circle cx="${x - 10}" cy="${y - 12}" r="8"/><circle cx="${x + 10}" cy="${y - 12}" r="8"/><circle cx="${x}" cy="${y - 16}" r="9"/><rect x="${x - 14}" y="${y - 10}" width="28" height="12" rx="3"/></g>`; } },
+  beret: { chapeau: true, dessin: (f, c) => { const [x, y] = f.sommet;
+    return `<ellipse cx="${x + 4}" cy="${y - 2}" rx="21" ry="7" fill="${c}"/><path d="M${x + 4} ${y - 9}v-5" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`; } },
+  casque: { chapeau: true, dessin: (f, c) => { const [tg, td, ty] = f.tempes, sy = f.sommet[1];
+    return `<path d="M${tg + 2} ${ty}C${tg} ${sy - 16} ${td} ${sy - 16} ${td - 2} ${ty}" stroke="${ENCRE}" stroke-width="5" fill="none" stroke-linecap="round"/><rect x="${tg - 6}" y="${ty - 10}" width="11" height="20" rx="5" fill="${c}" stroke="${ENCRE}" stroke-width="2"/><rect x="${td - 5}" y="${ty - 10}" width="11" height="20" rx="5" fill="${c}" stroke="${ENCRE}" stroke-width="2"/>`; } },
+  noeud: { dessin: (f, c) => { const [x, y] = f.cou;
+    return `<path d="M${x} ${y}l-13-8v16zM${x} ${y}l13-8v16z" fill="${c}" stroke="${ENCRE}" stroke-width="2" stroke-linejoin="round"/><circle cx="${x}" cy="${y}" r="3.5" fill="${c}" stroke="${ENCRE}" stroke-width="2"/>`; } },
+};
+let MASCOTTE_FICHIER = null;   // dessin libre (mascotte.fichier), chargé au démarrage
 function mascot(mood = "happy", couleur = "var(--prim)"){
   const m = APP.mascotte;
-  const mouth = mood === "sad" ? `<path d="M51 84q9-7 18 0" stroke="#2a2340" stroke-width="3.5" fill="none" stroke-linecap="round"/>`
-    : mood === "wow" ? `<ellipse cx="60" cy="83" rx="6" ry="7" fill="#2a2340"/>`
-    : `<path d="M49 79q11 11 22 0" stroke="#2a2340" stroke-width="3.5" fill="#fff" stroke-linecap="round"/>`;
-  return `<svg class="mascot" viewBox="0 0 120 120" aria-hidden="true">
-    ${cadreSVG(couleur)}
-    <path d="M60 12c17 0 30 30 30 56a30 30 0 0 1-60 0c0-26 13-56 30-56z" fill="${m.corps}" stroke="${m.bord}" stroke-width="3"/>
-    <ellipse cx="48" cy="36" rx="6" ry="9" fill="#fff" opacity=".9"/>
-    <circle cx="49" cy="64" r="7" fill="#fff" stroke="#2a2340" stroke-width="1.5"/><circle cx="71" cy="64" r="7" fill="#fff" stroke="#2a2340" stroke-width="1.5"/>
-    <circle cx="50.5" cy="65" r="3.6" fill="#2a2340"/><circle cx="72.5" cy="65" r="3.6" fill="#2a2340"/>
-    <circle cx="40" cy="76" r="5" fill="#ff9fb4" opacity=".6"/><circle cx="80" cy="76" r="5" fill="#ff9fb4" opacity=".6"/>
-    ${mouth}</svg>`;
+  if (MASCOTTE_FICHIER) {
+    const svg = MASCOTTE_FICHIER.cloneNode(true);
+    const humeurs = [...svg.querySelectorAll('[id^="humeur-"]')];
+    const garde = humeurs.find(g => g.id === `humeur-${mood}`) || humeurs.find(g => g.id === "humeur-happy");
+    humeurs.forEach(g => { if (g !== garde) g.remove(); });
+    svg.setAttribute("class", "mascot"); svg.setAttribute("aria-hidden", "true");
+    return svg.outerHTML;
+  }
+  const f = MASCOTTES[m.forme] || MASCOTTES.oeuf, acc = ACCESSOIRES[m.accessoire];
+  const corps = f.dessin(m) + visageSVG(f, mood) + (acc ? acc.dessin(f, couleur) : "");
+  const cadre = cadreSVG(couleur, !!f.cadreDevant);
+  return `<svg class="mascot" viewBox="0 0 120 120" aria-hidden="true">${f.cadreDevant ? "" : cadre}${acc?.chapeau ? `<g transform="translate(6 12) scale(.9)">${corps}</g>` : corps}${f.cadreDevant ? cadre : ""}</svg>`;
+}
+async function chargerMascotte(){
+  if (!APP.mascotte.fichier) return;
+  try {
+    const txt = await (await fetch(APP.mascotte.fichier)).text();
+    const svg = new DOMParser().parseFromString(txt, "image/svg+xml").documentElement;
+    if (svg.nodeName.toLowerCase() === "svg") MASCOTTE_FICHIER = document.importNode(svg, true);
+  } catch(e) { console.warn("mascotte.fichier illisible :", e); }
+  I.logo = logoSVG();
 }
 /* petit logo de la barre du haut : la mascotte, sans les joues */
-const logoSVG = () => mascot("happy").replace('class="mascot"', 'class="logo"').replace(/<circle cx="(40|80)" cy="76"[^>]*\/>/g, "");
+const logoSVG = () => mascot("happy").replace('class="mascot"', 'class="logo"').replace(/<circle class="joue"[^>]*\/>/g, "");
 I.logo = logoSVG();
 
 /* ---------------- sauvegarde ---------------- */
 // La progression est indexée par des identifiants explicites (jamais par position) : ajouter du contenu ne perd rien.
 function freshState(){
-  return { v:1, xp:0, streak:{count:0,last:null}, days:{}, done:{}, quiz:{}, boss:{}, games:{}, badges:{}, erreurs:[], notions:{}, daily:{}, fiches:{}, ouvertes:{}, brouillons:{}, stats:{ premierCoup:0, bugs:0, codes:0 }, theme:null };
+  return { v:1, xp:0, streak:{count:0,last:null}, days:{}, done:{}, quiz:{}, boss:{}, games:{}, badges:{}, erreurs:[], notions:{}, daily:{}, fiches:{}, ouvertes:{}, brouillons:{}, stats:{ premierCoup:0, bugs:0, codes:0 }, theme:null, installPlusTard:null, installJamais:false, projet:{}, repliees:{} };
 }
 function normaliser(o){
   const s = freshState();
@@ -118,11 +221,13 @@ function normaliser(o){
   if (!obj(o)) return s;
   s.xp = Math.max(0, num(o.xp, 0));
   if (obj(o.streak)) s.streak = { count:Math.max(0, num(o.streak.count, 0)), last:typeof o.streak.last === "string" ? o.streak.last : null };
-  for (const k of ["days", "done", "games", "badges", "daily", "fiches", "ouvertes", "brouillons"]) if (obj(o[k])) s[k] = o[k];
+  for (const k of ["days", "done", "games", "badges", "daily", "fiches", "ouvertes", "brouillons", "projet", "repliees"]) if (obj(o[k])) s[k] = o[k];
   for (const k of ["quiz", "boss", "notions"]) if (obj(o[k])) s[k] = Object.fromEntries(Object.entries(o[k]).filter(([, q]) => obj(q)));
   if (Array.isArray(o.erreurs)) s.erreurs = o.erreurs.filter(x => typeof x === "string").slice(-80);
   if (obj(o.stats)) for (const k of Object.keys(s.stats)) s.stats[k] = Math.max(0, num(o.stats[k], 0));
   if (o.theme === "light" || o.theme === "dark") s.theme = o.theme;
+  if (typeof o.installPlusTard === "string") s.installPlusTard = o.installPlusTard;
+  s.installJamais = o.installJamais === true;
   return s;
 }
 function loadState(){
@@ -147,13 +252,13 @@ function gainXP(n){
   if (after.nom !== before.nom) toast(I.star, `Nouveau rang : ${after.nom}`, `${fmt(ST.xp)} XP au compteur.`);
   checkBadges(); save(); renderTop();
 }
-/* badges : ceux de config.json + un badge par unité (quiz) et un par unité (tous ses boss), générés depuis les unités */
+/* badges : ceux de config.json (sauf ceux d'un module absent : "module": "code-js") + un badge par unité (quiz) et un par unité (tous ses boss), générés depuis les unités */
 function tousLesBadges(){
   const parUnite = D.unites.flatMap(u => [
     { id:`unite-${u.id}`, nom:`${u.titre} : validé`, desc:`Valider le quiz de l'unité ${u.numero}`, icone:u.badgeIcone || "medaille" },
     ...(u.boss?.length ? [{ id:`boss-${u.id}`, nom:`Boss vaincu : ${u.titre}`, desc:`Réussir ${u.boss.length > 1 ? `les ${u.boss.length} boss` : "le boss"} de l'unité ${u.numero}`, icone:"boss" }] : [])
   ]);
-  return [...D.config.badges, ...parUnite];
+  return [...D.config.badges.filter(b => !b.module || aModule(b.module)), ...parUnite];
 }
 function award(id){
   if (ST.badges[id]) return;
@@ -227,6 +332,93 @@ function confirmBox(title, text, okLabel, onOk, danger = true){
   m.addEventListener("click", e => { const a = e.target.closest("[data-a]")?.dataset.a; if (a === "ok") { fermer(); onOk(); } else if (a === "no" || e.target === m) fermer(); });
   document.body.appendChild(m); majCalques(); m.querySelector('[data-a="no"]').focus();
 }
+/* ---------------- appli sur l'écran d'accueil (repris de Pampre) ---------------- */
+// Android (Chrome, Edge, Samsung Internet) : invite native, reçue par « beforeinstallprompt ».
+// iOS et les autres navigateurs : pas d'invite programmable, on affiche le mode d'emploi du navigateur détecté.
+// Proposé uniquement sur téléphone et tablette, jamais sur ordinateur, dans l'appli déjà installée ni en mode ?test.
+let INVITE_INSTALL = null;
+window.addEventListener("beforeinstallprompt", e => {
+  e.preventDefault(); INVITE_INSTALL = e;
+  document.querySelectorAll("[data-installer]").forEach(b => b.textContent = "Installer");
+});
+window.addEventListener("appinstalled", () => {
+  INVITE_INSTALL = null; document.querySelector(".modal.installer")?.closest(".modal-bg")?.remove(); majCalques();
+  toast(I.check, `${APP.nom} est installé`, `Retrouve ${APP.mascotte.nom} sur ton écran d'accueil.`);
+});
+function appareil(){
+  const ua = navigator.userAgent;
+  const ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);   // iPadOS se présente comme un Mac
+  const android = !ios && /Android/.test(ua);
+  const v = ua.match(/OS (\d+)_(\d+)/); const versionIOS = v ? +v[1] + +v[2] / 100 : 99;
+  return {
+    ios, android, mobile: ios || android,
+    installe: matchMedia("(display-mode: standalone)").matches || matchMedia("(display-mode: fullscreen)").matches || navigator.standalone === true,
+    // navigateurs intégrés aux applis (Instagram, Facebook, Messenger, TikTok…) : pas d'ajout à l'écran d'accueil
+    integre: /FBAN|FBAV|FB_IAB|FBIOS|Instagram|Messenger|Snapchat|TikTok|musical_ly|Bytedance|LinkedInApp|Pinterest|Line\//.test(ua),
+    nav: ios ? (/CriOS/.test(ua) ? "chrome" : /FxiOS/.test(ua) ? "firefox" : /EdgiOS/.test(ua) ? "edge" : "safari")
+      : /SamsungBrowser/.test(ua) ? "samsung" : /Firefox/.test(ua) ? "firefox" : /OPR\//.test(ua) ? "opera" : /EdgA/.test(ua) ? "edge" : "chrome",
+    ancienIOS: ios && versionIOS < 16.04   // avant iOS 16.4, seul Safari sait ajouter à l'écran d'accueil
+  };
+}
+const installPossible = () => { const a = appareil(); return a.mobile && !a.installe && !/[?&]test\b/.test(location.search); };
+// fenêtre automatique : après la première leçon, puis 14 jours après chaque « plus tard », jusqu'au « ne plus proposer »
+const proposerInstall = () => installPossible() && ST.xp > 0 && !ST.installJamais && !(ST.installPlusTard && dayDiff(ST.installPlusTard, todayStr()) < 14);
+const pic = n => `<span class="pic">${I[n]}</span>`;
+// mode d'emploi : liste d'étapes (HTML) selon l'appareil
+function etapesInstall(a){
+  const m = esc(APP.mascotte.nom);
+  if (a.integre) return [`Cette page est ouverte dans une appli (Instagram, Facebook…), qui ne permet pas l'ajout à l'écran d'accueil.`,
+    `Touche ${pic("pointsH")} ou ${pic("points")} puis « Ouvrir dans ${a.ios ? "Safari" : "le navigateur"} ».`, `Reviens ici : le mode d'emploi s'adaptera à ton navigateur.`];
+  if (a.ios && a.nav !== "safari" && a.ancienIOS) return [`Sur ta version d'iOS, seul Safari sait ajouter un site à l'écran d'accueil.`, `Ouvre cette page dans Safari, puis reviens ici.`];
+  if (a.ios && a.nav === "safari") return [
+    `Touche le bouton Partager ${pic("partager")} de Safari : en bas de l'écran sur iPhone, en haut sur iPad. S'il n'apparaît pas, il est dans le menu ${pic("pointsH")} à côté de l'adresse.`,
+    `Fais défiler et choisis « Sur l'écran d'accueil » ${pic("ajouter")} (selon la version : « Ajouter à l'écran d'accueil », parfois sous « Plus »).`,
+    `Touche « Ajouter » en haut à droite. ${m} rejoint tes applis.`];
+  if (a.ios) return [
+    a.nav === "chrome" ? `Touche le bouton Partager ${pic("partager")} à droite de la barre d'adresse.` : `Ouvre le menu ${pic("menu")} ou ${pic("pointsH")} du navigateur, puis « Partager » ${pic("partager")}.`,
+    `Choisis « Sur l'écran d'accueil » (ou « Ajouter à l'écran d'accueil ») ${pic("ajouter")}.`,
+    `Touche « Ajouter ». ${m} rejoint tes applis.`];
+  if (a.nav === "samsung") return [`Touche le menu ${pic("menu")} en bas à droite.`, `Choisis « Ajouter la page à », puis « Écran d'accueil ».`, `Confirme avec « Ajouter ».`];
+  if (a.nav === "firefox") return [`Touche le menu ${pic("points")} (en haut ou en bas à droite).`, `Choisis « Ajouter à l'écran d'accueil » (ou « Installer »).`, `Confirme : l'icône apparaît avec tes applis.`];
+  if (a.nav === "opera") return [`Touche le menu ${pic("points")} en haut à droite.`, `Choisis « Ajouter à… », puis « Écran d'accueil ».`, `Confirme avec « Ajouter ».`];
+  if (a.nav === "edge") return [`Touche le menu ${pic("menu")} en bas de l'écran.`, `Choisis « Ajouter au téléphone » (ou « Ajouter à l'écran d'accueil »).`, `Confirme avec « Installer ».`];
+  return [`Touche le menu ${pic("points")} en haut à droite de Chrome.`, `Choisis « Ajouter à l'écran d'accueil » ou « Installer l'application ».`, `Confirme avec « Installer ».`];
+}
+// la fenêtre : bouton « Installer » quand le navigateur offre l'invite native, sinon le mode d'emploi ; auto = proposée d'elle-même
+function aideInstall(auto = false){
+  const a = appareil(), nom = esc(APP.nom);
+  if (auto) { ST.installPlusTard = todayStr(); save(); }   // fermer la fenêtre vaut « plus tard »
+  const autres = `<details class="autres"><summary>Sur un autre appareil</summary><dl>
+    <dt>iPhone, iPad (Safari)</dt><dd>Partager ${pic("partager")} → « Sur l'écran d'accueil » → Ajouter.</dd>
+    <dt>iPhone, iPad (Chrome, Edge, Firefox ; iOS 16.4 ou plus)</dt><dd>Partager ${pic("partager")} → « Sur l'écran d'accueil ».</dd>
+    <dt>Android (Chrome, Edge)</dt><dd>Bouton « Installer » de ${nom}, ou menu ${pic("points")} → « Ajouter à l'écran d'accueil ».</dd>
+    <dt>Android (Samsung Internet)</dt><dd>Menu ${pic("menu")} → « Ajouter la page à » → « Écran d'accueil ».</dd>
+    <dt>Android (Firefox)</dt><dd>Menu ${pic("points")} → « Ajouter à l'écran d'accueil ».</dd></dl></details>`;
+  const etapes = `<ol class="etapes">${etapesInstall(a).map(e => `<li><span>${e}</span></li>`).join("")}</ol>`;
+  const m = h(`<div class="modal-bg"><div class="modal installer" role="dialog" aria-modal="true" aria-labelledby="inst-titre">
+    <div class="inst-tete">${mascot("wow")}<h3 id="inst-titre">${nom} sur ton écran d'accueil</h3></div>
+    <p class="muted">Une icône comme une vraie appli : ${nom} s'ouvre en plein écran, sans barre d'adresse, même hors connexion. Rien à télécharger dans un store, ta progression reste la même.</p>
+    ${INVITE_INSTALL ? `<details class="autres"><summary>Le faire à la main</summary>${etapes}</details>` : etapes}${autres}
+    <div class="row-btns">${auto ? `<button class="btn ghost" data-a="plus-tard">Plus tard</button>` : ""}<button class="btn" data-a="${INVITE_INSTALL ? "installer" : "ok"}">${INVITE_INSTALL ? "Installer" : "Compris"}</button></div>
+    ${auto ? `<button type="button" class="lien-discret" data-a="jamais">Ne plus me le proposer</button>` : ""}</div></div>`);
+  const avant = document.activeElement;
+  const fermer = () => { document.removeEventListener("keydown", echap, true); m.remove(); majCalques(); if (avant?.isConnected) avant.focus({preventScroll:true}); };
+  const echap = e => { if (e.key === "Escape") { e.stopPropagation(); fermer(); } };
+  document.addEventListener("keydown", echap, true);
+  m.addEventListener("click", e => {
+    const act = e.target.closest("[data-a]")?.dataset.a;
+    if (act === "installer") { fermer(); installer(); }
+    else if (act === "jamais") { ST.installJamais = true; save(); fermer(); toast(I.phone, "C'est noté", "Tu retrouveras le mode d'emploi dans Profil."); }
+    else if (act || e.target === m) fermer();
+  });
+  document.body.appendChild(m); majCalques(); m.querySelector(".row-btns .btn:last-child").focus();
+}
+async function installer(){
+  if (!INVITE_INSTALL) return aideInstall();
+  const invite = INVITE_INSTALL; INVITE_INSTALL = null;   // une invite ne sert qu'une fois
+  try { await invite.prompt(); const { outcome } = await invite.userChoice; if (outcome !== "accepted") document.querySelectorAll("[data-installer]").forEach(b => b.textContent = b.dataset.aide); }
+  catch(e) { aideInstall(); }
+}
 function confetti(){
   const box = h(`<div class="confetti"></div>`); const cols = ["var(--prim)","var(--gold)","var(--ok)","var(--teal)","#ff9fb4"];
   for (let i = 0; i < 60; i++) { const c = document.createElement("i"); c.style.left = Math.random()*100 + "%"; c.style.background = cols[i % cols.length]; c.style.animationDelay = (Math.random()*.8) + "s"; c.style.animationDuration = (1.8 + Math.random()*1.4) + "s"; box.appendChild(c); }
@@ -237,7 +429,7 @@ function confetti(){
 /* jetons colorés, découpés par ligne (un commentaire ou une chaîne peut s'étendre sur plusieurs lignes) */
 function lignesColorees(code){
   const out = [[]];
-  for (const j of jetons(code)) {
+  for (const j of (LANG || LANGAGES.js).jetons(code)) {
     const morceaux = j.v.split("\n");
     morceaux.forEach((m, i) => { if (i > 0) out.push([]); if (m) out[out.length - 1].push({ ...j, v:m }); });
   }
@@ -270,9 +462,21 @@ function consoleHTML(logs, opts = {}){
   return `<div class="console" role="log" aria-label="Console">${opts.titre === false ? "" : `<div class="titre">Console</div>`}${L || `<div class="vide">${esc(opts.vide || "Rien n'a été affiché.")}</div>`}</div>`;
 }
 
-/* ---------------- exécution dans le bac à sable (Web Worker) ---------------- */
-const DELAI_MAX = 2000;   // ms : au-delà, on considère que le code tourne en rond
+/* ---------------- exécution du code : celle du langage du cours (js/langages.js) ---------------- */
+/* payload : { code, donnees, prelude, tests, contexte, …champs propres au langage (champsExec) } → résultat au format de executerTout */
 function executer(payload){
+  if (!aCode()) return Promise.resolve({ ok:false, console:[], cas:[], diagnostics:[], conseils:[], erreur:{ titre:"Pas d'exécution", message:`Ce cours n'exécute pas le ${LANG.nom}.` } });
+  return LANG.executer(payload);
+}
+/* aperçu d'une page HTML produite par le code (PHP…) : iframe sans JavaScript */
+function apercuPageHTML(html){
+  const el = h(`<div class="apercu-page"><div class="eyebrow">Aperçu de la page envoyée au navigateur</div><iframe sandbox="" title="Aperçu de la page"></iframe><p class="note">Les scripts ne s'exécutent pas dans l'aperçu.</p></div>`);
+  el.querySelector("iframe").srcdoc = `<!doctype html><meta charset="utf-8"><style>body{font-family:system-ui,sans-serif;margin:12px;font-size:15px}</style>${html}`;
+  return el;
+}
+/* JavaScript (module code-js) : un Web Worker neuf par exécution (js/worker.js + js/banc.js), tué après DELAI_MAX */
+const DELAI_MAX = 2000;   // ms : au-delà, on considère que le code tourne en rond
+function executerJs(payload){
   return new Promise(resolve => {
     let w;
     const vide = { ok:false, console:[], cas:[], diagnostics:[], conseils:[] };
@@ -286,12 +490,13 @@ function executer(payload){
 }
 /* bouton « Exécuter » sous un exemple de code (cartes de leçon, fiches) */
 function blocExecutable(code, opts = {}){
+  prechargerLangage();
   const el = h(`<div>${codeHTML(code, opts)}<div class="code-run"><button type="button" class="btn small ghost" data-run>${I.play}Exécuter</button></div><div class="sortie"></div></div>`);
   el.querySelector("[data-run]").onclick = async (e) => {
     const b = e.currentTarget;
     if (opts.dom) {   // exemple sur une page web (TP DOM) : la page s'affiche, la console se remplit au fil des clics
       const s = el.querySelector(".sortie");
-      s.innerHTML = `<div class="apercu-zone"></div>${consoleHTML([], { vide:"Rien n'a été affiché (pas de console.log)." })}`;
+      s.innerHTML = `<div class="apercu-zone"></div>${consoleHTML([], { vide:`Rien n'a été affiché (pas de ${LANG.afficher}).` })}`;
       const cons = s.querySelector(".console") || s.lastElementChild;
       const ajouter = (t, err) => { cons.querySelector(".vide")?.remove(); const l = h(`<div class="cl ${err ? "err" : ""}"></div>`); l.innerHTML = ansiHTML(t); cons.appendChild(l); };
       const r = await apercuDom(s.querySelector(".apercu-zone"), { code, dom: opts.dom, surLog: (t, g) => ajouter(t, g === "error") });
@@ -299,11 +504,13 @@ function blocExecutable(code, opts = {}){
       return;
     }
     b.disabled = true;
-    const r = await executer({ code, donnees: opts.donnees || null });
+    const r = await executer({ code, donnees: opts.donnees || null, ...champsExec(opts.source) });
     b.disabled = false;
     const s = el.querySelector(".sortie");
-    s.innerHTML = consoleHTML(r.console.concat(r.erreur ? [`✖ ${r.erreur.titre} : ${r.erreur.message}`] : []), { vide:"Rien n'a été affiché (pas de console.log)." });
+    s.innerHTML = consoleHTML(r.console.concat(r.erreur ? [`✖ ${r.erreur.titre} : ${r.erreur.message}`] : []), { vide:`Rien n'a été affiché (pas de ${LANG.afficher}).` });
     if (r.erreur) s.querySelector(".cl:last-child")?.classList.add("err");
+    for (const c of (r.conseils || []).filter(c => c.avertissement)) s.appendChild(h(`<div class="diag conseil"><b>Avertissement de ${esc(LANG.nom)}</b>${richInline(c.message)}</div>`));
+    if (r.page) s.appendChild(apercuPageHTML(r.page));
   };
   return el;
 }
@@ -340,7 +547,7 @@ function ficheHTML(f){
   if (f.texte) el.appendChild(h(`<div class="rich" style="margin-top:14px">${rich(f.texte)}</div>`));
   for (const ex of f.exemples || []) {
     if (ex.titre) el.appendChild(h(`<h3>${richInline(ex.titre)}</h3>`));
-    el.appendChild(aModule("code-js") && ex.executable !== false ? blocExecutable(lignes(ex.code), { dom: ex.dom }) : h(`<div>${codeHTML(lignes(ex.code))}</div>`));
+    el.appendChild(aCode() && ex.executable !== false ? blocExecutable(lignes(ex.code), { dom: ex.dom, source: ex }) : h(`<div>${codeHTML(lignes(ex.code))}</div>`));
     if (ex.note) el.appendChild(h(`<div class="rich" style="font-size:15px">${rich(ex.note)}</div>`));
   }
   if (f.pieges?.length) el.appendChild(h(`<div class="aside piege">${I.warn.replace("<svg", '<svg style="color:var(--ko)"')}<div><b class="t">Pièges classiques</b><div class="rich">${rich(f.pieges.map(p => "- " + p).join("\n"))}</div></div></div>`));

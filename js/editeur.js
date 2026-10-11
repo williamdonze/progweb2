@@ -6,12 +6,9 @@
    (clavier du téléphone, sélection, copier-coller, annuler), le <pre> ne fait que l'affichage.
    ===================================================================== */
 
-const SYMBOLES = [
-  ["( )", "(", ")"], ["{ }", "{", "}"], ["[ ]", "[", "]"], ["=>", " => "], [";", ";"], [".", "."], [",", ", "],
-  ['" "', '"', '"'], ["' '", "'", "'"], ["...", "..."], ["===", " === "], ["!==", " !== "], ["&&", " && "], ["||", " || "],
-  ["%", " % "], ["+", " + "], ["-", " - "], ["*", " * "], ["<", " < "], [">", " > "], ["=", " = "], ["!", "!"], ["?", " ? "], [":", ": "],
-  ["return", "return "], ["const", "const "], ["log", "console.log(", ")"], ["⇥", "  "]
-];
+// la barre de symboles et l'indentation viennent du langage du cours (js/langages.js)
+const listeSymboles = () => (LANG || LANGAGES.js).symboles;
+const indentUnite = () => (LANG || LANGAGES.js).indent;
 const PAIRES = { "(":")", "[":"]", "{":"}", '"':'"', "'":"'", "`":"`" };
 
 /* Editeur({ code, entete, onChange, symboles }) → { el, valeur(), definir(code), focus(), marquer(ligne), lectureSeule(bool) } */
@@ -21,8 +18,8 @@ function Editeur({ code = "", entete = "", onChange = () => {}, symboles = true,
       ${entete ? `<div class="ed-entete" translate="no"><span class="eyebrow">Déjà écrit pour toi</span>${colorer(entete)}</div>` : ""}
       <div class="ed-scroll"><div class="ed-inner"><div class="ed-n" aria-hidden="true"></div><div class="ed-zone"><pre aria-hidden="true" translate="no"></pre><textarea spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off" aria-label="${esc(etiquette)}" aria-describedby="ed-aide"></textarea><div class="ed-ligne-bad" hidden></div></div></div></div>
     </div>
-    ${symboles ? `<div class="symboles" role="toolbar" aria-label="Symboles à insérer">${SYMBOLES.map(([lib], i) => `<button type="button" data-s="${i}" class="${lib.length > 3 && /\w/.test(lib) ? "mot" : ""}" aria-label="Insérer ${esc(lib === "⇥" ? "une indentation" : lib)}">${esc(lib)}</button>`).join("")}</div>` : ""}
-    <p id="ed-aide" hidden>Tab insère deux espaces ; Échap pour sortir de l'éditeur.</p>
+    ${symboles ? `<div class="symboles" role="toolbar" aria-label="Symboles à insérer">${listeSymboles().map(([lib], i) => `<button type="button" data-s="${i}" class="${lib.length > 3 && /\w/.test(lib) ? "mot" : ""}" aria-label="Insérer ${esc(lib === "⇥" ? "une indentation" : lib)}">${esc(lib)}</button>`).join("")}</div>` : ""}
+    <p id="ed-aide" hidden>Tab insère une indentation ; Échap pour sortir de l'éditeur.</p>
   </div>`);
   const ta = el.querySelector("textarea"), pre = el.querySelector("pre"), nums = el.querySelector(".ed-n"), scroll = el.querySelector(".ed-scroll"), bad = el.querySelector(".ed-ligne-bad");
   let sel = [0, 0];
@@ -72,9 +69,9 @@ function Editeur({ code = "", entete = "", onChange = () => {}, symboles = true,
   function retourLigne(){
     const s = ta.selectionStart, v = ta.value, ind = indentation(s), prec = v[s - 1], suiv = v[s];
     if ((prec === "{" && suiv === "}") || (prec === "[" && suiv === "]") || (prec === "(" && suiv === ")")) {
-      inserer("\n" + ind + "  " + "\n" + ind, ind.length + 1); return;
+      inserer("\n" + ind + indentUnite() + "\n" + ind, ind.length + 1); return;
     }
-    inserer("\n" + ind + (prec === "{" || prec === "[" || prec === "(" ? "  " : ""));
+    inserer("\n" + ind + (prec === "{" || prec === "[" || prec === "(" || (prec === ":" && indentUnite().length === 4) ? indentUnite() : ""));
   }
   ta.addEventListener("beforeinput", e => {
     if (ta.readOnly) return;
@@ -86,7 +83,7 @@ function Editeur({ code = "", entete = "", onChange = () => {}, symboles = true,
     }
   });
   ta.addEventListener("keydown", e => {
-    if (e.key === "Tab" && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey && !ta.readOnly) { e.preventDefault(); inserer("  "); }
+    if (e.key === "Tab" && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey && !ta.readOnly) { e.preventDefault(); inserer(indentUnite()); }
     if (e.key === "Escape") { e.stopPropagation(); ta.blur(); }
     if (e.key === "Enter") e.stopPropagation();   // Entrée écrit une ligne, elle ne déclenche pas « Vérifier »
   });
@@ -99,7 +96,7 @@ function Editeur({ code = "", entete = "", onChange = () => {}, symboles = true,
     barre.addEventListener("pointerdown", e => { if (e.target.closest("button") && document.activeElement === ta) e.preventDefault(); });
     barre.addEventListener("click", e => {
       const b = e.target.closest("button[data-s]"); if (!b || ta.readOnly) return;
-      const [, ouvre, ferme] = SYMBOLES[+b.dataset.s];
+      const [, ouvre, ferme] = listeSymboles()[+b.dataset.s];
       if (document.activeElement !== ta) { ta.focus({ preventScroll:true }); ta.setSelectionRange(sel[0], sel[1]); }
       const s = ta.selectionStart, e2 = ta.selectionEnd;
       if (ferme) { const t = ta.value.slice(s, e2); inserer(ouvre + t + ferme, t ? 0 : ferme.length); }

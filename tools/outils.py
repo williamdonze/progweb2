@@ -38,3 +38,23 @@ def navigateur(p):
             if c and Path(c).exists():
                 return p.chromium.launch(executable_path=str(c))
         raise
+
+
+def exemple(page, nom):
+    """--exemple NOM : la page charge l'unité d'exemple tools/exemples/NOM/ (unite.json) au lieu du contenu, avec les
+    réglages de tools/exemples/NOM/config.json (langage, modules) : de quoi tester un langage ou un module dans le modèle."""
+    import json
+    if not nom:
+        return
+    dossier = RACINE / "tools" / "exemples" / nom
+    if not dossier.is_dir():
+        raise SystemExit(f"--exemple : dossier introuvable ({dossier}) ; exemples : {', '.join(d.name for d in (RACINE / 'tools/exemples').iterdir())}")
+    config = json.loads((RACINE / "content/config.json").read_text(encoding="utf-8"))
+    reglages = json.loads((dossier / "config.json").read_text(encoding="utf-8"))
+    config["app"] = {**config["app"], **reglages.get("app", {})}
+    config["unites"] = [f"tools/exemples/{nom}/unite.json"]
+    config["aVenir"] = []
+    config.pop("projet", None)
+    config["badges"] = [b for b in config["badges"] if b["id"] != "memoire"]
+    corps = json.dumps(config, ensure_ascii=False)
+    page.route("**/content/config.json", lambda r: r.fulfill(body=corps, content_type="application/json"))
