@@ -1,7 +1,7 @@
 /* Service worker : appli installable et utilisable hors connexion.
    Réseau d'abord (le contenu est toujours le plus récent quand on est en ligne), copie en cache pour le hors-ligne.
    Les moteurs lourds et figés de js/vendor/ (PHP en WebAssembly, 18 Mo) : le cache d'abord, et seulement une fois utilisés. */
-const CACHE = "progweb2-v6";
+const CACHE = "progweb2-v7";
 const CACHE_MOTEURS = "moteurs-v1";   // js/vendor/ : gardé d'une version du site à l'autre ; passer à v2 si on reconstruit un moteur
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", e => e.waitUntil(

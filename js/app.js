@@ -283,7 +283,13 @@ function viewHome(){
     el.appendChild(p);
   }
   if (proposerInstall()) setTimeout(() => { if (proposerInstall() && VIEW === "home" && !document.querySelector("body > .session, body > .modal-bg, body > .drawer")) aideInstall(true); }, 900);
-  let currentFound = false;
+  // un boss ne bloque jamais la suite : une étape s'ouvre quand l'étape précédente qui n'est pas un boss est faite
+  const estBoss = s => s.startsWith("boss:");
+  const precedentFait = (u, i) => { for (let j = i - 1; j >= 0; j--) if (!estBoss(u.parcours[j])) return noeudFait(u, u.parcours[j]); return true; };
+  // l'étape en cours (« Continuer », bouton « Reprendre ») : la première leçon, le premier jeu ou quiz à faire ;
+  // un boss seulement s'il ne reste rien d'autre (un boss sauté ne retient pas l'élève en arrière)
+  const ouvrables = D.unites.filter(uniteOuverte).flatMap(u => u.parcours.map((s, i) => ({ u, s, i }))).filter(({ u, s, i }) => !noeudFait(u, s) && precedentFait(u, i));
+  const courant = ouvrables.find(x => !estBoss(x.s)) || ouvrables[0] || null;
   D.unites.forEach((u, ui) => {
     const ouverte = uniteOuverte(u);
     const [c1, c2] = COULEURS_UNITE[ui % COULEURS_UNITE.length];
@@ -299,9 +305,8 @@ function viewHome(){
     const path = h(`<div class="path"></div>`);
     u.parcours.forEach((step, i) => {
       const fait = noeudFait(u, step);
-      const prevFait = i === 0 || noeudFait(u, u.parcours[i - 1]);
-      const isCur = !fait && prevFait && !currentFound;
-      if (isCur) currentFound = true;
+      const prevFait = precedentFait(u, i);
+      const isCur = !!courant && courant.u === u && courant.s === step;
       const open = fait || prevFait;
       const kind = step === "quiz" ? "quiz" : step.startsWith("jeu:") ? "jeu" : step.startsWith("boss:") ? "boss" : "lecon";
       const lecon = kind === "lecon" ? u.lecons.find(l => l.id === step) : null;
