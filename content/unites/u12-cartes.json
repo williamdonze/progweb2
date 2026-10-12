@@ -203,12 +203,12 @@
         {
           "id": "u12-l3-e4", "type": "trous", "notions": ["flatmap", "tableau-objets"],
           "question": "Complète pour obtenir **une seule** liste de 6 t-shirts `{ size, color }`.",
-          "code": ["const sizes = [\"S\", \"M\", \"L\"];", "const colors = [\"red\", \"blue\"];", "const shirts = sizes.___((size) => colors.map((color) => (___)));", "console.log(shirts.length);"],
-          "tests": { "cas": [ { "sortie": ["6"] } ], "obligatoire": ["flatMap"] },
+          "code": ["const sizes = [\"S\", \"M\", \"L\"];", "const colors = [\"red\", \"blue\"];", "const shirts = sizes.___((size) => colors.map((color) => (___)));", "console.log(shirts.length, shirts[0]);"],
+          "tests": { "cas": [ { "sortie": ["6 { size: \"S\", color: \"red\" }"], "siEchec": "Chaque t-shirt doit être un **objet** `{ size, color }`. Sans accolades, `(size, color)` ne fabrique pas d'objet : la virgule ne garde que la dernière valeur, la couleur." } ], "obligatoire": ["flatMap"] },
           "indices": ["Une seule boîte : pas `map`, mais sa cousine qui vide les petites boîtes.", "L'objet raccourci : `{ size, color }`."],
           "solution": ["flatMap", "{ size, color }"],
-          "erreursTypiques": [ { "trous": ["map", "{ size, color }"], "attendu": "echec" } ],
-          "explication": "3 tailles × 2 couleurs = 6. Les parenthèses autour de l'objet sont déjà là."
+          "erreursTypiques": [ { "trous": ["map", "{ size, color }"], "attendu": "echec" }, { "trous": ["flatMap", "size, color"], "attendu": "echec", "diagnostic": "contenu" } ],
+          "explication": "3 tailles × 2 couleurs = 6. Les parenthèses autour de l'objet sont déjà là ; à l'intérieur, il faut les accolades de l'objet : `({ size, color })`."
         },
         {
           "id": "u12-l3-e5", "type": "ecrire", "notions": ["flatmap"],
