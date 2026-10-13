@@ -1,0 +1,90 @@
+<!DOCTYPE html> <html lang=fr style><!--
+ Page saved with SingleFile 
+ url: https://chabloz.eu/progweb/js_dom_tier_list.html 
+ saved date: Tue Oct 13 2026 08:24:46 GMT+0200 (Central European Summer Time)
+--><meta charset=utf-8>
+<meta name=viewport content="width=device-width, initial-scale=1">
+<title>Exercice JS - DOM et délégation d'événements</title>
+<style>:root{color-scheme:light;--color-background:#fff;--color-text:#181818;--color-heading:#000;--color-ink:#111;--color-muted:#333;--color-border:#ccc;--color-border-soft:#d4d4d4;--color-border-strong:#777;--color-surface:#f5f5f5;--color-surface-hover:#ececec;--color-code-text:#f5f5f5;--font-family-sans:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--font-family-mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;--font-size-small:0.9rem;--font-size-code:0.92em;--font-size-card-title:1.15rem;--font-size-site-title:1.25rem;--font-weight-medium:600;--font-weight-semibold:650;--font-weight-bold:750;font-family:var(--font-family-sans);color:var(--color-text);background:var(--color-background);line-height:1.65}*{box-sizing:border-box}body{margin:0;padding:2rem 1rem}.site-shell{width:100%}.site-header{display:flex;width:min(100%,52rem);margin:0 auto 1rem;align-items:center;justify-content:space-between;gap:1rem 2rem}.site-title{flex:none;color:var(--color-heading);font-size:var(--font-size-site-title);font-weight:var(--font-weight-bold);text-decoration:none}.site-nav{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:0.35rem}.site-nav a{padding:0.4rem 0.65rem;color:var(--color-ink);border-radius:0.2rem;font-size:var(--font-size-small);font-weight:var(--font-weight-medium);text-decoration:none}.site-nav a:hover{color:var(--color-heading);background:var(--color-surface-hover)}.site-nav a[aria-current="page"]{color:var(--color-background);background:var(--color-ink)}.document{width:min(100%,52rem);margin:0 auto;padding:clamp(1.5rem,4vw,3rem);background:var(--color-background);border:1px solid var(--color-border-soft);border-radius:0.25rem}h1,h2{color:var(--color-heading);line-height:1.25}h1{margin-top:0;padding-bottom:0.75rem;border-bottom:2px solid var(--color-ink)}a{color:var(--color-heading)}a:focus-visible{outline:3px solid var(--color-ink);outline-offset:3px}pre{overflow-x:auto;padding:1rem;color:var(--color-code-text);background:var(--color-ink);border-radius:0.25rem}code{font-family:var(--font-family-mono);font-size:var(--font-size-code)}:not(pre)>code{padding:0.15em 0.35em;color:var(--color-ink);background:var(--color-surface-hover);border-radius:0.15rem}li+li{margin-top:0.35rem}@media (max-width:40rem){body{padding:0}.site-header{margin-bottom:0;padding:1rem 1.25rem;align-items:flex-start;flex-direction:column}.site-nav{justify-content:flex-start}.document{border:0;border-radius:0;box-shadow:none}}</style>
+<meta name=referrer content=no-referrer><link type=image/x-icon rel="shortcut icon" href=data:image/x-icon;base64,AAABAAEAEBACAAAAAACwAAAAFgAAACgAAAAQAAAAIAAAAAEAAQAAAAAAQAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAAX/8AAF//AABf/wAA//8AABERAABVVQAAEREAAP//AABRFwAAVVcAAFEXAAD//wAAFEUAAFVVAAAURQAA><link rel=canonical href=https://chabloz.eu/progweb/js_dom_tier_list.html><meta http-equiv=content-security-policy content="default-src 'none'; font-src 'self' data:; img-src 'self' data:; style-src 'unsafe-inline'; media-src 'self' data:; script-src 'unsafe-inline' data:; object-src 'self' data:; frame-src 'self' data:; form-action 'none'; base-uri 'none';"></head>
+<body>
+ <div class=site-shell>
+ <header class=site-header>
+ <a class=site-title href=https://chabloz.eu/progweb/index.html>Prog. Web</a>
+ <nav class=site-nav aria-label="Navigation principale">
+ <a href=https://chabloz.eu/progweb/index.html>Objectifs</a>
+ <a href=https://chabloz.eu/progweb/supports.html>Supports</a>
+ <a href=https://chabloz.eu/progweb/exercices.html aria-current=page>TP</a>
+ <a href=https://chabloz.eu/progweb/vod.html>VOD</a>
+ </nav>
+ </header>
+ <main class=document>
+<h1>Exercice JS - DOM et délégation d'événements</h1>
+<p><strong>Objectif</strong>: Manipuler des éléments du DOM, factoriser les opérations courantes et utiliser la délégation d'événements pour gérer des éléments créés dynamiquement.</p>
+<h2>Ressources</h2>
+<ul>
+<li><a href=https://developer.mozilla.org/en-US/docs/Web/API/Element/querySelector>querySelector</a> et <a href=https://developer.mozilla.org/en-US/docs/Web/API/Element/querySelectorAll>querySelectorAll</a></li>
+<li><a href=https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener>addEventListener</a></li>
+<li><a href=https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement/submit_event>submit</a> et <a href=https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault>preventDefault</a></li>
+<li><a href=https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/template>template et content</a> et <a href=https://developer.mozilla.org/en-US/docs/Web/API/Node/cloneNode>cloneNode</a></li>
+<li><a href=https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent>textContent</a>, <a href=https://developer.mozilla.org/en-US/docs/Web/API/Element/append>append</a> et <a href=https://developer.mozilla.org/en-US/docs/Web/API/Element/remove>remove</a></li>
+<li><a href=https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm>confirm</a></li>
+<li><a href=https://developer.mozilla.org/en-US/docs/Web/API/Event/target>target</a>, <a href=https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget>currentTarget</a> et <a href=https://developer.mozilla.org/en-US/docs/Web/API/Element/closest>closest</a></li>
+<li><a href=https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dataset>dataset</a> et <a href=https://developer.mozilla.org/en-US/docs/Web/API/Node/contains>contains</a></li>
+<li><a href=https://developer.mozilla.org/en-US/docs/Web/API/Element/previousElementSibling>previousElementSibling</a> et <a href=https://developer.mozilla.org/en-US/docs/Web/API/Element/nextElementSibling>nextElementSibling</a></li>
+</ul>
+<h2>Mise en place</h2>
+<p>Nous allons créer une tier list pour classer les éléments de votre choix : films, jeux, livres… Chaque élément appartient à une catégorie, de <strong>S</strong> à <strong>D</strong>, et possède une position dans cette catégorie. Les éléments préférés viennent en premier.</p>
+<ol>
+<li>
+<p>Télécharger <a href=https://chabloz.eu/progweb/markdown_codes/tier_list.html>tier_list.html</a> et <a href=https://chabloz.eu/progweb/markdown_codes/tier_list.css>tier_list.css</a>, puis les placer dans un même dossier.</p>
+</li>
+<li>
+<p>Créer un fichier <strong>tier_list.js</strong> et le charger depuis le <code>&lt;head&gt;</code> du HTML :</p>
+<pre><code class=language-html>&lt;script src="tier_list.js" type="module"&gt;&lt;/script&gt;
+</code></pre>
+</li>
+<li>
+<p>Lancer un serveur HTTP depuis ce dossier :</p>
+<pre><code class=language-sh>php -S 127.0.0.1:8080
+</code></pre>
+<p>Ouvrir <a href=http://127.0.0.1:8080/tier_list.html>http://127.0.0.1:8080/tier_list.html</a>. Utiliser la console et l'inspecteur pour tester votre code. Arrêter le serveur avec <strong>Ctrl+C</strong>.</p>
+</li>
+</ol>
+<p>Utiliser la mini-bibliothèque <a href=https://chabloz.eu/progweb/markdown_codes/dom.js>dom.js</a> fournie pour les sélections, les événements et les échanges d'éléments. La placer dans le même dossier que <strong>tier_list.js</strong>, puis importer ses fonctions au début de ce fichier :</p>
+<pre><code class=language-js>import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';
+</code></pre>
+<h2>Créer les éléments</h2>
+<p>Au démarrage du script, préparer une constante <strong>tmplItem</strong> en clonant l'élément <strong>article.item</strong> contenu dans le template <strong>#item-template</strong> :</p>
+<pre><code class=language-js>const tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);
+</code></pre>
+<p>Conserver ce modèle intact pour créer les cartes suivantes.</p>
+<p><strong>1</strong>) À la soumission du formulaire <strong>#add-item-form</strong>, créer une nouvelle carte à partir du modèle <strong>tmplItem</strong>, lui donner le nom saisi par l'utilisateur et l'ajouter à la fin de <strong>#tier-s</strong>.</p>
+<p>Vérifier que le bouton <strong>Add</strong> et la touche <strong>Entrée</strong> dans le champ permettent tous deux de créer un élément.</p>
+<h2>Programmer les actions</h2>
+<p>Utiliser <strong>delegateOn</strong> pour installer un seul écouteur <strong>click</strong> sur <strong>#tiers</strong>, ciblant les boutons qui possèdent l'attribut <strong>data-action</strong>. Les boutons contiennent des éléments <strong>span</strong> : un clic sur leur texte ou leur symbole doit être traité comme un clic sur le bouton.</p>
+<p><strong>2</strong>) Programmer le bouton de suppression (<strong>delete</strong>) : demander confirmation avec <strong>confirm</strong>, puis retirer la carte avec <strong>remove</strong> uniquement si l'utilisateur confirme. Vérifier qu'une annulation conserve la carte.</p>
+<p><strong>3</strong>) Programmer les changements de catégorie :</p>
+<ul>
+<li><strong>Tier ▲</strong> (<strong>up</strong>) : déplacer la carte dans la catégorie précédente, vers S.</li>
+<li><strong>Tier ▼</strong> (<strong>down</strong>) : déplacer la carte dans la catégorie suivante, vers D.</li>
+</ul>
+<p>Définir l'ordre des catégories dans une constante :</p>
+<pre><code class=language-js>const TIERS = ['S', 'A', 'B', 'C', 'D'];
+</code></pre>
+<p>Retrouver la section <strong>.tier</strong> de la carte et lire son attribut <strong>data-tier</strong> avec <strong>dataset</strong>. Utiliser <strong>TIERS</strong> pour déterminer la catégorie de destination, puis sélectionner celle-ci par son attribut <strong>data-tier</strong>. Ajouter la carte à la fin de son conteneur <strong>.items</strong>.</p>
+<p>En S, monter ne fait rien. En D, descendre ne fait rien.</p>
+<p><strong>4</strong>) Utiliser <strong>swapNodes</strong> pour les changements d'ordre dans une catégorie :</p>
+<ul>
+<li><strong>Order +</strong> (<strong>previous</strong>) : donner plus d'importance à la carte en l'échangeant avec la carte précédente.</li>
+<li><strong>Order −</strong> (<strong>next</strong>) : diminuer l'importance de la carte en l'échangeant avec la carte suivante.</li>
+</ul>
+<p>Utiliser <strong>previousElementSibling</strong> et <strong>nextElementSibling</strong> sur la carte. Si le voisin demandé n'existe pas, ne rien faire.</p>
+<p><strong>5</strong>) Tester votre tier list avec plusieurs éléments :</p>
+<ul>
+<li>Ajouter, déplacer, réordonner et supprimer des cartes dans différentes catégories.</li>
+<li>Cliquer directement sur les symboles à l'intérieur des boutons.</li>
+<li>Vérifier les limites : première et dernière position, catégories S et D.</li>
+</ul>
+ </main>
+ </div>
