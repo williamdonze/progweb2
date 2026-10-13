@@ -109,6 +109,12 @@ def verifier_question(q, ou):
             if not any(k in c for k in ("attendu", "sortie", "contient", "neContientPas", "redirection", "cookies", "session", "sessionVide", "statut", "variables")):
                 W(f"{ou} : un cas de test ne vérifie rien ({c.get('titre', '?')})")
     if (t == "selecteur" or q.get("dom")) and "dom" not in MODULES: E(f"{ou} : page web (dom) : il faut le module « dom »")
+    dom = q.get("dom") or {}
+    if dom.get("page"):
+        for ext in ("html", "css"):
+            if not (RACINE / f"content/pages/{dom['page']}.{ext}").exists(): E(f"{ou} : page introuvable content/pages/{dom['page']}.{ext}")
+    for nom, chemin in (dom.get("fichiers") or {}).items():   # modules importables : import … from './dom.js'
+        if not (RACINE / chemin).exists(): E(f"{ou} : fichier importable « {nom} » introuvable ({chemin})")
     qid = q.get("id")
     if not qid: E(f"{ou} : pas d'id (obligatoire : il sert à la sauvegarde)")
     elif qid in ids_q: E(f"{ou} : id « {qid} » déjà utilisé ({ids_q[qid]})")

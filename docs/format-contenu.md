@@ -288,10 +288,11 @@ Chaque **cas** peut contenir :
 
 ### Exercices sur une page web (TP DOM)
 
-Le Web Worker n'a pas de DOM. Avec un champ `dom`, le code de l'élève tourne dans une `<iframe sandbox="allow-scripts">` (sans accès à l'appli ni à la sauvegarde) qui contient la page, chargé comme un **module** (comme `<script type="module">` dans le TP). Fichiers : `js/dom.js` (côté appli) et `js/dom-harnais.js` (dans l'iframe).
+Le Web Worker n'a pas de DOM. Avec un champ `dom`, le code de l'élève tourne dans une `<iframe sandbox="allow-scripts allow-forms">` (sans accès à l'appli ni à la sauvegarde ; `allow-modals` en plus dans l'aperçu, pour que `confirm` et `alert` s'affichent) qui contient la page, chargé comme un **module** (comme `<script type="module">` dans le TP). Fichiers : `js/dom.js` (côté appli) et `js/dom-harnais.js` (dans l'iframe).
 
 - `"dom": { "page": "cards" }` : `content/pages/cards.html` (le contenu du `<body>`) et `content/pages/cards.css`.
 - `"dom": { "html": ["<button id=\"plus\">+1</button>"], "css": ["…"] }` : une petite page écrite dans l'exercice.
+- `"fichiers": { "dom.js": "content/pages/dom.js" }` (dans `dom`) : des **modules que le code de l'élève peut importer**, comme la bibliothèque fournie par le prof (`import { getNode } from './dom.js';` ; sans le `./`, l'import échoue comme dans un vrai navigateur). Un nom de fichier faux donne « Fichier à importer introuvable » avec le bon nom.
 
 « Exécuter » affiche la page sous le code : l'élève clique lui-même, la console se remplit au fil des clics. « Vérifier » rejoue les **étapes** dans une page cachée :
 
@@ -302,10 +303,14 @@ Le Web Worker n'a pas de DOM. Avec un champ `dom`, le code de l'élève tourne d
   "etapes": [
     { "titre": "B · Hearts : 13 cartes",
       "actions": [ { "clic": "#select-hearts" }, { "script": "__pw.clearSelection()" } ],   // dans l'ordre ; après le chargement du code
+      // autres actions : { "saisir": ["#item-name", "Dune"] } (remplit un champ, événements input et change),
+      //   { "entree": "#item-name" } (touche Entrée dans le champ : envoie son formulaire), { "soumettre": "#add-item-form" },
+      //   { "confirm": false } (le PROCHAIN confirm() répond « Annuler » ; sans cela, « OK »)
       "verifier": [
         { "compter": ".deck .selected", "egal": 13, "libelle": "Cartes sélectionnées" },      // nombre d'éléments
         { "identique": [".deck .selected", ".deck .heart"], "message": "…" },                 // exactement les mêmes éléments
         { "vrai": "window.__mains.size > 1", "message": "…" },                                // expression JavaScript dans la page
+                                                  // (window.__confirms : les messages des confirm() déjà appelés)
         { "sortie": ["52", "DIAMOND-KING"], "message": "…" }                                  // tout ce que la console a affiché
       ],
       "siEchec": "Si tu en as 14, appelle clearSelection() au début de chaque clic." }
@@ -313,6 +318,8 @@ Le Web Worker n'a pas de DOM. Avec un champ `dom`, le code de l'élève tourne d
   "obligatoire": ["addEventListener"], "interdit": ["filter"]     // analyse statique, comme pour le JavaScript pur
 }
 ```
+
+**Formulaires** : un envoi que le code de l'élève n'empêche pas (`event.preventDefault()`) rechargerait la page ; le harnais l'empêche et fait échouer l'étape avec une explication (dans l'aperçu, un avertissement dans la console). **`confirm`** : dans les tests, il ne s'affiche pas ; il répond selon les actions `{ "confirm": … }`.
 
 Les étapes s'enchaînent **dans la même page** (l'état d'une étape reste pour la suivante). Une étape sans `actions` vérifie l'état courant (la première : juste après le chargement du code). Le message affiché est le `siEchec` de la première étape ratée qui en a un. Pour un test « au hasard » (main tirée), répéter les clics dans un `script` et ranger les résultats dans `window` (voir le boss `u15-b1`).
 

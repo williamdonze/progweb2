@@ -5,7 +5,7 @@
 
 Une appli façon Duolingo pour réviser le cours : leçons de cinq minutes, exercices interactifs, XP, séries de jours, badges, défi du jour et révisions espacées (les notions ratées reviennent vite, les autres de plus en plus rarement). Elle s'installe sur le téléphone et marche hors connexion ; la progression reste dans le navigateur.
 
-**15 unités · 64 leçons · 711 questions · 75 fiches de théorie · 46 boss** (les exercices du cours).
+**17 unités · 72 leçons · 804 questions · 86 fiches de théorie · 51 boss** (les exercices du cours).
 
 ## Les unités
 
@@ -26,6 +26,8 @@ Une appli façon Duolingo pour réviser le cours : leçons de cinq minutes, exer
 | 13 | **Mélanger et tirer**<br><sub>TP Tableaux · jeu de cartes 3, 4, 5, 6, 7</sub> | Échanger deux cases, tirer un indice au hasard, mélanger un paquet avec Fisher–Yates, tirer des cartes sans toucher au paquet d'origine, jouer une main complète. | TP Tableaux · jeu de cartes, exercice 3<br>TP Tableaux · jeu de cartes, exercice 4<br>TP Tableaux · jeu de cartes, exercice 5 (2e partie)<br>TP Tableaux · jeu de cartes, exercices 6 et 7 (fin) |
 | 14 | **DOM : sélectionner**<br><sub>TP DOM · exercices 1 à 3</sub> | Trouver des éléments de la page avec querySelector et querySelectorAll, écrire des sélecteurs CSS (id, classe, OU, attribut, :not), ajouter et retirer des classes avec classList, réagir à un clic. | TP DOM · exercice 1<br>TP DOM · exercices 2 et 3 (boutons A à C)<br>TP DOM · exercices 2 et 3 (boutons D à F) |
 | 15 | **DOM : tirer une main**<br><sub>TP DOM · exercices 4 à 6</sub> | Convertir une NodeList en tableau, cloner des éléments avec leurs enfants, retirer un attribut, remplacer le contenu d'un conteneur en une opération, et assembler tout le TP DOM. | TP DOM · exercices 4, 5 et 6<br>TP DOM · exercices 1 à 6 |
+| 16 | **Formulaires et modèles**<br><sub>TP 4 · DOM et délégation, exercice 1</sub> | Importer les fonctions d'une petite bibliothèque, réagir à l'envoi d'un formulaire sans recharger la page, fabriquer des éléments à partir d'un modèle (la balise template). | TP 4 · DOM et délégation d'événements, exercice 1 |
+| 17 | **Délégation d'événements**<br><sub>TP 4 · DOM et délégation, exercices 2 à 5</sub> | Gérer tous les boutons avec un seul écouteur (délégation), lire les attributs data-, supprimer avec confirmation, déplacer et échanger des éléments. | TP 4 · DOM et délégation d'événements, exercice 2<br>TP 4 · DOM et délégation d'événements, exercice 3<br>TP 4 · DOM et délégation d'événements, exercice 4<br>TP 4 · DOM et délégation d'événements, exercices 1 à 5 |
 
 ## Sur ton téléphone
 

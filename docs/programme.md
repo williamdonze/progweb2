@@ -3,7 +3,7 @@
 Objectif : faire **seul et sans aide** tous les exercices du cours *Prog. Web* (HEIG-VD, Nicolas Chabloz), en partant de zéro.
 Chaque unité prépare des exercices précis des TP ; ses **boss** sont ces exercices, avec tests et indices, sans jamais afficher la solution.
 
-Source : les pages du cours enregistrées le 10 octobre 2026 : **Exercice JS - Fonctions** (10 exercices), **Exercice JS - Tableaux** (10 exercices sur les nombres, 8 sur les chaînes, 8 sur le jeu de cartes), **Exercice JS - DOM** (6 exercices sur le jeu de cartes en HTML).
+Source : les pages du cours enregistrées le 10 octobre 2026 : **Exercice JS - Fonctions** (10 exercices), **Exercice JS - Tableaux** (10 exercices sur les nombres, 8 sur les chaînes, 8 sur le jeu de cartes), **Exercice JS - DOM** (6 exercices sur le jeu de cartes en HTML) ; puis, enregistrée le 13 octobre 2026, **Exercice JS - DOM et délégation d'événements** (5 exercices : une tier list de films).
 
 ## Unités faites
 
@@ -24,8 +24,10 @@ Source : les pages du cours enregistrées le 10 octobre 2026 : **Exercice JS - F
 | 13 | Mélanger et tirer | échanger deux cases (déstructuration), indice au hasard de 0 à i, Fisher–Yates (simulateur + test d'équité), sur place ou copie | **TP Tableaux** cartes : 3 (`shuffleInPlace`), 4 (`drawCards`), fin du 5 (annoncer la plus forte), 6 et 7 (la main de cinq cartes, affichée en couleur) |
 | 14 | DOM : sélectionner | le DOM, querySelector / querySelectorAll, NodeList, sélecteurs CSS (id, classe, `,` OU, attribut, ET collé, `:not()`), classList, chercher dans `.deck`, addEventListener | **TP DOM** 1 (`clearSelection`), 2 et 3 (les six boutons A à F : 1, 13, 26, 12, 6, 39 cartes) |
 | 15 | DOM : tirer une main | `[...NodeList]`, cloneNode(true), removeAttribute, replaceChildren(...cartes) | **TP DOM** 4 à 6 (Draw a hand), puis le TP DOM complet en un seul fichier |
+| 16 | Formulaires et modèles | `import` / `export` et le « ./ », la bibliothèque `dom.js` du prof (getNode, on…), formulaire : `submit` et `preventDefault`, Entrée = envoi, `<template>` : `content.cloneNode(true)`, textContent, append | **TP DOM et délégation** 1 (ajouter une carte avec le bouton ou Entrée) |
+| 17 | Délégation d'événements | le clic remonte, `target` / `currentTarget`, `closest`, un seul écouteur (délégation), `delegateOn`, `data-*` et `dataset`, `confirm` puis `remove`, catégorie précédente / suivante (`TIERS`), voisins (`previousElementSibling`, `nextElementSibling`) et `swapNodes` | **TP DOM et délégation** 2 (supprimer avec confirmation), 3 (Tier ▲ / ▼), 4 (Previous / Next), puis la tier list complète (exercices 1 à 5) |
 
-**Les trois TP sont complets** : Fonctions (10 exercices), Tableaux (10 + 8 + 8), DOM (6). Les exercices DOM tournent sur la page du TP (`content/pages/cards.html` et `cards.css`) dans une iframe isolée : les tests cliquent sur les boutons et comptent les cartes.
+**Les quatre TP sont complets** : Fonctions (10 exercices), Tableaux (10 + 8 + 8), DOM (6), DOM et délégation (5). Les exercices DOM tournent sur la page du TP (`content/pages/cards.html` et `cards.css` ; `tier_list.html`, `tier_list.css` et le `dom.js` du prof, importable) dans une iframe isolée : les tests cliquent, saisissent, envoient le formulaire, répondent à `confirm` et vérifient la page.
 
 ## Les difficultés ciblées
 
@@ -49,3 +51,6 @@ Source : les pages du cours enregistrées le 10 octobre 2026 : **Exercice JS - F
 | 16. for à l'envers, Math.random et ses bornes | u02 l1, boss getRandomInt (u03), u04 l2 (à l'envers), boss pile ou face (u04), u13 (indice de 0 à i, Fisher–Yates, test d'équité) |
 | 17. Portée des variables, ordre de déclaration | u01 l2, u03 l4, u04 l4 (compteur déclaré avant la boucle) |
 | 18. Enchaînements de méthodes et types | u06 l5 et u07 l5 (exercice « Suis les types ») |
+| 19. Oublier `preventDefault` sur un formulaire | u16 l3 (la page se recharge), détection automatique de l'envoi non empêché, boss u16-b1 |
+| 20. `event.target` n'est pas toujours le bouton (clic sur le span) | u17 l1 (`closest`), u17 l2 (`delegateOn`), étapes « clic sur le symbole » des boss u17 |
+| 21. Écouteur sur chaque élément au lieu de la délégation | u17 l1 (tâche ajoutée plus tard), boss u17 (cartes ajoutées après le chargement) |

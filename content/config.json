@@ -40,7 +40,9 @@
     "content/unites/u12-cartes.json",
     "content/unites/u13-melanger.json",
     "content/unites/u14-dom-selection.json",
-    "content/unites/u15-dom-clones.json"
+    "content/unites/u15-dom-clones.json",
+    "content/unites/u16-formulaires-et-modeles.json",
+    "content/unites/u17-delegation-d-evenements.json"
   ],
   "aVenir": [],
   "rangs": [

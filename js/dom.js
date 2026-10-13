@@ -1,18 +1,20 @@
 "use strict";
 /* =====================================================================
    Moteur de cours — bac à sable DOM (TP « Manipulation du DOM »).
-   Le Web Worker n'a pas de DOM : ici, le code de l'élève tourne dans une <iframe sandbox="allow-scripts">
+   Le Web Worker n'a pas de DOM : ici, le code de l'élève tourne dans une <iframe sandbox="allow-scripts allow-forms">
    qui contient la page de l'exercice (content/pages/*.html + .css, ou du HTML écrit dans l'exercice).
    - executerDom({ code, dom, tests }) : iframe cachée, joue les tests, renvoie un résultat au format de executerTout ;
    - apercuDom(conteneur, { code, dom, surLog }) : la même page, visible, pour cliquer soi-même (« Exécuter »).
    ===================================================================== */
 const TEXTES = {};
 const texteDe = u => TEXTES[u] ??= fetch(u, { cache:"no-cache" }).then(r => { if (!r.ok) throw new Error(`${u} : HTTP ${r.status}`); return r.text(); });
-/* la page d'un exercice : { page: "cards" } (fichiers de content/pages/) ou { html: [lignes], css: [lignes] } */
+/* la page d'un exercice : { page: "cards" } (fichiers de content/pages/) ou { html: [lignes], css: [lignes] } ;
+   "fichiers": { "dom.js": "content/pages/dom.js" } : modules que le code de l'élève peut importer (import … from './dom.js') */
 async function pageDom(dom = {}){
   const html = dom.page ? await texteDe(`content/pages/${dom.page}.html`) : lignes(dom.html || "");
   const css = dom.page ? await texteDe(`content/pages/${dom.page}.css`) : lignes(dom.css || "");
-  return { html, css };
+  const fichiers = Object.fromEntries(await Promise.all(Object.entries(dom.fichiers || {}).map(async ([nom, chemin]) => [nom, await texteDe(chemin)])));
+  return { html, css, fichiers };
 }
 async function documentDom(dom, harnais = true){
   const page = await pageDom(dom);
@@ -24,11 +26,13 @@ const DELAI_DOM = 4000;
 function lancerIframe({ code, dom, tests, conteneur, surLog }){
   return new Promise(async resolve => {
     const vide = { ok:false, console:[], cas:[], diagnostics:[], conseils:[] };
-    let doc;
-    try { doc = await documentDom(dom); }
+    let doc, fichiers;
+    try { doc = await documentDom(dom); fichiers = (await pageDom(dom)).fichiers; }
     catch(e) { return resolve({ ...vide, erreur:{ titre:"Page introuvable", message:`La page de l'exercice n'a pas pu être chargée (${e.message}).` } }); }
     const f = document.createElement("iframe");
-    f.setAttribute("sandbox", "allow-scripts");
+    // allow-forms : l'événement submit existe (le harnais empêche tout rechargement de la page) ;
+    // allow-modals dans l'aperçu seulement : confirm() et alert() s'affichent quand l'élève clique lui-même (dans les tests, le harnais y répond)
+    f.setAttribute("sandbox", conteneur ? "allow-scripts allow-forms allow-modals" : "allow-scripts allow-forms");
     f.setAttribute("title", "Page de l'exercice");
     f.className = conteneur ? "apercu-dom" : "iframe-cachee";
     f.srcdoc = doc;
@@ -37,7 +41,7 @@ function lancerIframe({ code, dom, tests, conteneur, surLog }){
     const ecoute = e => {
       if (fini && !f.isConnected) { removeEventListener("message", ecoute); return; }   // aperçu remplacé : on arrête d'écouter
       if (e.source !== f.contentWindow || !e.data) return;
-      if (e.data.type === "pret") f.contentWindow.postMessage({ type:"lancer", code, tests: tests || null }, "*");
+      if (e.data.type === "pret") f.contentWindow.postMessage({ type:"lancer", code, tests: tests || null, fichiers }, "*");
       else if (e.data.type === "log") surLog?.(e.data.texte, e.data.genre);
       else if (e.data.type === "resultat") finir(e.data.res);
     };

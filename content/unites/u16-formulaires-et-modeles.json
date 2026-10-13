@@ -1,0 +1,1717 @@
+{
+  "id": "u16",
+  "titre": "Formulaires et modèles",
+  "sousTitre": "TP 4 · DOM et délégation, exercice 1",
+  "objectif": "Importer les fonctions d'une petite bibliothèque, réagir à l'envoi d'un formulaire sans recharger la page, fabriquer des éléments à partir d'un modèle (la balise template).",
+  "icone": "📝",
+  "fiches": [
+    {
+      "id": "modules-import",
+      "titre": "Importer des fonctions d'un autre fichier",
+      "icone": "⇢",
+      "resume": "`export` rend une fonction disponible hors de son fichier ; `import { a, b } from './fichier.js';` la récupère. Le `./` veut dire « dans le même dossier ».",
+      "analogie": "Une **boîte à outils** prêtée par le prof : le fichier `dom.js` contient les outils (`export`), et ton fichier ne sort que ceux dont il a besoin (`import { getNode, on }`).",
+      "texte": "- Dans `dom.js` : `export function getNode(selector, dom = document) { … }`.\n- Dans ton fichier : `import { getNode, on } from './dom.js';`, **tout en haut**.\n- Les noms entre accolades doivent être **exactement** ceux exportés (majuscules comprises).\n- Le chemin commence par `./` : sans lui, le navigateur refuse l'import.\n- `import` ne marche que dans un **module** : dans le HTML, `<script src=\"tier_list.js\" type=\"module\"></script>`.\n\nDans ProgWeb 2, les exercices du TP 4 ont le vrai `dom.js` du prof à côté de ton code : tu l'importes comme dans le TP.",
+      "exemples": [
+        {
+          "code": [
+            "import { getNode, getNodes } from './dom.js';",
+            "",
+            "console.log(getNode('h1').textContent);",
+            "console.log(getNodes('.tier').length);"
+          ],
+          "dom": {
+            "page": "tier_list",
+            "fichiers": {
+              "dom.js": "content/pages/dom.js"
+            }
+          }
+        }
+      ],
+      "pieges": [
+        "`from 'dom.js'` sans `./` : l'import échoue.",
+        "`import { getnode }` : le nom doit être exactement celui exporté (`getNode`)."
+      ]
+    },
+    {
+      "id": "bibliotheque-dom",
+      "titre": "La boîte à outils dom.js",
+      "icone": "🧰",
+      "resume": "`getNode(sel, dom)` = `querySelector`, `getNodes(sel, dom)` = `querySelectorAll`, `forEach(sel, callback)` parcourt les éléments trouvés, `on(sel, event, callback)` pose un écouteur sur chacun.",
+      "texte": "Le prof a écrit des **raccourcis** pour ce que tu faisais déjà au TP 3 :\n\n- `getNode('#tier-s')` : comme `document.querySelector('#tier-s')`.\n- `getNode('.item-name', item)` : le 2e argument dit **où chercher** (ici, dans la carte `item`, pas dans toute la page).\n- `getNodes('.tier')` : comme `document.querySelectorAll('.tier')`.\n- `forEach('.tier h3', (h3) => …)` : pour chaque élément trouvé, appelle la fonction.\n- `on('#add-item-form', 'submit', (form, event) => …)` : pose un écouteur ; la fonction reçoit **l'élément** puis **l'événement**.\n\nL'ordre des arguments compte : sélecteur, événement, fonction.",
+      "pieges": [
+        "`on('#plus', () => …)` : il manque le nom de l'événement ('click').",
+        "Dans `on`, le 1er paramètre de la fonction est l'élément, le 2e l'événement : `(form, event) =>`."
+      ]
+    },
+    {
+      "id": "formulaire-submit",
+      "titre": "Formulaires : submit et preventDefault",
+      "icone": "📨",
+      "resume": "Quand un formulaire est envoyé (bouton **ou** touche Entrée), l'événement `submit` se déclenche sur le `<form>`. Par défaut, le navigateur **recharge la page** : `event.preventDefault()` l'en empêche.",
+      "analogie": "Poster une lettre : sans consigne, le facteur l'emporte (la page part et revient vide). `preventDefault()`, c'est dire « garde-la, je m'en occupe ».",
+      "texte": "- On écoute `submit` sur le **formulaire**, pas `click` sur le bouton : `submit` arrive aussi avec la touche **Entrée** dans le champ.\n- Première ligne de l'écouteur : `event.preventDefault();`\n- Le texte saisi : `input.value` (une chaîne).\n\n```\nform.addEventListener('submit', (event) => {\n  event.preventDefault();\n  console.log(input.value);\n});\n```",
+      "pieges": [
+        "Écouter `click` sur le bouton : la touche Entrée n'est pas gérée.",
+        "Oublier `preventDefault()` : la page se recharge et tout ce qui a été ajouté disparaît."
+      ]
+    },
+    {
+      "id": "template-content",
+      "titre": "Les modèles : <template> et content",
+      "icone": "📄",
+      "resume": "Un `<template>` contient du HTML **qui ne s'affiche pas** : c'est un moule. Son contenu est dans `.content` ; on le **clone** (`cloneNode(true)`) pour fabriquer chaque nouvel élément.",
+      "analogie": "Un **tampon encreur** : le tampon (le modèle) ne bouge pas, chaque coup de tampon (`cloneNode(true)`) fait une nouvelle copie sur la page.",
+      "texte": "- `getNode('#item-template').content` : le contenu du modèle (un fragment, hors de la page).\n- `getNode('article.item', … .content)` : la carte modèle à l'intérieur.\n- Le TP la clone **une fois** au démarrage (`tmplItem`), puis on clone `tmplItem` **à chaque** nouvelle carte : le modèle reste intact.\n- `cloneNode(true)` : avec les enfants (les boutons, le paragraphe…). Sans `true`, la copie est vide.",
+      "pieges": [
+        "Ajouter `tmplItem` lui-même dans la page : il n'existe qu'une fois, il se déplace au lieu de se multiplier.",
+        "`cloneNode()` sans `true` : une carte sans ses boutons."
+      ]
+    },
+    {
+      "id": "textcontent-append",
+      "titre": "textContent et append",
+      "icone": "✍",
+      "resume": "`el.textContent = 'Dune'` remplace le texte d'un élément. `parent.append(el)` ajoute `el` **à la fin** de `parent`, sans toucher à ce qui y est déjà.",
+      "texte": "- `textContent` se lit et s'écrit : `p.textContent` (lire), `p.textContent = nom` (écrire). Le texte est affiché tel quel (pas interprété comme du HTML).\n- `append(el)` : ajoute à la fin. Si `el` était déjà dans la page, il est **déplacé** (un élément n'existe qu'à un seul endroit).\n- `replaceChildren(…)` (TP 3) : remplace **tout** le contenu. `append` : **ajoute**.",
+      "pieges": [
+        "`append` d'un élément déjà dans la page : il est déplacé, pas copié."
+      ]
+    }
+  ],
+  "lecons": [
+    {
+      "id": "u16-l1",
+      "titre": "Importer des fonctions",
+      "duree": 5,
+      "notions": [
+        "modules-import"
+      ],
+      "cartes": [
+        {
+          "titre": "Une boîte à outils prêtée",
+          "texte": "Pour le TP 4, le prof fournit `dom.js` : un fichier de **fonctions toutes prêtes**. Ton fichier `tier_list.js` les **importe** au lieu de les réécrire.",
+          "analogie": "Une boîte à outils prêtée : tu sors seulement les outils dont tu as besoin.",
+          "fiche": "modules-import"
+        },
+        {
+          "titre": "export d'un côté…",
+          "texte": "Dans `dom.js`, chaque fonction est précédée de `export` : elle peut sortir du fichier.",
+          "code": [
+            "export function getNode(selector, dom = document) {",
+            "  return dom.querySelector(selector);",
+            "}"
+          ],
+          "executable": false
+        },
+        {
+          "titre": "… import de l'autre",
+          "texte": "Tout en haut de ton fichier : les noms **entre accolades**, puis le chemin du fichier, avec `./` (le même dossier). Exécute : la page du TP s'affiche, la console montre le titre et le nombre de catégories.",
+          "code": [
+            "import { getNode, getNodes } from './dom.js';",
+            "",
+            "console.log(getNode('h1').textContent);",
+            "console.log(getNodes('.tier').length);"
+          ],
+          "dom": {
+            "page": "tier_list",
+            "fichiers": {
+              "dom.js": "content/pages/dom.js"
+            }
+          }
+        },
+        {
+          "titre": "Un fichier « module »",
+          "texte": "`import` ne marche que si ton script est chargé comme **module** : `<script src=\"tier_list.js\" type=\"module\"></script>`, comme le demande le TP.",
+          "piege": "Sans `type=\"module\"`, le navigateur s'arrête sur la ligne `import` avec une erreur."
+        }
+      ],
+      "exercices": [
+        {
+          "id": "u16-l1-e1",
+          "type": "qcm",
+          "notions": [
+            "modules-import"
+          ],
+          "question": "Que fait `import { getNode } from './dom.js';` ?",
+          "choix": [
+            "Il rend la fonction getNode de dom.js utilisable dans ce fichier",
+            "Il copie tout le fichier dom.js dans la page",
+            "Il crée une nouvelle fonction getNode vide",
+            "Il exécute dom.js une deuxième fois à chaque appel"
+          ],
+          "bonne": 0,
+          "explication": "On récupère seulement les fonctions nommées entre accolades."
+        },
+        {
+          "id": "u16-l1-e2",
+          "type": "bug",
+          "notions": [
+            "modules-import"
+          ],
+          "question": "Ce fichier plante dès le chargement. Quelle ligne corriger ?",
+          "code": [
+            "import { getnode } from './dom.js';",
+            "",
+            "console.log(getnode('h1').textContent);"
+          ],
+          "ligne": 1,
+          "choix": [
+            "Le nom exporté est `getNode` (N majuscule) : les noms doivent être identiques",
+            "Il faut des parenthèses à la place des accolades",
+            "Il faut `import getNode from dom.js`",
+            "`console.log` ne marche pas dans un module"
+          ],
+          "bonne": 0,
+          "explication": "dom.js n'exporte rien qui s'appelle getnode : les majuscules comptent."
+        },
+        {
+          "id": "u16-l1-e3",
+          "type": "vf",
+          "notions": [
+            "modules-import"
+          ],
+          "question": "Dans `from './dom.js'`, le `./` veut dire « dans le même dossier que mon fichier ».",
+          "bonne": true,
+          "explication": "Sans `./`, le navigateur refuse l'import."
+        },
+        {
+          "id": "u16-l1-e4",
+          "type": "assoc",
+          "notions": [
+            "modules-import"
+          ],
+          "mono": true,
+          "question": "Associe chaque morceau à son rôle.",
+          "paires": [
+            [
+              "export function getNode",
+              "rend la fonction disponible hors de dom.js"
+            ],
+            [
+              "{ getNode, on }",
+              "les fonctions qu'on veut utiliser"
+            ],
+            [
+              "'./dom.js'",
+              "le fichier où les chercher"
+            ],
+            [
+              "type=\"module\"",
+              "permet d'utiliser import dans le script"
+            ]
+          ],
+          "explication": "Les quatre pièces d'un import."
+        },
+        {
+          "id": "u16-l1-e5",
+          "type": "ecrire",
+          "notions": [
+            "modules-import"
+          ],
+          "question": "Importe `getNodes` depuis `dom.js`, puis affiche dans la console le **nombre de catégories** de la tier list (les éléments `.tier`).",
+          "dom": {
+            "page": "tier_list",
+            "fichiers": {
+              "dom.js": "content/pages/dom.js"
+            }
+          },
+          "depart": [
+            "",
+            ""
+          ],
+          "tests": {
+            "etapes": [
+              {
+                "titre": "Au chargement",
+                "verifier": [
+                  {
+                    "sortie": [
+                      "5"
+                    ],
+                    "message": "La console doit afficher 5."
+                  }
+                ]
+              }
+            ],
+            "obligatoire": [
+              "getNodes()"
+            ]
+          },
+          "indices": [
+            "Première ligne : `import { … } from './dom.js';`.",
+            {
+              "code": "import { ___ } from './dom.js';\n\nconsole.log(getNodes('___').length);"
+            }
+          ],
+          "solution": [
+            "import { getNodes } from './dom.js';",
+            "",
+            "console.log(getNodes('.tier').length);"
+          ],
+          "erreursTypiques": [
+            {
+              "code": "console.log(getNodes('.tier').length);",
+              "attendu": "erreur"
+            },
+            {
+              "code": "import { getNodes } from 'dom.js';\nconsole.log(getNodes('.tier').length);",
+              "attendu": "erreur"
+            },
+            {
+              "code": "import { getNodes } from './dom.js';\nconsole.log(getNodes('.tier'));",
+              "attendu": "echec"
+            }
+          ],
+          "explication": "getNodes retourne une liste (NodeList) : `.length` donne son nombre d'éléments."
+        }
+      ]
+    },
+    {
+      "id": "u16-l2",
+      "titre": "La boîte à outils du prof",
+      "duree": 6,
+      "notions": [
+        "bibliotheque-dom"
+      ],
+      "cartes": [
+        {
+          "titre": "Des raccourcis",
+          "texte": "`getNode` et `getNodes` font exactement `querySelector` et `querySelectorAll`. Le 2e argument dit **où** chercher (par défaut : toute la page).",
+          "code": [
+            "export function getNode(selector, dom = document) {",
+            "  return dom.querySelector(selector);",
+            "}",
+            "",
+            "export function getNodes(selector, dom = document) {",
+            "  return dom.querySelectorAll(selector);",
+            "}"
+          ],
+          "executable": false,
+          "fiche": "bibliotheque-dom"
+        },
+        {
+          "titre": "Chercher dans un élément",
+          "texte": "`getNode('h3', tier)` cherche le titre **dans** cette catégorie, pas dans toute la page (comme `deckEl.querySelectorAll` au TP 3).",
+          "code": [
+            "import { getNode } from './dom.js';",
+            "",
+            "const tierB = getNode('[data-tier=\"B\"]');",
+            "console.log(getNode('h3', tierB).textContent);"
+          ],
+          "dom": {
+            "page": "tier_list",
+            "fichiers": {
+              "dom.js": "content/pages/dom.js"
+            }
+          }
+        },
+        {
+          "titre": "forEach : pour chaque élément trouvé",
+          "texte": "`forEach(sélecteur, fonction)` trouve les éléments et appelle la fonction avec **chacun**.",
+          "code": [
+            "import { forEach } from './dom.js';",
+            "",
+            "forEach('.tier', (tier) => console.log(tier.dataset.tier));"
+          ],
+          "dom": {
+            "page": "tier_list",
+            "fichiers": {
+              "dom.js": "content/pages/dom.js"
+            }
+          }
+        },
+        {
+          "titre": "on : un écouteur en une ligne",
+          "texte": "`on(sélecteur, événement, fonction)` pose un écouteur. La fonction reçoit **l'élément**, puis **l'événement**. Exécute, puis clique sur le titre de la page.",
+          "code": [
+            "import { on } from './dom.js';",
+            "",
+            "on('h1', 'click', (titre, event) => {",
+            "  console.log('clic sur', titre.textContent);",
+            "});"
+          ],
+          "dom": {
+            "page": "tier_list",
+            "fichiers": {
+              "dom.js": "content/pages/dom.js"
+            }
+          },
+          "piege": "L'ordre compte : sélecteur, puis nom de l'événement, puis fonction."
+        }
+      ],
+      "exercices": [
+        {
+          "id": "u16-l2-e1",
+          "type": "qcm",
+          "notions": [
+            "bibliotheque-dom"
+          ],
+          "question": "Dans `on('#add-item-form', 'submit', (form, event) => { … })`, que contient `form` ?",
+          "choix": [
+            "Le formulaire trouvé par le sélecteur",
+            "Le texte saisi",
+            "L'événement submit",
+            "Le bouton Add"
+          ],
+          "bonne": 0,
+          "explication": "on appelle la fonction avec l'élément, puis l'événement."
+        },
+        {
+          "id": "u16-l2-e2",
+          "type": "qcm",
+          "notions": [
+            "bibliotheque-dom"
+          ],
+          "question": "Où cherche `getNode('.item-name', item)` ?",
+          "choix": [
+            "À l'intérieur de l'élément item",
+            "Dans toute la page",
+            "Dans le fichier dom.js",
+            "Dans le template"
+          ],
+          "bonne": 0,
+          "explication": "Le 2e argument dit où chercher."
+        },
+        {
+          "id": "u16-l2-e3",
+          "type": "pointer-code",
+          "notions": [
+            "bibliotheque-dom"
+          ],
+          "question": "Touche le paramètre qui reçoit **l'événement**.",
+          "code": [
+            "on('#plus', 'click', (bouton, ⟦evt⟧) => {",
+            "  console.log(evt.type);",
+            "});"
+          ],
+          "explication": "Le 2e paramètre de la fonction donnée à on."
+        },
+        {
+          "id": "u16-l2-e4",
+          "type": "ecrire",
+          "notions": [
+            "bibliotheque-dom"
+          ],
+          "question": "Avec `forEach` de `dom.js`, affiche dans la console la lettre de chaque catégorie (le texte de chaque titre `h3` des `.tier`), une par ligne.",
+          "dom": {
+            "page": "tier_list",
+            "fichiers": {
+              "dom.js": "content/pages/dom.js"
+            }
+          },
+          "depart": [
+            "import { forEach } from './dom.js';",
+            "",
+            ""
+          ],
+          "tests": {
+            "etapes": [
+              {
+                "titre": "Au chargement",
+                "verifier": [
+                  {
+                    "sortie": [
+                      "S",
+                      "A",
+                      "B",
+                      "C",
+                      "D"
+                    ],
+                    "message": "La console doit afficher S, A, B, C, D (une lettre par ligne)."
+                  }
+                ]
+              }
+            ],
+            "obligatoire": [
+              "forEach()"
+            ]
+          },
+          "indices": [
+            "Le sélecteur trouve les titres des catégories : `.tier h3`.",
+            {
+              "code": "forEach('___', (h3) => console.log(___));"
+            }
+          ],
+          "solution": [
+            "import { forEach } from './dom.js';",
+            "",
+            "forEach('.tier h3', (h3) => console.log(h3.textContent));"
+          ],
+          "erreursTypiques": [
+            {
+              "code": "import { forEach } from './dom.js';\nforEach('.tier h3', (h3) => console.log(h3));",
+              "attendu": "echec"
+            },
+            {
+              "code": "import { forEach } from './dom.js';\nforEach('h2', (h) => console.log(h.textContent));",
+              "attendu": "echec"
+            }
+          ],
+          "explication": "Le forEach de dom.js prend un sélecteur, pas un tableau : il cherche puis parcourt."
+        },
+        {
+          "id": "u16-l2-e5",
+          "type": "ecrire",
+          "notions": [
+            "bibliotheque-dom",
+            "textcontent-append"
+          ],
+          "question": "Avec `on` et `getNode` de `dom.js` : à chaque clic sur le bouton `#plus`, augmente de 1 le nombre affiché dans `#compteur`.",
+          "dom": {
+            "html": [
+              "<button id=\"plus\" type=\"button\">+1</button>",
+              "<p>Total : <span id=\"compteur\">0</span></p>"
+            ],
+            "css": [
+              "body{font-family:system-ui,sans-serif;padding:12px}",
+              "li{margin:4px 0}"
+            ],
+            "fichiers": {
+              "dom.js": "content/pages/dom.js"
+            }
+          },
+          "depart": [
+            "import { getNode, on } from './dom.js';",
+            "",
+            "let total = 0;",
+            ""
+          ],
+          "tests": {
+            "etapes": [
+              {
+                "titre": "Avant tout clic",
+                "verifier": [
+                  {
+                    "vrai": "document.querySelector('#compteur').textContent === '0'",
+                    "message": "Avant le premier clic, le compteur affiche 0."
+                  }
+                ]
+              },
+              {
+                "titre": "Trois clics",
+                "actions": [
+                  {
+                    "clic": "#plus"
+                  },
+                  {
+                    "clic": "#plus"
+                  },
+                  {
+                    "clic": "#plus"
+                  }
+                ],
+                "verifier": [
+                  {
+                    "vrai": "document.querySelector('#compteur').textContent === '3'",
+                    "message": "Après 3 clics, le compteur doit afficher 3."
+                  }
+                ],
+                "siEchec": "Dans la fonction donnée à `on`, augmente `total`, puis écris-le dans `#compteur` avec `textContent`."
+              }
+            ],
+            "obligatoire": [
+              "on()"
+            ]
+          },
+          "indices": [
+            "`on(sélecteur, 'click', fonction)` : relis l'ordre des arguments.",
+            {
+              "code": "on('#plus', '___', () => {\n  total++;\n  getNode('#compteur').___ = total;\n});"
+            }
+          ],
+          "solution": [
+            "import { getNode, on } from './dom.js';",
+            "",
+            "let total = 0;",
+            "on('#plus', 'click', () => {",
+            "  total++;",
+            "  getNode('#compteur').textContent = total;",
+            "});"
+          ],
+          "erreursTypiques": [
+            {
+              "code": "import { getNode, on } from './dom.js';\nlet total = 0;\non('#plus', () => {\n  total++;\n  getNode('#compteur').textContent = total;\n});",
+              "attendu": "echec",
+              "diagnostic": "contenu"
+            },
+            {
+              "code": "import { getNode, on } from './dom.js';\nlet total = 0;\non('#plus', 'click', () => {\n  total++;\n});",
+              "attendu": "echec",
+              "diagnostic": "contenu"
+            }
+          ],
+          "explication": "on(sélecteur, événement, fonction) : sans 'click', l'écouteur ne se déclenche jamais."
+        }
+      ]
+    },
+    {
+      "id": "u16-l3",
+      "titre": "Formulaires : submit et preventDefault",
+      "duree": 6,
+      "notions": [
+        "formulaire-submit"
+      ],
+      "cartes": [
+        {
+          "titre": "Envoyer un formulaire",
+          "texte": "Un `<form>` s'envoie de **deux façons** : le bouton, ou la touche **Entrée** dans un champ. Dans les deux cas, l'événement `submit` se déclenche sur le formulaire.",
+          "fiche": "formulaire-submit"
+        },
+        {
+          "titre": "Le piège du rechargement",
+          "texte": "Par défaut, un formulaire envoyé **recharge la page**. Exécute, tape un article, appuie sur Entrée : la console prévient que la page se rechargerait.",
+          "code": [
+            "const form = document.querySelector('#courses');",
+            "form.addEventListener('submit', () => {",
+            "  console.log('envoyé !');",
+            "});"
+          ],
+          "dom": {
+            "html": [
+              "<form id=\"courses\"><input id=\"article\" required placeholder=\"Un article…\"> <button>Ajouter</button></form>",
+              "<ul id=\"liste\"></ul>"
+            ],
+            "css": [
+              "body{font-family:system-ui,sans-serif;padding:12px}",
+              "li{margin:4px 0}"
+            ]
+          },
+          "analogie": "Poster une lettre : sans consigne, le facteur l'emporte. preventDefault(), c'est « garde-la, je m'en occupe »."
+        },
+        {
+          "titre": "preventDefault()",
+          "texte": "Première ligne de l'écouteur : `event.preventDefault()`. La page reste là, et ton code s'occupe de la suite.",
+          "code": [
+            "const form = document.querySelector('#courses');",
+            "const input = document.querySelector('#article');",
+            "form.addEventListener('submit', (event) => {",
+            "  event.preventDefault();",
+            "  console.log(input.value);",
+            "});"
+          ],
+          "dom": {
+            "html": [
+              "<form id=\"courses\"><input id=\"article\" required placeholder=\"Un article…\"> <button>Ajouter</button></form>",
+              "<ul id=\"liste\"></ul>"
+            ],
+            "css": [
+              "body{font-family:system-ui,sans-serif;padding:12px}",
+              "li{margin:4px 0}"
+            ]
+          }
+        },
+        {
+          "titre": "submit, pas click",
+          "texte": "Un écouteur `click` sur le bouton ne voit pas la touche Entrée. Le TP le demande : « Vérifier que le bouton Add et la touche Entrée permettent tous deux de créer un élément ».",
+          "piege": "Écoute toujours `submit` sur le formulaire."
+        }
+      ],
+      "exercices": [
+        {
+          "id": "u16-l3-e1",
+          "type": "qcm",
+          "notions": [
+            "formulaire-submit"
+          ],
+          "question": "Que se passe-t-il, sans `preventDefault()`, quand on envoie un formulaire ?",
+          "choix": [
+            "La page se recharge : ce que le script avait ajouté disparaît",
+            "Rien du tout",
+            "Le texte est effacé mais la page reste",
+            "Une erreur s'affiche dans la console"
+          ],
+          "bonne": 0,
+          "explication": "C'est le comportement par défaut du navigateur."
+        },
+        {
+          "id": "u16-l3-e2",
+          "type": "tri",
+          "notions": [
+            "formulaire-submit"
+          ],
+          "question": "Qu'est-ce qui déclenche l'événement `submit` du formulaire ?",
+          "categories": [
+            "déclenche submit",
+            "ne le déclenche pas"
+          ],
+          "items": [
+            [
+              "Clic sur le bouton du formulaire",
+              0
+            ],
+            [
+              "Touche Entrée dans le champ",
+              0
+            ],
+            [
+              "Taper une lettre dans le champ",
+              1
+            ],
+            [
+              "Clic sur le titre de la page",
+              1
+            ]
+          ],
+          "explication": "Le bouton et la touche Entrée envoient le formulaire."
+        },
+        {
+          "id": "u16-l3-e3",
+          "type": "bug",
+          "notions": [
+            "formulaire-submit"
+          ],
+          "question": "La touche Entrée n'ajoute rien. Quelle ligne corriger ?",
+          "code": [
+            "const bouton = document.querySelector('#courses button');",
+            "bouton.addEventListener('click', (event) => {",
+            "  event.preventDefault();",
+            "  console.log(document.querySelector('#article').value);",
+            "});"
+          ],
+          "ligne": 2,
+          "choix": [
+            "Écouter `submit` sur le formulaire, pas `click` sur le bouton",
+            "Il faut retirer preventDefault",
+            "Il faut `.textContent` à la place de `.value`",
+            "Il manque `type=\"module\"`"
+          ],
+          "bonne": 0,
+          "explication": "submit couvre le bouton et la touche Entrée."
+        },
+        {
+          "id": "u16-l3-e4",
+          "type": "qcm",
+          "notions": [
+            "formulaire-submit"
+          ],
+          "question": "Comment lire le texte tapé dans `<input id=\"article\">` ?",
+          "choix": [
+            "document.querySelector('#article').value",
+            "document.querySelector('#article').textContent",
+            "document.querySelector('#article').text",
+            "document.querySelector('#article').innerText"
+          ],
+          "bonne": 0,
+          "mono": true,
+          "explication": "Un champ de saisie garde son texte dans `.value`."
+        },
+        {
+          "id": "u16-l3-e5",
+          "type": "ecrire",
+          "notions": [
+            "formulaire-submit"
+          ],
+          "question": "À l'envoi du formulaire `#courses` (bouton **et** touche Entrée), affiche dans la console le texte saisi dans `#article`, **sans recharger la page**.",
+          "dom": {
+            "html": [
+              "<form id=\"courses\"><input id=\"article\" required placeholder=\"Un article…\"> <button>Ajouter</button></form>",
+              "<ul id=\"liste\"></ul>"
+            ],
+            "css": [
+              "body{font-family:system-ui,sans-serif;padding:12px}",
+              "li{margin:4px 0}"
+            ]
+          },
+          "depart": [
+            "const form = document.querySelector('#courses');",
+            "const input = document.querySelector('#article');",
+            ""
+          ],
+          "tests": {
+            "etapes": [
+              {
+                "titre": "Le bouton Ajouter",
+                "actions": [
+                  {
+                    "saisir": [
+                      "#article",
+                      "pain"
+                    ]
+                  },
+                  {
+                    "clic": "#courses button"
+                  }
+                ],
+                "verifier": [
+                  {
+                    "sortie": [
+                      "pain"
+                    ],
+                    "message": "La console doit afficher pain."
+                  }
+                ]
+              },
+              {
+                "titre": "La touche Entrée",
+                "actions": [
+                  {
+                    "saisir": [
+                      "#article",
+                      "lait"
+                    ]
+                  },
+                  {
+                    "entree": "#article"
+                  }
+                ],
+                "verifier": [
+                  {
+                    "sortie": [
+                      "pain",
+                      "lait"
+                    ],
+                    "message": "Après Entrée, la console doit aussi afficher lait."
+                  }
+                ],
+                "siEchec": "Écoute `submit` sur le formulaire : le bouton et la touche Entrée l'envoient tous les deux."
+              }
+            ],
+            "obligatoire": [
+              "preventDefault"
+            ]
+          },
+          "indices": [
+            "L'événement d'un formulaire envoyé : `submit`.",
+            {
+              "code": "form.addEventListener('___', (event) => {\n  event.___();\n  console.log(input.___);\n});"
+            }
+          ],
+          "solution": [
+            "const form = document.querySelector('#courses');",
+            "const input = document.querySelector('#article');",
+            "form.addEventListener('submit', (event) => {",
+            "  event.preventDefault();",
+            "  console.log(input.value);",
+            "});"
+          ],
+          "erreursTypiques": [
+            {
+              "code": "const form = document.querySelector('#courses');\nconst input = document.querySelector('#article');\ndocument.querySelector('#courses button').addEventListener('click', (event) => {\n  event.preventDefault();\n  console.log(input.value);\n});",
+              "attendu": "echec",
+              "diagnostic": "contenu"
+            },
+            {
+              "code": "const form = document.querySelector('#courses');\nconst input = document.querySelector('#article');\nform.addEventListener('submit', (event) => {\n  event.preventDefault();\n  console.log(input.textContent);\n});",
+              "attendu": "echec"
+            },
+            {
+              "code": "const form = document.querySelector('#courses');\nconst input = document.querySelector('#article');\nform.addEventListener('submit', () => {\n  console.log(input.value);\n});",
+              "attendu": "echec",
+              "diagnostic": "obligatoire"
+            }
+          ],
+          "explication": "submit + preventDefault + value : la base de tous les formulaires en JavaScript."
+        }
+      ]
+    },
+    {
+      "id": "u16-l4",
+      "titre": "Les modèles : template, clone, append",
+      "duree": 7,
+      "notions": [
+        "template-content",
+        "textcontent-append"
+      ],
+      "cartes": [
+        {
+          "titre": "Un moule invisible",
+          "texte": "Un `<template>` contient du HTML qui **ne s'affiche pas**. Exécute : la page ne montre que le bouton, mais le modèle est bien là.",
+          "code": [
+            "const modele = document.querySelector('#modele');",
+            "console.log(modele.content.querySelectorAll('li').length);"
+          ],
+          "dom": {
+            "html": [
+              "<button id=\"ajouter\" type=\"button\">Ajouter un titre</button>",
+              "<ol id=\"playlist\"></ol>",
+              "<template id=\"modele\"><li class=\"titre\"><span class=\"nom\"></span> <small>♪</small></li></template>"
+            ],
+            "css": [
+              "body{font-family:system-ui,sans-serif;padding:12px}",
+              "li{margin:4px 0}"
+            ]
+          },
+          "analogie": "Un tampon encreur : le tampon ne s'imprime pas tout seul, il sert à faire des copies.",
+          "fiche": "template-content"
+        },
+        {
+          "titre": "content, puis clone",
+          "texte": "On prend l'élément modèle dans `.content`, et on le **clone** avec `cloneNode(true)` (avec ses enfants) pour chaque copie.",
+          "code": [
+            "const li = document.querySelector('#modele').content.querySelector('li');",
+            "const copie = li.cloneNode(true);",
+            "console.log(copie.querySelector('.nom') !== null);"
+          ],
+          "dom": {
+            "html": [
+              "<button id=\"ajouter\" type=\"button\">Ajouter un titre</button>",
+              "<ol id=\"playlist\"></ol>",
+              "<template id=\"modele\"><li class=\"titre\"><span class=\"nom\"></span> <small>♪</small></li></template>"
+            ],
+            "css": [
+              "body{font-family:system-ui,sans-serif;padding:12px}",
+              "li{margin:4px 0}"
+            ]
+          }
+        },
+        {
+          "titre": "Remplir et ajouter",
+          "texte": "`textContent` écrit le texte, `append` ajoute la copie **à la fin**. Exécute, puis clique plusieurs fois sur le bouton.",
+          "code": [
+            "const li = document.querySelector('#modele').content.querySelector('li');",
+            "const liste = document.querySelector('#playlist');",
+            "let n = 0;",
+            "document.querySelector('#ajouter').addEventListener('click', () => {",
+            "  n++;",
+            "  const copie = li.cloneNode(true);",
+            "  copie.querySelector('.nom').textContent = 'Chanson ' + n;",
+            "  liste.append(copie);",
+            "});"
+          ],
+          "dom": {
+            "html": [
+              "<button id=\"ajouter\" type=\"button\">Ajouter un titre</button>",
+              "<ol id=\"playlist\"></ol>",
+              "<template id=\"modele\"><li class=\"titre\"><span class=\"nom\"></span> <small>♪</small></li></template>"
+            ],
+            "css": [
+              "body{font-family:system-ui,sans-serif;padding:12px}",
+              "li{margin:4px 0}"
+            ]
+          },
+          "fiche": "textcontent-append"
+        },
+        {
+          "titre": "Garder le modèle intact",
+          "texte": "Le TP prépare **une fois** la carte modèle (`tmplItem`), puis la **clone à chaque** nouvelle carte. Si on ajoutait le modèle lui-même, il n'y en aurait qu'un : il se déplacerait au lieu de se multiplier.",
+          "piege": "Un élément n'existe qu'à un seul endroit de la page : `append` le déplace. D'où les clones."
+        }
+      ],
+      "exercices": [
+        {
+          "id": "u16-l4-e1",
+          "type": "vf",
+          "notions": [
+            "template-content"
+          ],
+          "question": "Le contenu d'un `<template>` s'affiche dans la page comme le reste du HTML.",
+          "bonne": false,
+          "explication": "C'est un moule invisible : on le clone pour afficher des copies."
+        },
+        {
+          "id": "u16-l4-e2",
+          "type": "qcm",
+          "notions": [
+            "textcontent-append"
+          ],
+          "question": "La liste contient 2 titres. Après `liste.append(copie)`, combien en contient-elle ?",
+          "choix": [
+            "3 : append ajoute à la fin",
+            "1 : append remplace tout",
+            "2 : append ne fait rien",
+            "0"
+          ],
+          "bonne": 0,
+          "explication": "append ajoute ; c'est replaceChildren qui remplace."
+        },
+        {
+          "id": "u16-l4-e3",
+          "type": "ordre",
+          "notions": [
+            "template-content",
+            "textcontent-append"
+          ],
+          "question": "Remets dans l'ordre la fabrication d'un nouvel élément à partir d'un modèle.",
+          "items": [
+            "Prendre l'élément modèle dans template.content",
+            "Le cloner avec cloneNode(true)",
+            "Écrire le texte avec textContent",
+            "L'ajouter à la fin avec append"
+          ],
+          "explication": "Cloner, remplir, ajouter."
+        },
+        {
+          "id": "u16-l4-e4",
+          "type": "bug",
+          "notions": [
+            "template-content"
+          ],
+          "question": "Seul le premier clic ajoute un titre ; ensuite, rien ne s'ajoute. Quelle ligne corriger ?",
+          "code": [
+            "const li = document.querySelector('#modele').content.querySelector('li');",
+            "document.querySelector('#ajouter').addEventListener('click', () => {",
+            "  li.querySelector('.nom').textContent = 'Nouveau';",
+            "  document.querySelector('#playlist').append(li);",
+            "});"
+          ],
+          "ligne": 4,
+          "choix": [
+            "Il faut ajouter une copie : `li.cloneNode(true)`, pas le modèle lui-même",
+            "Il faut `replaceChildren`",
+            "Il faut `.value` à la place de `.textContent`",
+            "Il manque preventDefault"
+          ],
+          "bonne": 0,
+          "explication": "Le modèle n'existe qu'une fois : append le déplace au lieu de le copier."
+        },
+        {
+          "id": "u16-l4-e5",
+          "type": "ecrire",
+          "notions": [
+            "template-content",
+            "textcontent-append"
+          ],
+          "question": "À chaque clic sur `#ajouter`, ajoute **à la fin** de `#playlist` une copie du `<li>` du modèle `#modele`, avec le texte « Titre 1 », puis « Titre 2 »… dans son `.nom`. Le modèle doit rester intact.",
+          "dom": {
+            "html": [
+              "<button id=\"ajouter\" type=\"button\">Ajouter un titre</button>",
+              "<ol id=\"playlist\"></ol>",
+              "<template id=\"modele\"><li class=\"titre\"><span class=\"nom\"></span> <small>♪</small></li></template>"
+            ],
+            "css": [
+              "body{font-family:system-ui,sans-serif;padding:12px}",
+              "li{margin:4px 0}"
+            ]
+          },
+          "depart": [
+            "const liste = document.querySelector('#playlist');",
+            "let n = 0;",
+            ""
+          ],
+          "tests": {
+            "etapes": [
+              {
+                "titre": "Un clic",
+                "actions": [
+                  {
+                    "clic": "#ajouter"
+                  }
+                ],
+                "verifier": [
+                  {
+                    "compter": "#playlist li",
+                    "egal": 1,
+                    "libelle": "Titres dans la playlist"
+                  },
+                  {
+                    "vrai": "document.querySelector('#playlist li .nom')?.textContent === 'Titre 1'",
+                    "message": "Le premier titre doit s'appeler « Titre 1 »."
+                  }
+                ]
+              },
+              {
+                "titre": "Deux clics de plus",
+                "actions": [
+                  {
+                    "clic": "#ajouter"
+                  },
+                  {
+                    "clic": "#ajouter"
+                  }
+                ],
+                "verifier": [
+                  {
+                    "compter": "#playlist li",
+                    "egal": 3,
+                    "libelle": "Titres dans la playlist"
+                  },
+                  {
+                    "vrai": "[...document.querySelectorAll('#playlist .nom')].map((s) => s.textContent).join() === 'Titre 1,Titre 2,Titre 3'",
+                    "message": "Les titres doivent être, dans l'ordre : Titre 1, Titre 2, Titre 3."
+                  }
+                ],
+                "siEchec": "Une **copie** à chaque clic (`cloneNode(true)`), ajoutée à la fin avec `append`."
+              },
+              {
+                "titre": "Le modèle est intact",
+                "verifier": [
+                  {
+                    "vrai": "document.querySelector('#modele').content.querySelectorAll('li .nom').length === 1 && document.querySelector('#modele').content.querySelector('.nom').textContent === ''",
+                    "message": "Le modèle doit rester tel quel : on clone, on ne modifie pas l'original."
+                  }
+                ]
+              }
+            ],
+            "obligatoire": [
+              "cloneNode",
+              "append"
+            ]
+          },
+          "indices": [
+            "Le modèle : `document.querySelector('#modele').content.querySelector('li')`.",
+            "À chaque clic : cloner (avec true), écrire le texte dans `.nom`, ajouter avec append.",
+            {
+              "code": "document.querySelector('#ajouter').addEventListener('click', () => {\n  n++;\n  const copie = ___.cloneNode(___);\n  copie.querySelector('.nom').textContent = 'Titre ' + n;\n  liste.___(copie);\n});"
+            }
+          ],
+          "solution": [
+            "const liste = document.querySelector('#playlist');",
+            "let n = 0;",
+            "const modele = document.querySelector('#modele').content.querySelector('li');",
+            "document.querySelector('#ajouter').addEventListener('click', () => {",
+            "  n++;",
+            "  const copie = modele.cloneNode(true);",
+            "  copie.querySelector('.nom').textContent = 'Titre ' + n;",
+            "  liste.append(copie);",
+            "});"
+          ],
+          "erreursTypiques": [
+            {
+              "code": "const liste = document.querySelector('#playlist');\nlet n = 0;\nconst modele = document.querySelector('#modele').content.querySelector('li');\ndocument.querySelector('#ajouter').addEventListener('click', () => {\n  n++;\n  modele.querySelector('.nom').textContent = 'Titre ' + n;\n  liste.append(modele.cloneNode(true));\n});",
+              "attendu": "echec"
+            },
+            {
+              "code": "const liste = document.querySelector('#playlist');\nlet n = 0;\nconst modele = document.querySelector('#modele').content.querySelector('li');\ndocument.querySelector('#ajouter').addEventListener('click', () => {\n  n++;\n  const copie = modele.cloneNode();\n  copie.querySelector('.nom').textContent = 'Titre ' + n;\n  liste.append(copie);\n});",
+              "attendu": "erreur"
+            },
+            {
+              "code": "const liste = document.querySelector('#playlist');\nlet n = 0;\nconst modele = document.querySelector('#modele').content.querySelector('li');\ndocument.querySelector('#ajouter').addEventListener('click', () => {\n  n++;\n  const copie = modele.cloneNode(true);\n  copie.querySelector('.nom').textContent = 'Titre ' + n;\n  liste.replaceChildren(copie);\n});",
+              "attendu": "echec",
+              "diagnostic": "contenu"
+            }
+          ],
+          "explication": "C'est exactement la mécanique du TP 4 : un modèle intact, une copie par nouvel élément."
+        }
+      ]
+    }
+  ],
+  "jeux": [
+    {
+      "id": "u16-formulaires",
+      "titre": "Le guichet",
+      "description": "Formulaires, modèles, imports : réponds vite.",
+      "tours": 10,
+      "questions": [
+        {
+          "id": "u16-j1-1",
+          "type": "vf",
+          "notions": [
+            "formulaire-submit"
+          ],
+          "question": "La touche Entrée dans un champ envoie le formulaire.",
+          "bonne": true,
+          "explication": "Comme le bouton : l'événement submit se déclenche."
+        },
+        {
+          "id": "u16-j1-2",
+          "type": "vf",
+          "notions": [
+            "formulaire-submit"
+          ],
+          "question": "`preventDefault()` efface le texte du champ.",
+          "bonne": false,
+          "explication": "Il empêche seulement le rechargement de la page."
+        },
+        {
+          "id": "u16-j1-3",
+          "type": "qcm",
+          "notions": [
+            "formulaire-submit"
+          ],
+          "question": "Sur quel élément écouter `submit` ?",
+          "choix": [
+            "Le <form>",
+            "Le <button>",
+            "Le <input>",
+            "Le <body>"
+          ],
+          "bonne": 0,
+          "explication": "submit est un événement du formulaire."
+        },
+        {
+          "id": "u16-j1-4",
+          "type": "vf",
+          "notions": [
+            "template-content"
+          ],
+          "question": "`cloneNode()` sans `true` copie aussi les enfants.",
+          "bonne": false,
+          "explication": "Sans true : l'élément seul, vide."
+        },
+        {
+          "id": "u16-j1-5",
+          "type": "qcm",
+          "notions": [
+            "template-content"
+          ],
+          "question": "Où se trouve le contenu d'un `<template>` ?",
+          "choix": [
+            "Dans sa propriété .content",
+            "Dans .value",
+            "Dans .textContent",
+            "Dans .children seulement"
+          ],
+          "bonne": 0,
+          "mono": true,
+          "explication": "template.content : un fragment hors de la page."
+        },
+        {
+          "id": "u16-j1-6",
+          "type": "vf",
+          "notions": [
+            "textcontent-append"
+          ],
+          "question": "`append` remplace tout le contenu de l'élément.",
+          "bonne": false,
+          "explication": "append ajoute à la fin ; replaceChildren remplace."
+        },
+        {
+          "id": "u16-j1-7",
+          "type": "qcm",
+          "notions": [
+            "modules-import"
+          ],
+          "question": "Quelle ligne importe correctement getNode et on ?",
+          "choix": [
+            "import { getNode, on } from './dom.js';",
+            "import getNode, on from './dom.js';",
+            "import { getNode, on } from 'dom.js';",
+            "require('./dom.js');"
+          ],
+          "bonne": 0,
+          "mono": true,
+          "explication": "Des accolades, et le chemin avec ./"
+        },
+        {
+          "id": "u16-j1-8",
+          "type": "vf",
+          "notions": [
+            "bibliotheque-dom"
+          ],
+          "question": "`getNode('#tier-s')` fait la même chose que `document.querySelector('#tier-s')`.",
+          "bonne": true,
+          "explication": "C'est un raccourci."
+        },
+        {
+          "id": "u16-j1-9",
+          "type": "qcm",
+          "notions": [
+            "bibliotheque-dom"
+          ],
+          "question": "Dans `on('#b', 'click', (a, b) => …)`, que reçoit `b` ?",
+          "choix": [
+            "L'événement",
+            "L'élément #b",
+            "Le texte du bouton",
+            "Rien"
+          ],
+          "bonne": 0,
+          "explication": "on passe l'élément, puis l'événement."
+        },
+        {
+          "id": "u16-j1-10",
+          "type": "vf",
+          "notions": [
+            "textcontent-append"
+          ],
+          "question": "`p.textContent = 'Dune'` affiche « Dune » dans le paragraphe.",
+          "bonne": true,
+          "explication": "textContent s'écrit aussi."
+        },
+        {
+          "id": "u16-j1-11",
+          "type": "qcm",
+          "notions": [
+            "template-content"
+          ],
+          "question": "Pourquoi cloner `tmplItem` à chaque nouvelle carte ?",
+          "choix": [
+            "Pour garder le modèle intact et avoir une carte par ajout",
+            "Pour aller plus vite",
+            "Parce que template.content est en lecture seule",
+            "Pour retirer l'id"
+          ],
+          "bonne": 0,
+          "explication": "Un élément n'existe qu'à un endroit : sans clone, il se déplacerait."
+        },
+        {
+          "id": "u16-j1-12",
+          "type": "vf",
+          "notions": [
+            "modules-import"
+          ],
+          "question": "On peut utiliser `import` dans un script chargé sans `type=\"module\"`.",
+          "bonne": false,
+          "explication": "import demande un module."
+        }
+      ]
+    }
+  ],
+  "quiz": {
+    "titre": "Quiz : formulaires et modèles",
+    "questions": [
+      {
+        "id": "u16-q1",
+        "type": "qcm",
+        "notions": [
+          "formulaire-submit"
+        ],
+        "question": "Que fait `event.preventDefault()` dans un écouteur de submit ?",
+        "choix": [
+          "Il empêche le navigateur de recharger la page",
+          "Il vide le formulaire",
+          "Il annule l'écouteur",
+          "Il envoie le formulaire au serveur"
+        ],
+        "bonne": 0,
+        "explication": "Il bloque le comportement par défaut : l'envoi et le rechargement."
+      },
+      {
+        "id": "u16-q2",
+        "type": "bug",
+        "notions": [
+          "formulaire-submit"
+        ],
+        "question": "Les cartes ajoutées disparaissent aussitôt. Quelle ligne manque-t-il après la ligne 1 ?",
+        "code": [
+          "form.addEventListener('submit', (event) => {",
+          "  const item = tmplItem.cloneNode(true);",
+          "  getNode('#tier-s').append(item);",
+          "});"
+        ],
+        "ligne": 1,
+        "choix": [
+          "`event.preventDefault();`",
+          "`event.stopPropagation();`",
+          "`form.reset();`",
+          "`return false;`"
+        ],
+        "bonne": 0,
+        "explication": "Sans preventDefault, la page se recharge : les cartes ajoutées sont perdues."
+      },
+      {
+        "id": "u16-q3",
+        "type": "qcm",
+        "notions": [
+          "modules-import"
+        ],
+        "question": "Ton fichier commence par `import { getNode } from './dom.js';`. Que doit contenir dom.js ?",
+        "choix": [
+          "export function getNode(…) { … }",
+          "function getNode(…) { … } sans export",
+          "import { getNode }",
+          "Rien de spécial"
+        ],
+        "bonne": 0,
+        "mono": true,
+        "explication": "Seules les fonctions exportées peuvent être importées."
+      },
+      {
+        "id": "u16-q4",
+        "type": "qcm",
+        "notions": [
+          "bibliotheque-dom"
+        ],
+        "question": "Que donne `getNodes('.tier').length` sur la page du TP 4 ?",
+        "choix": [
+          "5",
+          "1",
+          "0",
+          "4"
+        ],
+        "bonne": 0,
+        "explication": "Cinq catégories : S, A, B, C, D."
+      },
+      {
+        "id": "u16-q5",
+        "type": "ordre",
+        "notions": [
+          "formulaire-submit",
+          "template-content"
+        ],
+        "question": "Remets dans l'ordre ce qui se passe quand on ajoute une carte au TP 4.",
+        "items": [
+          "L'utilisateur tape un nom et appuie sur Entrée",
+          "L'événement submit se déclenche",
+          "preventDefault() empêche le rechargement",
+          "On clone tmplItem et on y écrit le nom",
+          "On ajoute la carte à la fin de #tier-s"
+        ],
+        "explication": "L'exercice 1 du TP 4, pas à pas."
+      },
+      {
+        "id": "u16-q6",
+        "type": "vf",
+        "notions": [
+          "template-content"
+        ],
+        "question": "`getNode('#item-template').content` est déjà affiché dans la page.",
+        "bonne": false,
+        "explication": "Le contenu d'un template ne s'affiche pas."
+      },
+      {
+        "id": "u16-q7",
+        "type": "qcm",
+        "notions": [
+          "textcontent-append"
+        ],
+        "question": "`#tier-s` contient Dune et Alien. Où arrive la carte ajoutée avec `append` ?",
+        "choix": [
+          "Après Alien (à la fin)",
+          "Avant Dune",
+          "À la place de Dune et Alien",
+          "Dans le template"
+        ],
+        "bonne": 0,
+        "explication": "append : à la fin."
+      },
+      {
+        "id": "u16-q8",
+        "type": "qcm",
+        "notions": [
+          "formulaire-submit"
+        ],
+        "question": "Le texte tapé dans un `<input>` se lit avec…",
+        "choix": [
+          ".value",
+          ".textContent",
+          ".content",
+          ".dataset"
+        ],
+        "bonne": 0,
+        "mono": true,
+        "explication": "Un champ garde sa saisie dans value."
+      },
+      {
+        "id": "u16-q9",
+        "type": "assoc",
+        "notions": [
+          "bibliotheque-dom"
+        ],
+        "mono": true,
+        "question": "Associe chaque outil de dom.js à ce qu'il remplace.",
+        "paires": [
+          [
+            "getNode(sel)",
+            "document.querySelector(sel)"
+          ],
+          [
+            "getNodes(sel)",
+            "document.querySelectorAll(sel)"
+          ],
+          [
+            "forEach(sel, f)",
+            "getNodes(sel), puis f pour chaque élément"
+          ],
+          [
+            "on(sel, 'click', f)",
+            "addEventListener sur chaque élément trouvé"
+          ]
+        ],
+        "explication": "Des raccourcis pour ce que tu faisais au TP 3."
+      },
+      {
+        "id": "u16-q10",
+        "type": "bug",
+        "notions": [
+          "modules-import"
+        ],
+        "question": "La console affiche « Fichier à importer introuvable ». Quelle ligne corriger ?",
+        "code": [
+          "import { getNode } from 'dom.js';",
+          "console.log(getNode('h1').textContent);"
+        ],
+        "ligne": 1,
+        "choix": [
+          "Le chemin doit commencer par ./ : './dom.js'",
+          "Il faut getNodes",
+          "Il faut des parenthèses autour de getNode",
+          "Il faut mettre l'import à la fin"
+        ],
+        "bonne": 0,
+        "explication": "Sans ./, le navigateur refuse l'import."
+      },
+      {
+        "id": "u16-q11",
+        "type": "tri",
+        "notions": [
+          "textcontent-append",
+          "template-content"
+        ],
+        "mono": true,
+        "question": "Ajoute ou remplace ?",
+        "categories": [
+          "ajoute à la fin",
+          "remplace le contenu"
+        ],
+        "items": [
+          [
+            "liste.append(copie)",
+            0
+          ],
+          [
+            "liste.replaceChildren(copie)",
+            1
+          ],
+          [
+            "p.textContent = 'Dune'",
+            1
+          ],
+          [
+            "liste.append(a, b)",
+            0
+          ]
+        ],
+        "explication": "append ajoute ; replaceChildren et textContent remplacent."
+      },
+      {
+        "id": "u16-q12",
+        "type": "qcm",
+        "notions": [
+          "template-content"
+        ],
+        "question": "Que donne `tmplItem.cloneNode(true)` ?",
+        "choix": [
+          "Une nouvelle carte complète (avec ses boutons), pas encore dans la page",
+          "La carte modèle elle-même",
+          "Une carte vide sans boutons",
+          "Une carte déjà ajoutée dans #tier-s"
+        ],
+        "bonne": 0,
+        "explication": "Une copie profonde, à placer ensuite avec append."
+      },
+      {
+        "id": "u16-q13",
+        "type": "qcm",
+        "notions": [
+          "queryselector",
+          "classlist"
+        ],
+        "question": "Révision (TP 3) : comment ajouter la classe selected à toutes les cartes de cœur ?",
+        "choix": [
+          "getNodes('.heart').forEach((c) => c.classList.add('selected'))",
+          "getNodes('.heart').classList.add('selected')",
+          "getNode('.heart').classList.add('selected')",
+          "getNodes('heart').add('selected')"
+        ],
+        "bonne": 0,
+        "mono": true,
+        "explication": "Une liste n'a pas de classList : on parcourt."
+      },
+      {
+        "id": "u16-q14",
+        "type": "vf",
+        "notions": [
+          "clonenode"
+        ],
+        "question": "Révision (TP 3) : `cloneNode(true)` garde l'id de l'élément copié.",
+        "bonne": true,
+        "explication": "D'où removeAttribute('id') au TP 3. Les cartes du template du TP 4 n'ont pas d'id."
+      },
+      {
+        "id": "u16-q15",
+        "type": "qcm",
+        "notions": [
+          "addeventlistener"
+        ],
+        "question": "Révision (TP 3) : `bouton.addEventListener('click', afficher())` …",
+        "choix": [
+          "appelle afficher tout de suite, une seule fois",
+          "appelle afficher à chaque clic",
+          "provoque une erreur de syntaxe",
+          "ne fait rien du tout"
+        ],
+        "bonne": 0,
+        "explication": "On donne la fonction (afficher), on ne l'appelle pas (afficher())."
+      }
+    ]
+  },
+  "boss": [
+    {
+      "id": "u16-b1",
+      "titre": "Ajouter une carte",
+      "source": "TP 4 · DOM et délégation d'événements, exercice 1",
+      "notions": [
+        "formulaire-submit",
+        "template-content",
+        "textcontent-append",
+        "modules-import"
+      ],
+      "enonce": "Au démarrage du script, préparer une constante `tmplItem` en clonant l'élément `article.item` contenu dans le template `#item-template` (la ligne est donnée). Conserver ce modèle intact pour créer les cartes suivantes.\n\n**1)** À la soumission du formulaire `#add-item-form`, créer une nouvelle carte à partir du modèle `tmplItem`, lui donner le nom saisi par l'utilisateur et l'ajouter à la fin de `#tier-s`.\n\nVérifier que le bouton **Add** et la touche **Entrée** dans le champ permettent tous deux de créer un élément.",
+      "regles": [
+        "Utiliser la mini-bibliothèque dom.js fournie (déjà importée en haut du fichier).",
+        "Le modèle tmplItem reste intact : chaque carte est une copie."
+      ],
+      "dom": {
+        "page": "tier_list",
+        "fichiers": {
+          "dom.js": "content/pages/dom.js"
+        }
+      },
+      "depart": [
+        "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';",
+        "",
+        "const tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);",
+        "",
+        "// 1) À la soumission du formulaire #add-item-form…",
+        ""
+      ],
+      "tests": {
+        "etapes": [
+          {
+            "titre": "Au démarrage",
+            "verifier": [
+              {
+                "compter": "#tiers .item",
+                "egal": 0,
+                "libelle": "Cartes avant tout ajout"
+              }
+            ],
+            "siEchec": "Aucune carte ne doit apparaître avant que l'utilisateur envoie le formulaire."
+          },
+          {
+            "titre": "Le bouton Add",
+            "actions": [
+              {
+                "saisir": [
+                  "#item-name",
+                  "Dune"
+                ]
+              },
+              {
+                "clic": "#add-item-form button"
+              }
+            ],
+            "verifier": [
+              {
+                "compter": "#tier-s .item",
+                "egal": 1,
+                "libelle": "Cartes dans S"
+              },
+              {
+                "vrai": "[...document.querySelectorAll('#tier-s .item-name')].map((n) => n.textContent).join() === 'Dune'",
+                "message": "La carte doit porter le nom saisi (« Dune ») dans son .item-name."
+              }
+            ],
+            "siEchec": "Dans l'écouteur de submit : `event.preventDefault()`, puis une copie de `tmplItem`, son `.item-name` rempli avec `textContent`, et `append` dans `#tier-s`."
+          },
+          {
+            "titre": "Une deuxième carte",
+            "actions": [
+              {
+                "saisir": [
+                  "#item-name",
+                  "Alien"
+                ]
+              },
+              {
+                "clic": "#add-item-form button"
+              }
+            ],
+            "verifier": [
+              {
+                "compter": "#tier-s .item",
+                "egal": 2,
+                "libelle": "Cartes dans S"
+              },
+              {
+                "vrai": "[...document.querySelectorAll('#tier-s .item-name')].map((n) => n.textContent).join() === 'Dune,Alien'",
+                "message": "Deux cartes, chacune avec son nom, la nouvelle à la fin : Dune, puis Alien."
+              }
+            ],
+            "siEchec": "Clone `tmplItem` à **chaque** ajout (`tmplItem.cloneNode(true)`) : si tu remplis ou ajoutes `tmplItem` lui-même, il n'existe qu'une carte, qui se déplace et change de nom."
+          },
+          {
+            "titre": "La touche Entrée",
+            "actions": [
+              {
+                "saisir": [
+                  "#item-name",
+                  "Brazil"
+                ]
+              },
+              {
+                "entree": "#item-name"
+              }
+            ],
+            "verifier": [
+              {
+                "compter": "#tier-s .item",
+                "egal": 3,
+                "libelle": "Cartes dans S"
+              },
+              {
+                "vrai": "[...document.querySelectorAll('#tier-s .item-name')].map((n) => n.textContent).join() === 'Dune,Alien,Brazil'",
+                "message": "Après Entrée, « Brazil » doit arriver à la fin de #tier-s."
+              }
+            ],
+            "siEchec": "Écoute `submit` sur le formulaire (pas `click` sur le bouton) : la touche Entrée envoie aussi le formulaire."
+          },
+          {
+            "titre": "Chaque carte est complète",
+            "verifier": [
+              {
+                "compter": "#tier-s .item [data-action]",
+                "egal": 15,
+                "libelle": "Boutons dans les cartes (5 par carte)"
+              }
+            ],
+            "siEchec": "`cloneNode(true)` : avec `true`, la copie garde ses boutons."
+          },
+          {
+            "titre": "Le modèle reste intact",
+            "verifier": [
+              {
+                "vrai": "document.querySelector('#item-template').content.querySelectorAll('.item').length === 1 && document.querySelector('#item-template').content.querySelector('.item-name').textContent === ''",
+                "message": "Le template doit garder sa carte modèle, vide."
+              }
+            ]
+          }
+        ],
+        "obligatoire": [
+          "preventDefault",
+          "cloneNode",
+          "append"
+        ]
+      },
+      "indices": [
+        "Relis [[formulaire-submit]] : l'écouteur va sur le formulaire, avec `on('#add-item-form', 'submit', …)` ou `addEventListener`.",
+        "Dans l'écouteur : `event.preventDefault()`, puis une copie de `tmplItem` ([[template-content]]), son `.item-name` rempli avec la valeur du champ `#item-name`, puis `append` ([[textcontent-append]]).",
+        {
+          "code": "on('#add-item-form', 'submit', (form, event) => {\n  event.___();\n  const item = tmplItem.___(true);\n  getNode('.item-name', item).___ = getNode('#item-name').___;\n  getNode('#tier-s').___(item);\n});"
+        }
+      ],
+      "solution": [
+        "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';",
+        "",
+        "const tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);",
+        "",
+        "on('#add-item-form', 'submit', (form, event) => {",
+        "  event.preventDefault();",
+        "  const item = tmplItem.cloneNode(true);",
+        "  getNode('.item-name', item).textContent = getNode('#item-name', form).value;",
+        "  getNode('#tier-s').append(item);",
+        "});"
+      ],
+      "erreursTypiques": [
+        {
+          "code": "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';\nconst tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);\non('#add-item-form button', 'click', () => {\n  const item = tmplItem.cloneNode(true);\n  getNode('.item-name', item).textContent = getNode('#item-name').value;\n  getNode('#tier-s').append(item);\n});\n// event.preventDefault",
+          "attendu": "echec",
+          "diagnostic": "contenu"
+        },
+        {
+          "code": "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';\nconst tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);\non('#add-item-form', 'submit', () => {\n  const item = tmplItem.cloneNode(true);\n  getNode('.item-name', item).textContent = getNode('#item-name').value;\n  getNode('#tier-s').append(item);\n});",
+          "attendu": "echec",
+          "diagnostic": "obligatoire"
+        },
+        {
+          "code": "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';\nconst tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);\non('#add-item-form', 'submit', (form, event) => {\n  event.preventDefault();\n  getNode('.item-name', tmplItem).textContent = getNode('#item-name').value;\n  getNode('#tier-s').append(tmplItem);\n});\n// cloneNode",
+          "attendu": "echec",
+          "diagnostic": "contenu"
+        },
+        {
+          "code": "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';\nconst tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);\non('#add-item-form', 'submit', (form, event) => {\n  event.preventDefault();\n  const item = tmplItem.cloneNode(true);\n  item.textContent = getNode('#item-name').value;\n  getNode('#tier-s').append(item);\n});",
+          "attendu": "echec",
+          "diagnostic": "contenu"
+        },
+        {
+          "code": "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';\nconst tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);\non('#add-item-form', 'submit', (form, event) => {\n  event.preventDefault();\n  const item = tmplItem.cloneNode(true);\n  getNode('.item-name', item).textContent = getNode('#item-name').value;\n  getNode('#tiers').append(item);\n});",
+          "attendu": "echec",
+          "diagnostic": "contenu"
+        }
+      ],
+      "explication": "Exercice 1 du TP 4. Avec on de dom.js, la fonction reçoit le formulaire puis l'événement ; `addEventListener` sur `getNode('#add-item-form')` marche tout aussi bien. Écrire `item.textContent = …` sur toute la carte effacerait ses boutons : on vise son `.item-name`."
+    }
+  ]
+}

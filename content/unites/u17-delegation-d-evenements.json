@@ -1,0 +1,2528 @@
+{
+  "id": "u17",
+  "titre": "Délégation d'événements",
+  "sousTitre": "TP 4 · DOM et délégation, exercices 2 à 5",
+  "objectif": "Gérer tous les boutons avec un seul écouteur (délégation), lire les attributs data-, supprimer avec confirmation, déplacer et échanger des éléments.",
+  "icone": "🎯",
+  "fiches": [
+    {
+      "id": "target-currenttarget",
+      "titre": "target, currentTarget et closest",
+      "icone": "🎯",
+      "resume": "Dans un écouteur, `event.target` est l'élément **réellement cliqué** (souvent un petit `<span>`), `event.currentTarget` celui qui **porte l'écouteur**. `el.closest(sel)` remonte de `el` jusqu'au premier ancêtre (ou lui-même) qui correspond.",
+      "analogie": "Une lettre arrive à l'**accueil** d'un immeuble (currentTarget). Sur l'enveloppe, l'adresse exacte : appartement 3B (target). `closest('.immeuble')` remonte de l'appartement jusqu'à l'immeuble.",
+      "texte": "- Un clic sur le `▲` d'un bouton `Tier <span>▲</span>` : `event.target` est le **span**, pas le bouton.\n- `event.target.closest('button')` remonte jusqu'au bouton (ou rend le bouton lui-même si on a cliqué dessus).\n- `closest` rend `null` s'il ne trouve rien en remontant.\n- `contains(el)` : vrai si `el` est à l'intérieur (ou est l'élément).\n\nC'est pour ça que le TP dit : « un clic sur leur texte ou leur symbole doit être traité comme un clic sur le bouton ».",
+      "pieges": [
+        "Lire `event.target.dataset.action` : si on a cliqué sur le span, il n'a pas de data-action."
+      ]
+    },
+    {
+      "id": "delegation",
+      "titre": "La délégation d'événements",
+      "icone": "📮",
+      "resume": "Au lieu d'un écouteur par bouton, **un seul** écouteur sur le conteneur : le clic remonte jusqu'à lui, et on regarde quel bouton a été visé. Il marche aussi pour les éléments **créés plus tard**.",
+      "analogie": "Un **standard téléphonique** : un seul numéro pour tout l'immeuble, et l'opératrice transmet au bon bureau. Un nouveau bureau ouvert demain est joignable sans changer de numéro.",
+      "texte": "Les cartes de la tier list sont créées **après** le chargement : un écouteur posé au démarrage sur chaque bouton les raterait. On écoute donc `#tiers`, qui existe dès le début.\n\nAvec `dom.js` :\n\n```\ndelegateOn('#tiers', '[data-action]', 'click', (button) => {\n  // button : le bouton visé (même si on a cliqué sur son span)\n});\n```\n\n`delegateOn(conteneur, sélecteur des enfants, événement, fonction)` : la fonction reçoit l'enfant trouvé avec `closest`, puis le conteneur, puis l'événement. Un clic ailleurs dans le conteneur (pas sur un bouton) est ignoré.",
+      "pieges": [
+        "Poser l'écouteur sur les boutons au démarrage : les cartes ajoutées ensuite n'en ont pas.",
+        "L'ordre des arguments de delegateOn : conteneur, enfants, événement, fonction."
+      ]
+    },
+    {
+      "id": "dataset",
+      "titre": "Les attributs data- et dataset",
+      "icone": "🏷",
+      "resume": "Un attribut `data-xxx` range une information dans le HTML ; `el.dataset.xxx` la lit (toujours du **texte**). `data-action=\"up\"` → `button.dataset.action` vaut `\"up\"`.",
+      "texte": "- `<section class=\"tier\" data-tier=\"S\">` : `section.dataset.tier` vaut `\"S\"`.\n- Les tirets deviennent des majuscules : `data-face-card` → `dataset.faceCard`.\n- Pour **sélectionner** par attribut : `.tier[data-tier=\"B\"]` (sélecteur CSS, TP 3).\n- Un bouton par action, la même fonction pour tous : on lit `dataset.action` pour savoir quoi faire.",
+      "pieges": [
+        "`dataset['data-action']` : on écrit seulement la fin, `dataset.action`."
+      ]
+    },
+    {
+      "id": "confirm-remove",
+      "titre": "confirm et remove",
+      "icone": "🗑",
+      "resume": "`confirm('Supprimer ?')` affiche OK / Annuler et retourne `true` ou `false`. `el.remove()` retire l'élément de la page.",
+      "texte": "```\nif (confirm('Supprimer cette carte ?')) {\n  item.remove();\n}\n```\n\n- `confirm` **attend** la réponse : la suite du code ne s'exécute qu'après le clic.\n- On retire la **carte** (`button.closest('.item')`), pas seulement le bouton.\n- Dans les exercices, l'appli répond à ta place pendant les tests ; quand tu cliques toi-même (« Exécuter »), la vraie fenêtre s'affiche.",
+      "pieges": [
+        "`button.remove()` : seul le bouton disparaît, la carte reste.",
+        "Supprimer avant de demander : la question arrive trop tard."
+      ]
+    },
+    {
+      "id": "voisins-swap",
+      "titre": "Voisins et échange : previousElementSibling, swapNodes",
+      "icone": "⇅",
+      "resume": "`el.previousElementSibling` : l'élément juste avant (`null` s'il n'y en a pas) ; `el.nextElementSibling` : juste après. `swapNodes(a, b)` de dom.js échange leurs places.",
+      "texte": "- Dans une catégorie, les cartes sont des **frères** : même parent `.items`.\n- La première carte n'a pas de précédente (`null`), la dernière pas de suivante.\n- Toujours vérifier avant d'échanger :\n\n```\nconst voisin = item.previousElementSibling;\nif (voisin) swapNodes(item, voisin);\n```\n\n- `swapNodes` met un repère à la place du premier, déplace le second, puis remet le premier à la place du repère.",
+      "pieges": [
+        "`swapNodes(item, null)` : erreur. Si le voisin n'existe pas, ne rien faire."
+      ]
+    },
+    {
+      "id": "ordre-categories",
+      "titre": "Une liste d'ordre : TIERS et indexOf",
+      "icone": "S→D",
+      "resume": "`TIERS = ['S', 'A', 'B', 'C', 'D']` donne l'ordre des catégories. `TIERS.indexOf('B')` vaut 2 ; la catégorie précédente est `TIERS[2 - 1]`, la suivante `TIERS[2 + 1]`.",
+      "texte": "- Lire la catégorie de la carte : `item.closest('.tier').dataset.tier`.\n- Sa position : `TIERS.indexOf(tier)`.\n- Monter = indice - 1 (vers S), descendre = indice + 1 (vers D).\n- **Les bords** : en S, l'indice - 1 vaut -1 ; en D, l'indice + 1 vaut 5 : `TIERS[-1]` et `TIERS[5]` valent `undefined`. On ne fait rien.\n- La catégorie de destination : `getNode(`.tier[data-tier=\"${nouvelle}\"] .items`)`.",
+      "pieges": [
+        "Oublier les bords : `undefined` arrive dans le sélecteur, getNode rend null, et `append` plante."
+      ]
+    }
+  ],
+  "lecons": [
+    {
+      "id": "u17-l1",
+      "titre": "Un seul écouteur pour tous",
+      "duree": 6,
+      "notions": [
+        "target-currenttarget",
+        "delegation"
+      ],
+      "cartes": [
+        {
+          "titre": "Le problème des éléments créés plus tard",
+          "texte": "Au TP 4, les cartes **n'existent pas** au chargement : elles arrivent quand on envoie le formulaire. Un écouteur posé au démarrage sur « tous les boutons » n'en trouve aucun.",
+          "fiche": "delegation"
+        },
+        {
+          "titre": "Le clic remonte",
+          "texte": "Un clic sur un bouton remonte vers ses parents, jusqu'à la page. Un écouteur sur le **conteneur** le reçoit donc aussi. Exécute, puis clique sur les boutons.",
+          "code": [
+            "const ul = document.querySelector('#taches');",
+            "ul.addEventListener('click', (event) => {",
+            "  console.log('cliqué :', event.target.tagName, '| écouteur sur :', event.currentTarget.id);",
+            "});"
+          ],
+          "dom": {
+            "html": [
+              "<ul id=\"taches\">",
+              "  <li><span class=\"nom\">Lire le TP</span> <button class=\"marquer\"><span>✔</span> Fait</button></li>",
+              "  <li><span class=\"nom\">Écrire le code</span> <button class=\"marquer\"><span>✔</span> Fait</button></li>",
+              "  <li><span class=\"nom\">Relire</span> <button class=\"marquer\"><span>✔</span> Fait</button></li>",
+              "</ul>",
+              "<button id=\"nouvelle\" type=\"button\">Nouvelle tâche</button>"
+            ],
+            "css": [
+              "body{font-family:system-ui,sans-serif;padding:12px}",
+              "li{margin:6px 0}",
+              ".fait{text-decoration:line-through;opacity:.6}"
+            ]
+          },
+          "analogie": "Un standard téléphonique : un seul numéro pour tout l'immeuble."
+        },
+        {
+          "titre": "target n'est pas toujours le bouton",
+          "texte": "Clique sur le **✔** : `event.target` est le `<span>`. `closest('button')` remonte jusqu'au bouton.",
+          "code": [
+            "document.querySelector('#taches').addEventListener('click', (event) => {",
+            "  const bouton = event.target.closest('button');",
+            "  console.log(event.target.tagName, '→', bouton ? 'bouton trouvé' : 'pas un bouton');",
+            "});"
+          ],
+          "dom": {
+            "html": [
+              "<ul id=\"taches\">",
+              "  <li><span class=\"nom\">Lire le TP</span> <button class=\"marquer\"><span>✔</span> Fait</button></li>",
+              "  <li><span class=\"nom\">Écrire le code</span> <button class=\"marquer\"><span>✔</span> Fait</button></li>",
+              "  <li><span class=\"nom\">Relire</span> <button class=\"marquer\"><span>✔</span> Fait</button></li>",
+              "</ul>",
+              "<button id=\"nouvelle\" type=\"button\">Nouvelle tâche</button>"
+            ],
+            "css": [
+              "body{font-family:system-ui,sans-serif;padding:12px}",
+              "li{margin:6px 0}",
+              ".fait{text-decoration:line-through;opacity:.6}"
+            ]
+          },
+          "fiche": "target-currenttarget"
+        },
+        {
+          "titre": "Et les nouveaux éléments ?",
+          "texte": "L'écouteur du conteneur marche aussi pour une tâche ajoutée **après** : c'est tout l'intérêt de la délégation.",
+          "piege": "Ignorer les clics qui ne visent pas un bouton : `closest` rend alors `null`."
+        }
+      ],
+      "exercices": [
+        {
+          "id": "u17-l1-e1",
+          "type": "qcm",
+          "notions": [
+            "target-currenttarget"
+          ],
+          "question": "Un écouteur est posé sur `#taches`. On clique sur le `<span>✔</span>` d'un bouton. Que vaut `event.currentTarget` ?",
+          "choix": [
+            "#taches (l'élément qui porte l'écouteur)",
+            "le <span>",
+            "le <button>",
+            "le <li>"
+          ],
+          "bonne": 0,
+          "explication": "currentTarget : l'élément de l'écouteur ; target : celui qu'on a cliqué."
+        },
+        {
+          "id": "u17-l1-e2",
+          "type": "qcm",
+          "notions": [
+            "target-currenttarget"
+          ],
+          "question": "Même clic sur le `<span>✔</span>`. Que vaut `event.target` ?",
+          "choix": [
+            "le <span>",
+            "le <button>",
+            "#taches",
+            "le <li>"
+          ],
+          "bonne": 0,
+          "explication": "target : l'élément le plus profond réellement cliqué."
+        },
+        {
+          "id": "u17-l1-e3",
+          "type": "vf",
+          "notions": [
+            "target-currenttarget"
+          ],
+          "question": "`bouton.closest('button')` rend le bouton lui-même.",
+          "bonne": true,
+          "explication": "closest commence par l'élément lui-même."
+        },
+        {
+          "id": "u17-l1-e4",
+          "type": "qcm",
+          "notions": [
+            "delegation"
+          ],
+          "question": "Pourquoi le TP 4 pose-t-il un seul écouteur sur `#tiers` plutôt qu'un par bouton ?",
+          "choix": [
+            "Les cartes sont créées après le chargement : leurs boutons n'existaient pas quand on a posé les écouteurs",
+            "Parce qu'addEventListener ne marche pas sur un bouton",
+            "Pour que les clics soient plus rapides",
+            "Parce que #tiers est un formulaire"
+          ],
+          "bonne": 0,
+          "explication": "Le conteneur existe dès le début ; il reçoit les clics de tous ses boutons, même futurs."
+        },
+        {
+          "id": "u17-l1-e5",
+          "type": "ecrire",
+          "notions": [
+            "delegation",
+            "target-currenttarget"
+          ],
+          "question": "Avec **un seul** écouteur sur `#taches` : un clic sur un bouton `.marquer` (ou sur son ✔) ajoute la classe `fait` à **sa** tâche (`li`). Ça doit marcher aussi pour une tâche ajoutée plus tard.",
+          "dom": {
+            "html": [
+              "<ul id=\"taches\">",
+              "  <li><span class=\"nom\">Lire le TP</span> <button class=\"marquer\"><span>✔</span> Fait</button></li>",
+              "  <li><span class=\"nom\">Écrire le code</span> <button class=\"marquer\"><span>✔</span> Fait</button></li>",
+              "  <li><span class=\"nom\">Relire</span> <button class=\"marquer\"><span>✔</span> Fait</button></li>",
+              "</ul>",
+              "<button id=\"nouvelle\" type=\"button\">Nouvelle tâche</button>"
+            ],
+            "css": [
+              "body{font-family:system-ui,sans-serif;padding:12px}",
+              "li{margin:6px 0}",
+              ".fait{text-decoration:line-through;opacity:.6}"
+            ]
+          },
+          "depart": [
+            "const ul = document.querySelector('#taches');",
+            ""
+          ],
+          "tests": {
+            "etapes": [
+              {
+                "titre": "Clic sur le bouton",
+                "actions": [
+                  {
+                    "clic": "#taches li:first-child .marquer"
+                  }
+                ],
+                "verifier": [
+                  {
+                    "compter": "#taches .fait",
+                    "egal": 1,
+                    "libelle": "Tâches faites"
+                  },
+                  {
+                    "vrai": "document.querySelector('#taches li:first-child').classList.contains('fait')",
+                    "message": "C'est la première tâche qui doit être faite."
+                  }
+                ]
+              },
+              {
+                "titre": "Clic sur le ✔",
+                "actions": [
+                  {
+                    "clic": "#taches li:nth-child(2) .marquer span"
+                  }
+                ],
+                "verifier": [
+                  {
+                    "compter": "#taches .fait",
+                    "egal": 2,
+                    "libelle": "Tâches faites"
+                  }
+                ],
+                "siEchec": "Un clic sur le ✔ vise le `<span>` : remonte jusqu'au bouton avec `event.target.closest('.marquer')`."
+              },
+              {
+                "titre": "Clic à côté",
+                "actions": [
+                  {
+                    "clic": "#taches li:last-child .nom"
+                  }
+                ],
+                "verifier": [
+                  {
+                    "compter": "#taches .fait",
+                    "egal": 2,
+                    "libelle": "Tâches faites"
+                  }
+                ],
+                "siEchec": "Un clic qui ne vise pas un bouton (closest rend null) ne doit rien faire."
+              },
+              {
+                "titre": "Une tâche ajoutée plus tard",
+                "actions": [
+                  {
+                    "script": "const ul = document.querySelector('#taches'); const li = ul.lastElementChild.cloneNode(true); li.classList.remove('fait'); li.querySelector('.nom').textContent = 'Tester'; ul.append(li);"
+                  },
+                  {
+                    "clic": "#taches li:last-child .marquer span"
+                  }
+                ],
+                "verifier": [
+                  {
+                    "compter": "#taches .fait",
+                    "egal": 3,
+                    "libelle": "Tâches faites"
+                  }
+                ],
+                "siEchec": "Un seul écouteur sur `#taches` (la délégation) : il marche aussi pour les tâches créées après le chargement."
+              }
+            ],
+            "interdit": [
+              "querySelectorAll"
+            ]
+          },
+          "indices": [
+            "Un seul `addEventListener` sur `ul` ; dans l'écouteur, retrouve le bouton visé.",
+            "`event.target.closest('.marquer')` (null si le clic ne vise pas un bouton), puis `closest('li')` pour sa tâche.",
+            {
+              "code": "ul.addEventListener('click', (event) => {\n  const bouton = event.target.closest('___');\n  if (!bouton) return;\n  bouton.closest('___').classList.add('fait');\n});"
+            }
+          ],
+          "solution": [
+            "const ul = document.querySelector('#taches');",
+            "ul.addEventListener('click', (event) => {",
+            "  const bouton = event.target.closest('.marquer');",
+            "  if (!bouton) return;",
+            "  bouton.closest('li').classList.add('fait');",
+            "});"
+          ],
+          "erreursTypiques": [
+            {
+              "code": "const ul = document.querySelector('#taches');\nul.addEventListener('click', (event) => {\n  event.target.closest('li').classList.add('fait');\n});",
+              "attendu": "echec",
+              "diagnostic": "contenu"
+            },
+            {
+              "code": "const ul = document.querySelector('#taches');\nul.addEventListener('click', (event) => {\n  if (event.target.classList.contains('marquer')) event.target.closest('li').classList.add('fait');\n});",
+              "attendu": "echec",
+              "diagnostic": "contenu"
+            },
+            {
+              "code": "const ul = document.querySelector('#taches');\nul.addEventListener('click', (event) => {\n  event.target.closest('.marquer').closest('li').classList.add('fait');\n});",
+              "attendu": "erreur"
+            }
+          ],
+          "explication": "closest remonte du span au bouton, puis du bouton à sa tâche ; le `if (!bouton) return;` ignore les clics à côté."
+        }
+      ]
+    },
+    {
+      "id": "u17-l2",
+      "titre": "delegateOn et data-action",
+      "duree": 6,
+      "notions": [
+        "dataset",
+        "delegation"
+      ],
+      "cartes": [
+        {
+          "titre": "Ranger une info dans le HTML",
+          "texte": "`data-action=\"plus\"` est un attribut **inventé**, pour notre code. JavaScript le lit avec `dataset.action`.",
+          "code": [
+            "const bouton = document.querySelector('[data-action=\"moins\"]');",
+            "console.log(bouton.dataset.action);"
+          ],
+          "dom": {
+            "html": [
+              "<div id=\"scores\">",
+              "  <p class=\"joueur\">Léa : <span class=\"points\">0</span>",
+              "    <button data-action=\"plus\"><span>+</span></button> <button data-action=\"moins\"><span>−</span></button></p>",
+              "  <p class=\"joueur\">Sami : <span class=\"points\">0</span>",
+              "    <button data-action=\"plus\"><span>+</span></button> <button data-action=\"moins\"><span>−</span></button></p>",
+              "</div>"
+            ],
+            "css": [
+              "body{font-family:system-ui,sans-serif;padding:12px}",
+              "li{margin:6px 0}",
+              ".fait{text-decoration:line-through;opacity:.6}"
+            ]
+          },
+          "fiche": "dataset"
+        },
+        {
+          "titre": "delegateOn : la délégation toute prête",
+          "texte": "`delegateOn(conteneur, enfants, événement, fonction)` fait le travail de la leçon précédente : il trouve l'enfant visé avec `closest` et ignore les autres clics. Exécute, puis clique sur les + et −.",
+          "code": [
+            "import { delegateOn } from './dom.js';",
+            "",
+            "delegateOn('#scores', '[data-action]', 'click', (bouton) => {",
+            "  console.log(bouton.dataset.action);",
+            "});"
+          ],
+          "dom": {
+            "html": [
+              "<div id=\"scores\">",
+              "  <p class=\"joueur\">Léa : <span class=\"points\">0</span>",
+              "    <button data-action=\"plus\"><span>+</span></button> <button data-action=\"moins\"><span>−</span></button></p>",
+              "  <p class=\"joueur\">Sami : <span class=\"points\">0</span>",
+              "    <button data-action=\"plus\"><span>+</span></button> <button data-action=\"moins\"><span>−</span></button></p>",
+              "</div>"
+            ],
+            "css": [
+              "body{font-family:system-ui,sans-serif;padding:12px}",
+              "li{margin:6px 0}",
+              ".fait{text-decoration:line-through;opacity:.6}"
+            ],
+            "fichiers": {
+              "dom.js": "content/pages/dom.js"
+            }
+          },
+          "fiche": "delegation"
+        },
+        {
+          "titre": "Une fonction pour tous les boutons",
+          "texte": "Un seul écouteur, et `dataset.action` dit **quoi faire**. C'est exactement la forme du TP 4 (delete, up, down, previous, next).",
+          "code": [
+            "delegateOn('#tiers', '[data-action]', 'click', (button) => {",
+            "  if (button.dataset.action === 'delete') { /* … */ }",
+            "  if (button.dataset.action === 'up') { /* … */ }",
+            "});"
+          ],
+          "executable": false
+        },
+        {
+          "titre": "Tirets et majuscules",
+          "texte": "`data-tier` → `dataset.tier` ; `data-face-card` (TP 3) → `dataset.faceCard`. Pour sélectionner par attribut, c'est du CSS : `[data-tier=\"B\"]`.",
+          "piege": "`dataset.data-action` n'existe pas : on écrit seulement ce qui suit `data-`."
+        }
+      ],
+      "exercices": [
+        {
+          "id": "u17-l2-e1",
+          "type": "qcm",
+          "notions": [
+            "dataset"
+          ],
+          "question": "`<button data-action=\"up\">`. Que vaut `button.dataset.action` ?",
+          "choix": [
+            "\"up\"",
+            "\"data-action\"",
+            "true",
+            "undefined"
+          ],
+          "bonne": 0,
+          "mono": true,
+          "explication": "dataset lit la valeur, toujours en texte."
+        },
+        {
+          "id": "u17-l2-e2",
+          "type": "assoc",
+          "notions": [
+            "dataset"
+          ],
+          "mono": true,
+          "question": "Associe l'attribut HTML à sa lecture en JavaScript.",
+          "paires": [
+            [
+              "data-tier=\"S\"",
+              "section.dataset.tier"
+            ],
+            [
+              "data-action=\"delete\"",
+              "button.dataset.action"
+            ],
+            [
+              "data-face-card",
+              "card.dataset.faceCard"
+            ],
+            [
+              "data-id=\"7\"",
+              "el.dataset.id (le texte \"7\")"
+            ]
+          ],
+          "explication": "Les tirets deviennent des majuscules ; la valeur est toujours du texte."
+        },
+        {
+          "id": "u17-l2-e3",
+          "type": "qcm",
+          "notions": [
+            "delegation"
+          ],
+          "question": "Dans `delegateOn('#tiers', '[data-action]', 'click', (button) => …)`, que reçoit `button` quand on clique sur le `▲` d'un bouton « Tier ▲ » ?",
+          "choix": [
+            "Le bouton (trouvé avec closest)",
+            "Le span ▲",
+            "#tiers",
+            "L'événement"
+          ],
+          "bonne": 0,
+          "explication": "delegateOn remonte de target jusqu'à l'enfant qui correspond."
+        },
+        {
+          "id": "u17-l2-e4",
+          "type": "qcm",
+          "notions": [
+            "dataset",
+            "selecteurs-css"
+          ],
+          "question": "Quel sélecteur trouve la catégorie B de la tier list ?",
+          "choix": [
+            ".tier[data-tier=\"B\"]",
+            ".tier.B",
+            "#B",
+            ".tier[dataset.tier=\"B\"]"
+          ],
+          "bonne": 0,
+          "mono": true,
+          "explication": "Un attribut se sélectionne entre crochets."
+        },
+        {
+          "id": "u17-l2-e5",
+          "type": "ecrire",
+          "notions": [
+            "delegation",
+            "dataset"
+          ],
+          "question": "Avec `delegateOn` de `dom.js` et **un seul** écouteur sur `#scores` : un clic sur `+` ajoute 1 aux points du joueur, un clic sur `−` en retire 1 (même en cliquant sur le symbole).",
+          "dom": {
+            "html": [
+              "<div id=\"scores\">",
+              "  <p class=\"joueur\">Léa : <span class=\"points\">0</span>",
+              "    <button data-action=\"plus\"><span>+</span></button> <button data-action=\"moins\"><span>−</span></button></p>",
+              "  <p class=\"joueur\">Sami : <span class=\"points\">0</span>",
+              "    <button data-action=\"plus\"><span>+</span></button> <button data-action=\"moins\"><span>−</span></button></p>",
+              "</div>"
+            ],
+            "css": [
+              "body{font-family:system-ui,sans-serif;padding:12px}",
+              "li{margin:6px 0}",
+              ".fait{text-decoration:line-through;opacity:.6}"
+            ],
+            "fichiers": {
+              "dom.js": "content/pages/dom.js"
+            }
+          },
+          "depart": [
+            "import { getNode, delegateOn } from './dom.js';",
+            "",
+            ""
+          ],
+          "tests": {
+            "etapes": [
+              {
+                "titre": "Léa : + + +",
+                "actions": [
+                  {
+                    "clic": ".joueur:first-child [data-action=plus]"
+                  },
+                  {
+                    "clic": ".joueur:first-child [data-action=plus] span"
+                  },
+                  {
+                    "clic": ".joueur:first-child [data-action=plus]"
+                  }
+                ],
+                "verifier": [
+                  {
+                    "vrai": "[...document.querySelectorAll('.points')].map((p) => p.textContent).join() === '3,0'",
+                    "message": "Léa doit avoir 3 points, Sami 0."
+                  }
+                ],
+                "siEchec": "Retrouve le joueur du bouton (`closest('.joueur')`), puis ses `.points` avec `getNode('.points', joueur)`."
+              },
+              {
+                "titre": "Sami : −",
+                "actions": [
+                  {
+                    "clic": ".joueur:last-child [data-action=moins] span"
+                  }
+                ],
+                "verifier": [
+                  {
+                    "vrai": "[...document.querySelectorAll('.points')].map((p) => p.textContent).join() === '3,-1'",
+                    "message": "Sami doit avoir -1 point."
+                  }
+                ],
+                "siEchec": "`button.dataset.action` vaut \"plus\" ou \"moins\" : un seul écouteur pour les deux."
+              }
+            ],
+            "obligatoire": [
+              "delegateOn()"
+            ]
+          },
+          "indices": [
+            "`delegateOn('#scores', '[data-action]', 'click', (bouton) => …)` : relis [[delegation]].",
+            "Les points du joueur : `getNode('.points', bouton.closest('.joueur'))`. Le texte est une chaîne : `Number(…)` avant d'ajouter.",
+            {
+              "code": "delegateOn('#scores', '[data-action]', 'click', (bouton) => {\n  const points = getNode('.points', bouton.closest('___'));\n  const pas = bouton.dataset.action === '___' ? 1 : -1;\n  points.textContent = Number(points.textContent) + pas;\n});"
+            }
+          ],
+          "solution": [
+            "import { getNode, delegateOn } from './dom.js';",
+            "",
+            "delegateOn('#scores', '[data-action]', 'click', (bouton) => {",
+            "  const points = getNode('.points', bouton.closest('.joueur'));",
+            "  const pas = bouton.dataset.action === 'plus' ? 1 : -1;",
+            "  points.textContent = Number(points.textContent) + pas;",
+            "});"
+          ],
+          "erreursTypiques": [
+            {
+              "code": "import { getNode, delegateOn } from './dom.js';\ndelegateOn('#scores', '[data-action]', 'click', (bouton) => {\n  const points = getNode('.points', bouton.closest('.joueur'));\n  points.textContent = points.textContent + 1;\n});",
+              "attendu": "echec",
+              "diagnostic": "contenu"
+            },
+            {
+              "code": "import { getNode, delegateOn } from './dom.js';\ndelegateOn('#scores', '[data-action]', 'click', (bouton) => {\n  const points = getNode('.points');\n  const pas = bouton.dataset.action === 'plus' ? 1 : -1;\n  points.textContent = Number(points.textContent) + pas;\n});",
+              "attendu": "echec",
+              "diagnostic": "contenu"
+            },
+            {
+              "code": "import { getNode, delegateOn } from './dom.js';\ndelegateOn('#scores', 'click', '[data-action]', (bouton) => {\n  const points = getNode('.points', bouton.closest('.joueur'));\n  points.textContent = Number(points.textContent) + 1;\n});",
+              "attendu": "echec"
+            }
+          ],
+          "explication": "textContent est du texte : sans Number, « 0 » + 1 donne « 01 ». getNode('.points') sans le 2e argument prend toujours le premier joueur."
+        }
+      ]
+    },
+    {
+      "id": "u17-l3",
+      "titre": "Supprimer avec confirmation",
+      "duree": 5,
+      "notions": [
+        "confirm-remove"
+      ],
+      "cartes": [
+        {
+          "titre": "Demander avant de supprimer",
+          "texte": "`confirm('…')` affiche une fenêtre OK / Annuler et **retourne** `true` (OK) ou `false` (Annuler). Exécute, puis clique sur une poubelle.",
+          "code": [
+            "document.querySelector('#notes').addEventListener('click', (event) => {",
+            "  const bouton = event.target.closest('.effacer');",
+            "  if (!bouton) return;",
+            "  console.log(confirm('Supprimer cette note ?'));",
+            "});"
+          ],
+          "dom": {
+            "html": [
+              "<ul id=\"notes\">",
+              "  <li class=\"note\">Lait <button class=\"effacer\"><span>🗑️</span></button></li>",
+              "  <li class=\"note\">Pain <button class=\"effacer\"><span>🗑️</span></button></li>",
+              "  <li class=\"note\">Œufs <button class=\"effacer\"><span>🗑️</span></button></li>",
+              "</ul>"
+            ],
+            "css": [
+              "body{font-family:system-ui,sans-serif;padding:12px}",
+              "li{margin:6px 0}",
+              ".fait{text-decoration:line-through;opacity:.6}"
+            ]
+          },
+          "fiche": "confirm-remove"
+        },
+        {
+          "titre": "remove",
+          "texte": "`el.remove()` retire l'élément de la page. On retire la **ligne entière** (`closest('.note')`), pas seulement la poubelle.",
+          "code": [
+            "document.querySelector('#notes').addEventListener('click', (event) => {",
+            "  const bouton = event.target.closest('.effacer');",
+            "  if (bouton) bouton.closest('.note').remove();",
+            "});"
+          ],
+          "dom": {
+            "html": [
+              "<ul id=\"notes\">",
+              "  <li class=\"note\">Lait <button class=\"effacer\"><span>🗑️</span></button></li>",
+              "  <li class=\"note\">Pain <button class=\"effacer\"><span>🗑️</span></button></li>",
+              "  <li class=\"note\">Œufs <button class=\"effacer\"><span>🗑️</span></button></li>",
+              "</ul>"
+            ],
+            "css": [
+              "body{font-family:system-ui,sans-serif;padding:12px}",
+              "li{margin:6px 0}",
+              ".fait{text-decoration:line-through;opacity:.6}"
+            ]
+          }
+        },
+        {
+          "titre": "Seulement si l'utilisateur confirme",
+          "texte": "On demande d'abord, on supprime seulement si la réponse est `true`. Le TP : « Vérifier qu'une annulation conserve la carte ».",
+          "piege": "Dans les tests de l'appli, la fenêtre ne s'affiche pas : l'appli répond OK ou Annuler à ta place, pour vérifier les deux cas."
+        }
+      ],
+      "exercices": [
+        {
+          "id": "u17-l3-e1",
+          "type": "qcm",
+          "notions": [
+            "confirm-remove"
+          ],
+          "question": "Que retourne `confirm('Supprimer ?')` quand l'utilisateur clique sur Annuler ?",
+          "choix": [
+            "false",
+            "true",
+            "null",
+            "le texte « Annuler »"
+          ],
+          "bonne": 0,
+          "mono": true,
+          "explication": "OK → true, Annuler → false."
+        },
+        {
+          "id": "u17-l3-e2",
+          "type": "bug",
+          "notions": [
+            "confirm-remove"
+          ],
+          "question": "Annuler supprime quand même la carte. Quelle ligne corriger ?",
+          "code": [
+            "const item = button.closest('.item');",
+            "item.remove();",
+            "if (!confirm('Supprimer ?')) {",
+            "  console.log('annulé');",
+            "}"
+          ],
+          "ligne": 2,
+          "choix": [
+            "Supprimer seulement après la réponse : `if (confirm(…)) item.remove();`",
+            "Il faut `button.remove()`",
+            "Il faut `confirm` sans parenthèses",
+            "Il manque preventDefault"
+          ],
+          "bonne": 0,
+          "explication": "La question doit venir avant la suppression."
+        },
+        {
+          "id": "u17-l3-e3",
+          "type": "vf",
+          "notions": [
+            "confirm-remove"
+          ],
+          "question": "`button.remove()` retire toute la carte qui contient le bouton.",
+          "bonne": false,
+          "explication": "Seulement le bouton : il faut `button.closest('.item').remove()`."
+        },
+        {
+          "id": "u17-l3-e4",
+          "type": "ecrire",
+          "notions": [
+            "confirm-remove",
+            "delegation"
+          ],
+          "question": "Avec un seul écouteur sur `#notes` : un clic sur une poubelle `.effacer` (ou sur 🗑️) demande confirmation avec `confirm`, puis retire **sa note** seulement si l'utilisateur confirme.",
+          "dom": {
+            "html": [
+              "<ul id=\"notes\">",
+              "  <li class=\"note\">Lait <button class=\"effacer\"><span>🗑️</span></button></li>",
+              "  <li class=\"note\">Pain <button class=\"effacer\"><span>🗑️</span></button></li>",
+              "  <li class=\"note\">Œufs <button class=\"effacer\"><span>🗑️</span></button></li>",
+              "</ul>"
+            ],
+            "css": [
+              "body{font-family:system-ui,sans-serif;padding:12px}",
+              "li{margin:6px 0}",
+              ".fait{text-decoration:line-through;opacity:.6}"
+            ]
+          },
+          "depart": [
+            "const liste = document.querySelector('#notes');",
+            ""
+          ],
+          "tests": {
+            "etapes": [
+              {
+                "titre": "Annuler conserve la note",
+                "actions": [
+                  {
+                    "confirm": false
+                  },
+                  {
+                    "clic": "#notes .note:nth-child(2) .effacer"
+                  }
+                ],
+                "verifier": [
+                  {
+                    "vrai": "window.__confirms.length === 1",
+                    "message": "Il faut demander confirmation avec confirm(…)."
+                  },
+                  {
+                    "compter": "#notes .note",
+                    "egal": 3,
+                    "libelle": "Notes après « Annuler »"
+                  }
+                ],
+                "siEchec": "`confirm` retourne false quand on annule : ne supprime que si la réponse est true."
+              },
+              {
+                "titre": "OK supprime la bonne note",
+                "actions": [
+                  {
+                    "clic": "#notes .note:nth-child(2) .effacer span"
+                  }
+                ],
+                "verifier": [
+                  {
+                    "vrai": "[...document.querySelectorAll('#notes .note')].map((n) => n.firstChild.textContent.trim()).join() === 'Lait,Œufs'",
+                    "message": "Il doit rester Lait et Œufs (Pain supprimé)."
+                  }
+                ],
+                "siEchec": "Retire la note entière : `bouton.closest('.note').remove()`."
+              }
+            ],
+            "obligatoire": [
+              "remove"
+            ]
+          },
+          "indices": [
+            "Comme à la leçon 1 : `event.target.closest('.effacer')`, puis la note avec `closest('.note')`.",
+            {
+              "code": "liste.addEventListener('click', (event) => {\n  const bouton = event.target.closest('.effacer');\n  if (!bouton) return;\n  if (___('Supprimer cette note ?')) {\n    bouton.closest('___').remove();\n  }\n});"
+            }
+          ],
+          "solution": [
+            "const liste = document.querySelector('#notes');",
+            "liste.addEventListener('click', (event) => {",
+            "  const bouton = event.target.closest('.effacer');",
+            "  if (!bouton) return;",
+            "  if (confirm('Supprimer cette note ?')) {",
+            "    bouton.closest('.note').remove();",
+            "  }",
+            "});"
+          ],
+          "erreursTypiques": [
+            {
+              "code": "const liste = document.querySelector('#notes');\nliste.addEventListener('click', (event) => {\n  const bouton = event.target.closest('.effacer');\n  if (bouton) bouton.closest('.note').remove();\n});",
+              "attendu": "echec",
+              "diagnostic": "contenu"
+            },
+            {
+              "code": "const liste = document.querySelector('#notes');\nliste.addEventListener('click', (event) => {\n  const bouton = event.target.closest('.effacer');\n  if (!bouton) return;\n  if (confirm('Supprimer ?')) bouton.remove();\n});",
+              "attendu": "echec",
+              "diagnostic": "contenu"
+            },
+            {
+              "code": "const liste = document.querySelector('#notes');\nliste.addEventListener('click', (event) => {\n  const bouton = event.target.closest('.effacer');\n  if (!bouton) return;\n  confirm('Supprimer ?');\n  bouton.closest('.note').remove();\n});",
+              "attendu": "echec",
+              "diagnostic": "contenu"
+            }
+          ],
+          "explication": "La réponse de confirm décide : on la met dans le if."
+        }
+      ]
+    },
+    {
+      "id": "u17-l4",
+      "titre": "Monter, descendre, échanger",
+      "duree": 7,
+      "notions": [
+        "voisins-swap",
+        "ordre-categories"
+      ],
+      "cartes": [
+        {
+          "titre": "Les voisins",
+          "texte": "`previousElementSibling` : l'élément juste avant ; `nextElementSibling` : juste après. Au bord, il n'y en a pas : `null`.",
+          "code": [
+            "const titres = document.querySelectorAll('#playlist .titre');",
+            "console.log(titres[1].previousElementSibling.querySelector('.nom').textContent);",
+            "console.log(titres[0].previousElementSibling);"
+          ],
+          "dom": {
+            "html": [
+              "<ol id=\"playlist\">",
+              "  <li class=\"titre\"><span class=\"nom\">Do</span> <button data-action=\"avant\"><span>▲</span></button> <button data-action=\"apres\"><span>▼</span></button></li>",
+              "  <li class=\"titre\"><span class=\"nom\">Ré</span> <button data-action=\"avant\"><span>▲</span></button> <button data-action=\"apres\"><span>▼</span></button></li>",
+              "  <li class=\"titre\"><span class=\"nom\">Mi</span> <button data-action=\"avant\"><span>▲</span></button> <button data-action=\"apres\"><span>▼</span></button></li>",
+              "</ol>"
+            ],
+            "css": [
+              "body{font-family:system-ui,sans-serif;padding:12px}",
+              "li{margin:6px 0}",
+              ".fait{text-decoration:line-through;opacity:.6}"
+            ]
+          },
+          "fiche": "voisins-swap"
+        },
+        {
+          "titre": "swapNodes : échanger deux places",
+          "texte": "`swapNodes(a, b)` de dom.js échange deux éléments. Vérifie toujours que le voisin existe.",
+          "code": [
+            "import { swapNodes } from './dom.js';",
+            "",
+            "const [premier, deuxieme] = document.querySelectorAll('#playlist .titre');",
+            "swapNodes(premier, deuxieme);",
+            "console.log([...document.querySelectorAll('#playlist .nom')].map((n) => n.textContent));"
+          ],
+          "dom": {
+            "html": [
+              "<ol id=\"playlist\">",
+              "  <li class=\"titre\"><span class=\"nom\">Do</span> <button data-action=\"avant\"><span>▲</span></button> <button data-action=\"apres\"><span>▼</span></button></li>",
+              "  <li class=\"titre\"><span class=\"nom\">Ré</span> <button data-action=\"avant\"><span>▲</span></button> <button data-action=\"apres\"><span>▼</span></button></li>",
+              "  <li class=\"titre\"><span class=\"nom\">Mi</span> <button data-action=\"avant\"><span>▲</span></button> <button data-action=\"apres\"><span>▼</span></button></li>",
+              "</ol>"
+            ],
+            "css": [
+              "body{font-family:system-ui,sans-serif;padding:12px}",
+              "li{margin:6px 0}",
+              ".fait{text-decoration:line-through;opacity:.6}"
+            ],
+            "fichiers": {
+              "dom.js": "content/pages/dom.js"
+            }
+          }
+        },
+        {
+          "titre": "Un ordre dans un tableau",
+          "texte": "Pour les catégories, l'ordre est dans `TIERS`. `indexOf` donne la position ; -1 monte, +1 descend. Aux bords, l'indice sort du tableau : `undefined`.",
+          "code": [
+            "const TIERS = ['S', 'A', 'B', 'C', 'D'];",
+            "const i = TIERS.indexOf('B');",
+            "console.log(TIERS[i - 1], TIERS[i + 1]);",
+            "console.log(TIERS[TIERS.indexOf('S') - 1]);"
+          ],
+          "fiche": "ordre-categories"
+        },
+        {
+          "titre": "Les bords ne font rien",
+          "texte": "Le TP : « En S, monter ne fait rien. En D, descendre ne fait rien. » et « Si le voisin demandé n'existe pas, ne rien faire ».",
+          "piege": "Sans vérification, `undefined` ou `null` arrivent dans getNode ou swapNodes, et le code plante."
+        }
+      ],
+      "exercices": [
+        {
+          "id": "u17-l4-e1",
+          "type": "predire",
+          "notions": [
+            "ordre-categories"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "const NIVEAUX = ['or', 'argent', 'bronze'];",
+            "const i = NIVEAUX.indexOf('argent');",
+            "console.log(NIVEAUX[i - 1], NIVEAUX[i + 1]);"
+          ],
+          "explication": "argent est à l'indice 1 : avant, or ; après, bronze."
+        },
+        {
+          "id": "u17-l4-e2",
+          "type": "predire",
+          "notions": [
+            "ordre-categories"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "const NIVEAUX = ['or', 'argent', 'bronze'];",
+            "console.log(NIVEAUX[NIVEAUX.indexOf('or') - 1]);"
+          ],
+          "explication": "L'indice -1 n'existe pas : undefined. C'est le bord « en S, monter ne fait rien »."
+        },
+        {
+          "id": "u17-l4-e3",
+          "type": "qcm",
+          "notions": [
+            "voisins-swap"
+          ],
+          "question": "Que vaut `premier.previousElementSibling` pour le premier élément d'une liste ?",
+          "choix": [
+            "null",
+            "le dernier élément",
+            "undefined",
+            "le parent"
+          ],
+          "bonne": 0,
+          "mono": true,
+          "explication": "Pas de frère avant : null."
+        },
+        {
+          "id": "u17-l4-e4",
+          "type": "ecrire",
+          "notions": [
+            "ordre-categories"
+          ],
+          "question": "Écris `voisin(liste, actuel, pas)` qui retourne l'élément de `liste` situé `pas` cases après `actuel` (pas = -1 : celui d'avant, pas = 1 : celui d'après), ou `undefined` si on sort du tableau.",
+          "depart": [
+            "function voisin(liste, actuel, pas) {",
+            "  ",
+            "}",
+            "",
+            "const NIVEAUX = ['or', 'argent', 'bronze'];",
+            "console.log(voisin(NIVEAUX, 'argent', 1));"
+          ],
+          "tests": {
+            "fonction": "voisin",
+            "cas": [
+              {
+                "titre": "Après",
+                "args": [
+                  [
+                    "or",
+                    "argent",
+                    "bronze"
+                  ],
+                  "argent",
+                  1
+                ],
+                "attendu": "bronze"
+              },
+              {
+                "titre": "Avant",
+                "args": [
+                  [
+                    "S",
+                    "A",
+                    "B",
+                    "C",
+                    "D"
+                  ],
+                  "B",
+                  -1
+                ],
+                "attendu": "A"
+              },
+              {
+                "titre": "Bord du début",
+                "args": [
+                  [
+                    "S",
+                    "A",
+                    "B",
+                    "C",
+                    "D"
+                  ],
+                  "S",
+                  -1
+                ],
+                "attenduUndefined": true,
+                "siEchec": "Avant le premier, il n'y a rien : undefined."
+              },
+              {
+                "titre": "Bord de la fin",
+                "args": [
+                  [
+                    "S",
+                    "A",
+                    "B",
+                    "C",
+                    "D"
+                  ],
+                  "D",
+                  1
+                ],
+                "attenduUndefined": true
+              }
+            ]
+          },
+          "indices": [
+            "La position de `actuel` : `indexOf`.",
+            {
+              "code": "return liste[liste.indexOf(___) + ___];"
+            }
+          ],
+          "solution": [
+            "function voisin(liste, actuel, pas) {",
+            "  return liste[liste.indexOf(actuel) + pas];",
+            "}",
+            "",
+            "const NIVEAUX = ['or', 'argent', 'bronze'];",
+            "console.log(voisin(NIVEAUX, 'argent', 1));"
+          ],
+          "erreursTypiques": [
+            {
+              "code": "function voisin(liste, actuel, pas) {\n  return liste[actuel + pas];\n}",
+              "attendu": "echec"
+            },
+            {
+              "code": "function voisin(liste, actuel, pas) {\n  return liste.indexOf(actuel) + pas;\n}",
+              "attendu": "echec"
+            }
+          ],
+          "explication": "Lire en dehors du tableau donne undefined : c'est ce qui permet de détecter les bords."
+        },
+        {
+          "id": "u17-l4-e5",
+          "type": "ecrire",
+          "notions": [
+            "voisins-swap",
+            "delegation",
+            "dataset"
+          ],
+          "question": "Avec `delegateOn` et `swapNodes` de `dom.js` : ▲ (`data-action=\"avant\"`) échange un titre avec celui d'avant, ▼ (`apres`) avec celui d'après. S'il n'y a pas de voisin, ne rien faire.",
+          "dom": {
+            "html": [
+              "<ol id=\"playlist\">",
+              "  <li class=\"titre\"><span class=\"nom\">Do</span> <button data-action=\"avant\"><span>▲</span></button> <button data-action=\"apres\"><span>▼</span></button></li>",
+              "  <li class=\"titre\"><span class=\"nom\">Ré</span> <button data-action=\"avant\"><span>▲</span></button> <button data-action=\"apres\"><span>▼</span></button></li>",
+              "  <li class=\"titre\"><span class=\"nom\">Mi</span> <button data-action=\"avant\"><span>▲</span></button> <button data-action=\"apres\"><span>▼</span></button></li>",
+              "</ol>"
+            ],
+            "css": [
+              "body{font-family:system-ui,sans-serif;padding:12px}",
+              "li{margin:6px 0}",
+              ".fait{text-decoration:line-through;opacity:.6}"
+            ],
+            "fichiers": {
+              "dom.js": "content/pages/dom.js"
+            }
+          },
+          "depart": [
+            "import { delegateOn, swapNodes } from './dom.js';",
+            "",
+            ""
+          ],
+          "tests": {
+            "etapes": [
+              {
+                "titre": "Ré ▲",
+                "actions": [
+                  {
+                    "clic": "#playlist .titre:nth-child(2) [data-action=avant] span"
+                  }
+                ],
+                "verifier": [
+                  {
+                    "vrai": "[...document.querySelectorAll('#playlist .nom')].map((n) => n.textContent).join() === 'Ré,Do,Mi'",
+                    "message": "Après « Ré ▲ », l'ordre doit être Ré, Do, Mi."
+                  }
+                ]
+              },
+              {
+                "titre": "Do ▼",
+                "actions": [
+                  {
+                    "clic": "#playlist .titre:nth-child(2) [data-action=apres]"
+                  }
+                ],
+                "verifier": [
+                  {
+                    "vrai": "[...document.querySelectorAll('#playlist .nom')].map((n) => n.textContent).join() === 'Ré,Mi,Do'",
+                    "message": "Après « Do ▼ », l'ordre doit être Ré, Mi, Do."
+                  }
+                ]
+              },
+              {
+                "titre": "Les bords",
+                "actions": [
+                  {
+                    "clic": "#playlist .titre:first-child [data-action=avant]"
+                  },
+                  {
+                    "clic": "#playlist .titre:last-child [data-action=apres] span"
+                  }
+                ],
+                "verifier": [
+                  {
+                    "vrai": "[...document.querySelectorAll('#playlist .nom')].map((n) => n.textContent).join() === 'Ré,Mi,Do'",
+                    "message": "Monter le premier ou descendre le dernier ne change rien."
+                  }
+                ],
+                "siEchec": "Le premier n'a pas de `previousElementSibling` (null) : vérifie avant d'appeler swapNodes."
+              }
+            ],
+            "obligatoire": [
+              "swapNodes()",
+              "delegateOn()"
+            ]
+          },
+          "indices": [
+            "Le titre du bouton : `bouton.closest('.titre')`. Son voisin : `previousElementSibling` ou `nextElementSibling`.",
+            {
+              "code": "delegateOn('#playlist', '[data-action]', 'click', (bouton) => {\n  const titre = bouton.closest('.titre');\n  const voisin = bouton.dataset.action === 'avant' ? titre.___ : titre.___;\n  if (voisin) swapNodes(titre, voisin);\n});"
+            }
+          ],
+          "solution": [
+            "import { delegateOn, swapNodes } from './dom.js';",
+            "",
+            "delegateOn('#playlist', '[data-action]', 'click', (bouton) => {",
+            "  const titre = bouton.closest('.titre');",
+            "  const voisin = bouton.dataset.action === 'avant' ? titre.previousElementSibling : titre.nextElementSibling;",
+            "  if (voisin) swapNodes(titre, voisin);",
+            "});"
+          ],
+          "erreursTypiques": [
+            {
+              "code": "import { delegateOn, swapNodes } from './dom.js';\ndelegateOn('#playlist', '[data-action]', 'click', (bouton) => {\n  const titre = bouton.closest('.titre');\n  const voisin = bouton.dataset.action === 'avant' ? titre.previousElementSibling : titre.nextElementSibling;\n  swapNodes(titre, voisin);\n});",
+              "attendu": "erreur"
+            },
+            {
+              "code": "import { delegateOn, swapNodes } from './dom.js';\ndelegateOn('#playlist', '[data-action]', 'click', (bouton) => {\n  const titre = bouton.closest('.titre');\n  const voisin = bouton.dataset.action === 'avant' ? titre.nextElementSibling : titre.previousElementSibling;\n  if (voisin) swapNodes(titre, voisin);\n});",
+              "attendu": "echec"
+            }
+          ],
+          "explication": "Le même schéma servira pour Order + et Order − du TP 4."
+        }
+      ]
+    }
+  ],
+  "jeux": [
+    {
+      "id": "u17-delegation",
+      "titre": "Le standard",
+      "description": "target, closest, dataset, voisins : qui reçoit l'appel ?",
+      "tours": 10,
+      "questions": [
+        {
+          "id": "u17-j1-1",
+          "type": "vf",
+          "notions": [
+            "target-currenttarget"
+          ],
+          "question": "`event.currentTarget` est l'élément qui porte l'écouteur.",
+          "bonne": true,
+          "explication": "target : l'élément cliqué ; currentTarget : celui de l'écouteur."
+        },
+        {
+          "id": "u17-j1-2",
+          "type": "vf",
+          "notions": [
+            "target-currenttarget"
+          ],
+          "question": "`closest` cherche parmi les enfants de l'élément.",
+          "bonne": false,
+          "explication": "Il remonte vers les parents (en commençant par l'élément lui-même)."
+        },
+        {
+          "id": "u17-j1-3",
+          "type": "vf",
+          "notions": [
+            "delegation"
+          ],
+          "question": "Un écouteur posé sur un conteneur reçoit aussi les clics de ses éléments créés plus tard.",
+          "bonne": true,
+          "explication": "C'est la délégation."
+        },
+        {
+          "id": "u17-j1-4",
+          "type": "qcm",
+          "notions": [
+            "dataset"
+          ],
+          "question": "`<section data-tier=\"C\">` : que vaut `section.dataset.tier` ?",
+          "choix": [
+            "\"C\"",
+            "\"data-tier\"",
+            "3",
+            "undefined"
+          ],
+          "bonne": 0,
+          "mono": true,
+          "explication": "Toujours du texte."
+        },
+        {
+          "id": "u17-j1-5",
+          "type": "qcm",
+          "notions": [
+            "confirm-remove"
+          ],
+          "question": "Que retourne `confirm` quand on clique sur OK ?",
+          "choix": [
+            "true",
+            "false",
+            "\"OK\"",
+            "undefined"
+          ],
+          "bonne": 0,
+          "mono": true,
+          "explication": "OK → true."
+        },
+        {
+          "id": "u17-j1-6",
+          "type": "vf",
+          "notions": [
+            "voisins-swap"
+          ],
+          "question": "Le dernier élément d'une liste a un `nextElementSibling` qui vaut `null`.",
+          "bonne": true,
+          "explication": "Pas de frère après lui."
+        },
+        {
+          "id": "u17-j1-7",
+          "type": "predire",
+          "notions": [
+            "ordre-categories"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "const TIERS = ['S', 'A', 'B', 'C', 'D'];",
+            "console.log(TIERS.indexOf('C'));"
+          ],
+          "explication": "S:0, A:1, B:2, C:3."
+        },
+        {
+          "id": "u17-j1-8",
+          "type": "predire",
+          "notions": [
+            "ordre-categories"
+          ],
+          "question": "Que va afficher ce code ?",
+          "code": [
+            "const TIERS = ['S', 'A', 'B', 'C', 'D'];",
+            "console.log(TIERS[TIERS.indexOf('D') + 1]);"
+          ],
+          "explication": "Après D, il n'y a rien : undefined."
+        },
+        {
+          "id": "u17-j1-9",
+          "type": "qcm",
+          "notions": [
+            "delegation"
+          ],
+          "question": "Ordre des arguments de `delegateOn` ?",
+          "choix": [
+            "conteneur, enfants, événement, fonction",
+            "événement, conteneur, fonction",
+            "enfants, conteneur, événement, fonction",
+            "fonction, événement, conteneur"
+          ],
+          "bonne": 0,
+          "explication": "delegateOn('#tiers', '[data-action]', 'click', (button) => …)."
+        },
+        {
+          "id": "u17-j1-10",
+          "type": "vf",
+          "notions": [
+            "confirm-remove"
+          ],
+          "question": "`item.remove()` met la carte de côté pour plus tard.",
+          "bonne": false,
+          "explication": "Elle est retirée de la page."
+        },
+        {
+          "id": "u17-j1-11",
+          "type": "qcm",
+          "notions": [
+            "target-currenttarget"
+          ],
+          "question": "On clique sur `<span>▼</span>` dans `<button data-action=\"down\">`. Que vaut `event.target.dataset.action` ?",
+          "choix": [
+            "undefined (le span n'a pas de data-action)",
+            "\"down\"",
+            "null",
+            "une erreur"
+          ],
+          "bonne": 0,
+          "explication": "D'où closest('[data-action]')."
+        },
+        {
+          "id": "u17-j1-12",
+          "type": "vf",
+          "notions": [
+            "voisins-swap"
+          ],
+          "question": "`swapNodes(a, b)` échange les places de a et b dans la page.",
+          "bonne": true,
+          "explication": "C'est l'outil du TP pour Order + et Order −."
+        }
+      ]
+    }
+  ],
+  "quiz": {
+    "titre": "Quiz : délégation d'événements",
+    "questions": [
+      {
+        "id": "u17-q1",
+        "type": "qcm",
+        "notions": [
+          "delegation"
+        ],
+        "question": "Quel est l'intérêt principal de la délégation d'événements au TP 4 ?",
+        "choix": [
+          "Les cartes créées après le chargement sont gérées par un seul écouteur posé dès le début",
+          "Elle rend les clics plus rapides",
+          "Elle évite d'écrire preventDefault",
+          "Elle supprime les cartes automatiquement"
+        ],
+        "bonne": 0,
+        "explication": "Le conteneur #tiers existe dès le chargement."
+      },
+      {
+        "id": "u17-q2",
+        "type": "qcm",
+        "notions": [
+          "target-currenttarget"
+        ],
+        "question": "On clique sur le texte « Tier » d'un bouton `Tier <span>▲</span>`. `event.target` est…",
+        "choix": [
+          "le bouton",
+          "le span",
+          "#tiers",
+          "la carte"
+        ],
+        "bonne": 0,
+        "explication": "Le texte « Tier » appartient directement au bouton (le span ne contient que ▲)."
+      },
+      {
+        "id": "u17-q3",
+        "type": "bug",
+        "notions": [
+          "target-currenttarget"
+        ],
+        "question": "Un clic sur ▲ ne fait rien. Quelle ligne corriger ?",
+        "code": [
+          "getNode('#tiers').addEventListener('click', (event) => {",
+          "  const action = event.target.dataset.action;",
+          "  if (action === 'up') monter(event.target.closest('.item'));",
+          "});"
+        ],
+        "ligne": 2,
+        "choix": [
+          "Remonter au bouton : `event.target.closest('[data-action]')`",
+          "Il faut currentTarget",
+          "Il faut `dataset['data-action']`",
+          "Il faut un écouteur par bouton"
+        ],
+        "bonne": 0,
+        "explication": "Le span ▲ n'a pas de data-action."
+      },
+      {
+        "id": "u17-q4",
+        "type": "qcm",
+        "notions": [
+          "dataset"
+        ],
+        "question": "Comment lire la catégorie d'une carte `item` ?",
+        "choix": [
+          "item.closest('.tier').dataset.tier",
+          "item.dataset.tier",
+          "item.tier",
+          "getNode('.tier').dataset.tier"
+        ],
+        "bonne": 0,
+        "mono": true,
+        "explication": "data-tier est sur la section .tier, un ancêtre de la carte."
+      },
+      {
+        "id": "u17-q5",
+        "type": "predire",
+        "notions": [
+          "ordre-categories"
+        ],
+        "question": "Que va afficher ce code ?",
+        "code": [
+          "const TIERS = ['S', 'A', 'B', 'C', 'D'];",
+          "const i = TIERS.indexOf('A');",
+          "console.log(TIERS[i - 1], TIERS[i + 1]);"
+        ],
+        "explication": "Avant A : S ; après A : B."
+      },
+      {
+        "id": "u17-q6",
+        "type": "qcm",
+        "notions": [
+          "ordre-categories"
+        ],
+        "question": "Une carte en S, on clique sur Tier ▲. Que doit faire le code ?",
+        "choix": [
+          "Rien",
+          "La mettre en D",
+          "La supprimer",
+          "Lever une erreur"
+        ],
+        "bonne": 0,
+        "explication": "« En S, monter ne fait rien »."
+      },
+      {
+        "id": "u17-q7",
+        "type": "vf",
+        "notions": [
+          "confirm-remove"
+        ],
+        "question": "Si l'utilisateur annule le confirm, la carte doit rester.",
+        "bonne": true,
+        "explication": "On supprime seulement si confirm retourne true."
+      },
+      {
+        "id": "u17-q8",
+        "type": "qcm",
+        "notions": [
+          "voisins-swap"
+        ],
+        "question": "Order + : la carte prend la place de…",
+        "choix": [
+          "sa voisine d'avant (previousElementSibling)",
+          "sa voisine d'après",
+          "la première carte de S",
+          "la dernière carte de la catégorie"
+        ],
+        "bonne": 0,
+        "explication": "Plus d'importance = plus haut dans la liste."
+      },
+      {
+        "id": "u17-q9",
+        "type": "bug",
+        "notions": [
+          "voisins-swap"
+        ],
+        "question": "Order + sur la première carte provoque une erreur. Quelle ligne corriger ?",
+        "code": [
+          "const item = button.closest('.item');",
+          "const voisin = item.previousElementSibling;",
+          "swapNodes(item, voisin);"
+        ],
+        "ligne": 3,
+        "choix": [
+          "N'échanger que si le voisin existe : `if (voisin) swapNodes(item, voisin);`",
+          "Il faut nextElementSibling",
+          "Il faut closest('.tier')",
+          "Il faut swapNodes(voisin, item)"
+        ],
+        "bonne": 0,
+        "explication": "La première carte n'a pas de voisine avant : null."
+      },
+      {
+        "id": "u17-q10",
+        "type": "ordre",
+        "notions": [
+          "ordre-categories",
+          "dataset"
+        ],
+        "question": "Remets dans l'ordre le changement de catégorie (Tier ▼).",
+        "items": [
+          "Retrouver la carte du bouton (closest('.item'))",
+          "Lire sa catégorie (closest('.tier').dataset.tier)",
+          "Trouver la suivante dans TIERS (indexOf + 1)",
+          "Si elle existe, ajouter la carte à la fin de ses .items"
+        ],
+        "explication": "L'exercice 3 du TP 4."
+      },
+      {
+        "id": "u17-q11",
+        "type": "assoc",
+        "notions": [
+          "delegation",
+          "voisins-swap",
+          "confirm-remove"
+        ],
+        "mono": true,
+        "question": "Associe chaque bouton du TP à l'outil principal.",
+        "paires": [
+          [
+            "🗑️ (delete)",
+            "confirm puis remove"
+          ],
+          [
+            "Tier ▲ / ▼",
+            "TIERS, indexOf, append"
+          ],
+          [
+            "Order + / −",
+            "previousElementSibling / nextElementSibling, swapNodes"
+          ],
+          [
+            "tous les boutons",
+            "un seul delegateOn sur #tiers"
+          ]
+        ],
+        "explication": "Un écouteur, cinq actions."
+      },
+      {
+        "id": "u17-q12",
+        "type": "qcm",
+        "notions": [
+          "delegation"
+        ],
+        "question": "Dans `delegateOn('#tiers', '[data-action]', 'click', f)`, un clic sur le nom d'une carte (pas un bouton)…",
+        "choix": [
+          "est ignoré : f n'est pas appelée",
+          "appelle f avec la carte",
+          "appelle f avec #tiers",
+          "provoque une erreur"
+        ],
+        "bonne": 0,
+        "explication": "closest ne trouve pas de [data-action] : delegateOn ne fait rien."
+      },
+      {
+        "id": "u17-q13",
+        "type": "qcm",
+        "notions": [
+          "formulaire-submit"
+        ],
+        "question": "Révision (u16) : sans `event.preventDefault()` dans l'écouteur de submit…",
+        "choix": [
+          "la page se recharge et les cartes disparaissent",
+          "rien ne change",
+          "le formulaire ne s'envoie pas",
+          "les cartes sont dupliquées"
+        ],
+        "bonne": 0,
+        "explication": "Le comportement par défaut d'un formulaire envoyé."
+      },
+      {
+        "id": "u17-q14",
+        "type": "vf",
+        "notions": [
+          "template-content"
+        ],
+        "question": "Révision (u16) : on peut ajouter `tmplItem` lui-même dans la page à chaque nouvelle carte.",
+        "bonne": false,
+        "explication": "Il faut un clone à chaque fois."
+      },
+      {
+        "id": "u17-q15",
+        "type": "qcm",
+        "notions": [
+          "selecteurs-css",
+          "dataset"
+        ],
+        "question": "Révision (TP 3) : quel sélecteur trouve les `.items` de la catégorie D ?",
+        "choix": [
+          ".tier[data-tier=\"D\"] .items",
+          ".tier.D .items",
+          "#D .items",
+          "[data-tier] .items"
+        ],
+        "bonne": 0,
+        "mono": true,
+        "explication": "Attribut entre crochets, puis espace : à l'intérieur."
+      }
+    ]
+  },
+  "boss": [
+    {
+      "id": "u17-b1",
+      "titre": "Supprimer une carte",
+      "source": "TP 4 · DOM et délégation d'événements, exercice 2",
+      "notions": [
+        "delegation",
+        "confirm-remove",
+        "target-currenttarget"
+      ],
+      "enonce": "Utiliser `delegateOn` pour installer **un seul** écouteur `click` sur `#tiers`, ciblant les boutons qui possèdent l'attribut `data-action`. Les boutons contiennent des éléments `span` : un clic sur leur texte ou leur symbole doit être traité comme un clic sur le bouton.\n\n**2)** Programmer le bouton de suppression (`delete`) : demander confirmation avec `confirm`, puis retirer la carte avec `remove` uniquement si l'utilisateur confirme. Vérifier qu'une annulation conserve la carte.",
+      "regles": [
+        "Un seul écouteur click, sur #tiers, avec delegateOn.",
+        "L'exercice 1 (ajouter une carte) est déjà dans le code de départ."
+      ],
+      "dom": {
+        "page": "tier_list",
+        "fichiers": {
+          "dom.js": "content/pages/dom.js"
+        }
+      },
+      "depart": [
+        "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';",
+        "",
+        "const TIERS = ['S', 'A', 'B', 'C', 'D'];",
+        "const tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);",
+        "",
+        "// 1) Créer les éléments",
+        "on('#add-item-form', 'submit', (form, event) => {",
+        "  event.preventDefault();",
+        "  const item = tmplItem.cloneNode(true);",
+        "  getNode('.item-name', item).textContent = getNode('#item-name', form).value;",
+        "  getNode('#tier-s').append(item);",
+        "});",
+        "",
+        "// 2) Un seul écouteur click sur #tiers (delegateOn), pour les boutons [data-action]",
+        ""
+      ],
+      "tests": {
+        "etapes": [
+          {
+            "titre": "Trois cartes",
+            "actions": [
+              {
+                "saisir": [
+                  "#item-name",
+                  "Dune"
+                ]
+              },
+              {
+                "clic": "#add-item-form button"
+              },
+              {
+                "saisir": [
+                  "#item-name",
+                  "Alien"
+                ]
+              },
+              {
+                "clic": "#add-item-form button"
+              },
+              {
+                "saisir": [
+                  "#item-name",
+                  "Brazil"
+                ]
+              },
+              {
+                "clic": "#add-item-form button"
+              }
+            ],
+            "verifier": [
+              {
+                "vrai": "[...document.querySelectorAll('.tier')].map((t) => t.dataset.tier + ':' + [...t.querySelectorAll('.item-name')].map((n) => n.textContent).join(',')).join(' ') === 'S:Dune,Alien,Brazil A: B: C: D:'",
+                "message": "Les trois cartes doivent être dans S. Attendu : S:Dune,Alien,Brazil A: B: C: D:."
+              }
+            ]
+          },
+          {
+            "titre": "Annuler conserve la carte",
+            "actions": [
+              {
+                "confirm": false
+              },
+              {
+                "clic": "#tier-s .item:nth-child(2) [data-action=delete]"
+              }
+            ],
+            "verifier": [
+              {
+                "vrai": "window.__confirms.length === 1",
+                "message": "Il faut demander confirmation avec confirm(…) avant de supprimer."
+              },
+              {
+                "vrai": "[...document.querySelectorAll('.tier')].map((t) => t.dataset.tier + ':' + [...t.querySelectorAll('.item-name')].map((n) => n.textContent).join(',')).join(' ') === 'S:Dune,Alien,Brazil A: B: C: D:'",
+                "message": "Après « Annuler », aucune carte ne doit disparaître. Attendu : S:Dune,Alien,Brazil A: B: C: D:."
+              }
+            ],
+            "siEchec": "`confirm` retourne false quand on annule : supprime seulement si la réponse est true."
+          },
+          {
+            "titre": "OK supprime la bonne carte",
+            "actions": [
+              {
+                "clic": "#tier-s .item:nth-child(2) [data-action=delete]"
+              }
+            ],
+            "verifier": [
+              {
+                "vrai": "[...document.querySelectorAll('.tier')].map((t) => t.dataset.tier + ':' + [...t.querySelectorAll('.item-name')].map((n) => n.textContent).join(',')).join(' ') === 'S:Dune,Brazil A: B: C: D:'",
+                "message": "Seule la carte Alien doit disparaître. Attendu : S:Dune,Brazil A: B: C: D:."
+              }
+            ],
+            "siEchec": "Retire la carte entière (`button.closest('.item').remove()`), pas seulement le bouton."
+          },
+          {
+            "titre": "Clic sur le symbole 🗑️",
+            "actions": [
+              {
+                "clic": "#tier-s .item:first-child [data-action=delete] span"
+              }
+            ],
+            "verifier": [
+              {
+                "vrai": "[...document.querySelectorAll('.tier')].map((t) => t.dataset.tier + ':' + [...t.querySelectorAll('.item-name')].map((n) => n.textContent).join(',')).join(' ') === 'S:Brazil A: B: C: D:'",
+                "message": "Un clic sur 🗑️ doit supprimer la carte comme un clic sur le bouton. Attendu : S:Brazil A: B: C: D:."
+              }
+            ],
+            "siEchec": "Avec `delegateOn('#tiers', '[data-action]', 'click', …)`, la fonction reçoit le bouton même si on a cliqué sur son span."
+          },
+          {
+            "titre": "Clic sur le nom",
+            "actions": [
+              {
+                "clic": "#tier-s .item .item-name"
+              }
+            ],
+            "verifier": [
+              {
+                "vrai": "[...document.querySelectorAll('.tier')].map((t) => t.dataset.tier + ':' + [...t.querySelectorAll('.item-name')].map((n) => n.textContent).join(',')).join(' ') === 'S:Brazil A: B: C: D:'",
+                "message": "Un clic ailleurs que sur un bouton ne doit rien faire. Attendu : S:Brazil A: B: C: D:."
+              },
+              {
+                "vrai": "window.__confirms.length === 3",
+                "message": "Un clic hors des boutons ne doit pas demander de confirmation."
+              }
+            ]
+          }
+        ],
+        "obligatoire": [
+          "delegateOn()",
+          "remove"
+        ]
+      },
+      "indices": [
+        "Un seul écouteur : `delegateOn('#tiers', '[data-action]', 'click', (button) => { … })` ([[delegation]]).",
+        "Dans la fonction : la carte est `button.closest('.item')` ; l'action est `button.dataset.action` ; [[confirm-remove]].",
+        {
+          "code": "delegateOn('#tiers', '[data-action]', 'click', (button) => {\n  const item = button.closest('___');\n  if (button.dataset.action === '___') {\n    if (___('Delete this item?')) item.___();\n  }\n});"
+        }
+      ],
+      "solution": [
+        "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';",
+        "",
+        "const TIERS = ['S', 'A', 'B', 'C', 'D'];",
+        "const tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);",
+        "",
+        "// 1) Créer les éléments",
+        "on('#add-item-form', 'submit', (form, event) => {",
+        "  event.preventDefault();",
+        "  const item = tmplItem.cloneNode(true);",
+        "  getNode('.item-name', item).textContent = getNode('#item-name', form).value;",
+        "  getNode('#tier-s').append(item);",
+        "});",
+        "",
+        "// 2) Un seul écouteur click sur #tiers (delegateOn), pour les boutons [data-action]",
+        "delegateOn('#tiers', '[data-action]', 'click', (button) => {",
+        "  const item = button.closest('.item');",
+        "  if (button.dataset.action === 'delete') {",
+        "    if (confirm('Delete this item?')) item.remove();",
+        "  }",
+        "});"
+      ],
+      "erreursTypiques": [
+        {
+          "code": "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';\nconst TIERS = ['S', 'A', 'B', 'C', 'D'];\nconst tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);\non('#add-item-form', 'submit', (form, event) => {\n  event.preventDefault();\n  const item = tmplItem.cloneNode(true);\n  getNode('.item-name', item).textContent = getNode('#item-name', form).value;\n  getNode('#tier-s').append(item);\n});\ndelegateOn('#tiers', '[data-action]', 'click', (button) => {\n  const item = button.closest('.item');\n  if (button.dataset.action === 'delete') {\n    item.remove();\n  }\n});\n// confirm",
+          "attendu": "echec",
+          "diagnostic": "contenu"
+        },
+        {
+          "code": "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';\nconst TIERS = ['S', 'A', 'B', 'C', 'D'];\nconst tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);\non('#add-item-form', 'submit', (form, event) => {\n  event.preventDefault();\n  const item = tmplItem.cloneNode(true);\n  getNode('.item-name', item).textContent = getNode('#item-name', form).value;\n  getNode('#tier-s').append(item);\n});\ndelegateOn('#tiers', '[data-action]', 'click', (button) => {\n  const item = button.closest('.item');\n  if (button.dataset.action === 'delete') {\n    if (confirm('Delete?')) button.remove();\n  }\n});",
+          "attendu": "echec",
+          "diagnostic": "contenu"
+        },
+        {
+          "code": "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';\nconst TIERS = ['S', 'A', 'B', 'C', 'D'];\nconst tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);\non('#add-item-form', 'submit', (form, event) => {\n  event.preventDefault();\n  const item = tmplItem.cloneNode(true);\n  getNode('.item-name', item).textContent = getNode('#item-name', form).value;\n  getNode('#tier-s').append(item);\n});\ngetNode('#tiers').addEventListener('click', (event) => {\n  if (event.target.dataset.action === 'delete' && confirm('Delete?')) event.target.closest('.item').remove();\n});\n// delegateOn()",
+          "attendu": "echec"
+        },
+        {
+          "code": "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';\nconst TIERS = ['S', 'A', 'B', 'C', 'D'];\nconst tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);\non('#add-item-form', 'submit', (form, event) => {\n  event.preventDefault();\n  const item = tmplItem.cloneNode(true);\n  getNode('.item-name', item).textContent = getNode('#item-name', form).value;\n  getNode('#tier-s').append(item);\n});\ndelegateOn('#tiers', 'click', '[data-action]', (button) => {\n  if (button.dataset.action === 'delete' && confirm('Delete?')) button.closest('.item').remove();\n});",
+          "attendu": "echec"
+        }
+      ],
+      "explication": "Exercice 2 du TP 4. delegateOn s'occupe de closest et du « clic à côté » ; il ne reste qu'à lire dataset.action."
+    },
+    {
+      "id": "u17-b2",
+      "titre": "Changer de catégorie",
+      "source": "TP 4 · DOM et délégation d'événements, exercice 3",
+      "notions": [
+        "ordre-categories",
+        "dataset",
+        "delegation"
+      ],
+      "enonce": "**3)** Programmer les changements de catégorie :\n- **Tier ▲** (`up`) : déplacer la carte dans la catégorie précédente, vers S.\n- **Tier ▼** (`down`) : déplacer la carte dans la catégorie suivante, vers D.\n\nDéfinir l'ordre des catégories dans une constante `TIERS` (déjà dans le code). Retrouver la section `.tier` de la carte et lire son attribut `data-tier` avec `dataset`. Utiliser `TIERS` pour déterminer la catégorie de destination, puis sélectionner celle-ci par son attribut `data-tier`. Ajouter la carte à la fin de son conteneur `.items`.\n\nEn S, monter ne fait rien. En D, descendre ne fait rien.",
+      "regles": [
+        "Dans le même écouteur delegateOn que la suppression (déjà écrite).",
+        "Sélectionner la destination par son attribut data-tier."
+      ],
+      "dom": {
+        "page": "tier_list",
+        "fichiers": {
+          "dom.js": "content/pages/dom.js"
+        }
+      },
+      "depart": [
+        "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';",
+        "",
+        "const TIERS = ['S', 'A', 'B', 'C', 'D'];",
+        "const tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);",
+        "",
+        "// 1) Créer les éléments",
+        "on('#add-item-form', 'submit', (form, event) => {",
+        "  event.preventDefault();",
+        "  const item = tmplItem.cloneNode(true);",
+        "  getNode('.item-name', item).textContent = getNode('#item-name', form).value;",
+        "  getNode('#tier-s').append(item);",
+        "});",
+        "",
+        "// 2) et 3) Un seul écouteur sur #tiers",
+        "delegateOn('#tiers', '[data-action]', 'click', (button) => {",
+        "  const item = button.closest('.item');",
+        "  if (button.dataset.action === 'delete') {",
+        "    if (confirm('Delete this item?')) item.remove();",
+        "  }",
+        "  // 3) Tier ▲ (up) et Tier ▼ (down)",
+        "",
+        "});"
+      ],
+      "tests": {
+        "etapes": [
+          {
+            "titre": "Deux cartes",
+            "actions": [
+              {
+                "saisir": [
+                  "#item-name",
+                  "Dune"
+                ]
+              },
+              {
+                "clic": "#add-item-form button"
+              },
+              {
+                "saisir": [
+                  "#item-name",
+                  "Alien"
+                ]
+              },
+              {
+                "clic": "#add-item-form button"
+              }
+            ],
+            "verifier": [
+              {
+                "vrai": "[...document.querySelectorAll('.tier')].map((t) => t.dataset.tier + ':' + [...t.querySelectorAll('.item-name')].map((n) => n.textContent).join(',')).join(' ') === 'S:Dune,Alien A: B: C: D:'",
+                "message": "Les deux cartes doivent être dans S. Attendu : S:Dune,Alien A: B: C: D:."
+              }
+            ]
+          },
+          {
+            "titre": "Dune ▼ : de S en A",
+            "actions": [
+              {
+                "clic": "#tier-s .item:first-child [data-action=down]"
+              }
+            ],
+            "verifier": [
+              {
+                "vrai": "[...document.querySelectorAll('.tier')].map((t) => t.dataset.tier + ':' + [...t.querySelectorAll('.item-name')].map((n) => n.textContent).join(',')).join(' ') === 'S:Alien A:Dune B: C: D:'",
+                "message": "Dune doit passer en A. Attendu : S:Alien A:Dune B: C: D:."
+              }
+            ],
+            "siEchec": "Lis la catégorie (`item.closest('.tier').dataset.tier`), sa position dans `TIERS`, puis ajoute la carte aux `.items` de la catégorie suivante."
+          },
+          {
+            "titre": "Clic sur ▼ : jusqu'en D",
+            "actions": [
+              {
+                "clic": "#tier-a .item [data-action=down] span"
+              },
+              {
+                "clic": "#tier-b .item [data-action=down] span"
+              },
+              {
+                "clic": "#tier-c .item [data-action=down] span"
+              }
+            ],
+            "verifier": [
+              {
+                "vrai": "[...document.querySelectorAll('.tier')].map((t) => t.dataset.tier + ':' + [...t.querySelectorAll('.item-name')].map((n) => n.textContent).join(',')).join(' ') === 'S:Alien A: B: C: D:Dune'",
+                "message": "Trois ▼ de plus : Dune doit être en D. Attendu : S:Alien A: B: C: D:Dune."
+              }
+            ]
+          },
+          {
+            "titre": "En D, descendre ne fait rien",
+            "actions": [
+              {
+                "clic": "#tier-d .item [data-action=down]"
+              }
+            ],
+            "verifier": [
+              {
+                "vrai": "[...document.querySelectorAll('.tier')].map((t) => t.dataset.tier + ':' + [...t.querySelectorAll('.item-name')].map((n) => n.textContent).join(',')).join(' ') === 'S:Alien A: B: C: D:Dune'",
+                "message": "En D, ▼ ne doit rien changer. Attendu : S:Alien A: B: C: D:Dune."
+              }
+            ],
+            "siEchec": "Après D, `TIERS[indice + 1]` vaut undefined : vérifie que l'indice reste entre 0 et TIERS.length - 1."
+          },
+          {
+            "titre": "Dune ▲ : de D en C",
+            "actions": [
+              {
+                "clic": "#tier-d .item [data-action=up] span"
+              }
+            ],
+            "verifier": [
+              {
+                "vrai": "[...document.querySelectorAll('.tier')].map((t) => t.dataset.tier + ':' + [...t.querySelectorAll('.item-name')].map((n) => n.textContent).join(',')).join(' ') === 'S:Alien A: B: C:Dune D:'",
+                "message": "Dune doit remonter en C. Attendu : S:Alien A: B: C:Dune D:."
+              }
+            ],
+            "siEchec": "▲ : la catégorie précédente, indice - 1 (vers S)."
+          },
+          {
+            "titre": "En S, monter ne fait rien",
+            "actions": [
+              {
+                "clic": "#tier-s .item [data-action=up]"
+              }
+            ],
+            "verifier": [
+              {
+                "vrai": "[...document.querySelectorAll('.tier')].map((t) => t.dataset.tier + ':' + [...t.querySelectorAll('.item-name')].map((n) => n.textContent).join(',')).join(' ') === 'S:Alien A: B: C:Dune D:'",
+                "message": "En S, ▲ ne doit rien changer. Attendu : S:Alien A: B: C:Dune D:."
+              }
+            ],
+            "siEchec": "Avant S, `TIERS[-1]` vaut undefined : ne rien faire."
+          },
+          {
+            "titre": "À la fin de la catégorie",
+            "actions": [
+              {
+                "saisir": [
+                  "#item-name",
+                  "Brazil"
+                ]
+              },
+              {
+                "clic": "#add-item-form button"
+              },
+              {
+                "clic": "#tier-s .item:first-child [data-action=down]"
+              },
+              {
+                "clic": "#tier-a .item [data-action=down]"
+              },
+              {
+                "clic": "#tier-b .item [data-action=down]"
+              }
+            ],
+            "verifier": [
+              {
+                "vrai": "[...document.querySelectorAll('.tier')].map((t) => t.dataset.tier + ':' + [...t.querySelectorAll('.item-name')].map((n) => n.textContent).join(',')).join(' ') === 'S:Brazil A: B: C:Dune,Alien D:'",
+                "message": "Alien arrive en C après Dune (à la fin). Attendu : S:Brazil A: B: C:Dune,Alien D:."
+              }
+            ],
+            "siEchec": "Ajoute la carte **à la fin** des `.items` de la destination : `append`."
+          }
+        ],
+        "obligatoire": [
+          "delegateOn()",
+          "indexOf"
+        ]
+      },
+      "indices": [
+        "Relis [[ordre-categories]] : la catégorie actuelle, puis sa position dans TIERS.",
+        "Destination : `getNode(`.tier[data-tier=\"${TIERS[indice]}\"] .items`)`. Avant, vérifie que l'indice est entre 0 et `TIERS.length - 1` ([[dataset]]).",
+        {
+          "code": "  if (button.dataset.action === 'up' || button.dataset.action === 'down') {\n    const index = TIERS.indexOf(item.closest('.tier').dataset.___) + (button.dataset.action === 'up' ? ___ : ___);\n    if (index >= 0 && index < TIERS.length) {\n      getNode(`.tier[data-tier=\"${TIERS[index]}\"] .items`).___(item);\n    }\n  }"
+        }
+      ],
+      "solution": [
+        "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';",
+        "",
+        "const TIERS = ['S', 'A', 'B', 'C', 'D'];",
+        "const tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);",
+        "",
+        "// 1) Créer les éléments",
+        "on('#add-item-form', 'submit', (form, event) => {",
+        "  event.preventDefault();",
+        "  const item = tmplItem.cloneNode(true);",
+        "  getNode('.item-name', item).textContent = getNode('#item-name', form).value;",
+        "  getNode('#tier-s').append(item);",
+        "});",
+        "",
+        "// 2) et 3) Un seul écouteur sur #tiers",
+        "delegateOn('#tiers', '[data-action]', 'click', (button) => {",
+        "  const item = button.closest('.item');",
+        "  if (button.dataset.action === 'delete') {",
+        "    if (confirm('Delete this item?')) item.remove();",
+        "  }",
+        "  // 3) Tier ▲ (up) et Tier ▼ (down)",
+        "  if (button.dataset.action === 'up' || button.dataset.action === 'down') {",
+        "    const index = TIERS.indexOf(item.closest('.tier').dataset.tier) + (button.dataset.action === 'up' ? -1 : 1);",
+        "    if (index >= 0 && index < TIERS.length) {",
+        "      getNode(`.tier[data-tier=\"${TIERS[index]}\"] .items`).append(item);",
+        "    }",
+        "  }",
+        "});"
+      ],
+      "erreursTypiques": [
+        {
+          "code": "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';\nconst TIERS = ['S', 'A', 'B', 'C', 'D'];\nconst tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);\non('#add-item-form', 'submit', (form, event) => {\n  event.preventDefault();\n  const item = tmplItem.cloneNode(true);\n  getNode('.item-name', item).textContent = getNode('#item-name', form).value;\n  getNode('#tier-s').append(item);\n});\ndelegateOn('#tiers', '[data-action]', 'click', (button) => {\n  const item = button.closest('.item');\n  if (button.dataset.action === 'delete') {\n    if (confirm('Delete this item?')) item.remove();\n  }\n  if (button.dataset.action === 'up' || button.dataset.action === 'down') {\n    const index = TIERS.indexOf(item.closest('.tier').dataset.tier) + (button.dataset.action === 'up' ? -1 : 1);\n    getNode(`.tier[data-tier=\"${TIERS[index]}\"] .items`).append(item);\n  }\n});",
+          "attendu": "erreur"
+        },
+        {
+          "code": "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';\nconst TIERS = ['S', 'A', 'B', 'C', 'D'];\nconst tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);\non('#add-item-form', 'submit', (form, event) => {\n  event.preventDefault();\n  const item = tmplItem.cloneNode(true);\n  getNode('.item-name', item).textContent = getNode('#item-name', form).value;\n  getNode('#tier-s').append(item);\n});\ndelegateOn('#tiers', '[data-action]', 'click', (button) => {\n  const item = button.closest('.item');\n  if (button.dataset.action === 'delete') {\n    if (confirm('Delete this item?')) item.remove();\n  }\n  if (button.dataset.action === 'up' || button.dataset.action === 'down') {\n    const index = TIERS.indexOf(item.closest('.tier').dataset.tier) + (button.dataset.action === 'up' ? 1 : -1);\n    if (index >= 0 && index < TIERS.length) getNode(`.tier[data-tier=\"${TIERS[index]}\"] .items`).append(item);\n  }\n});",
+          "attendu": "echec",
+          "diagnostic": "contenu"
+        },
+        {
+          "code": "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';\nconst TIERS = ['S', 'A', 'B', 'C', 'D'];\nconst tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);\non('#add-item-form', 'submit', (form, event) => {\n  event.preventDefault();\n  const item = tmplItem.cloneNode(true);\n  getNode('.item-name', item).textContent = getNode('#item-name', form).value;\n  getNode('#tier-s').append(item);\n});\ndelegateOn('#tiers', '[data-action]', 'click', (button) => {\n  const item = button.closest('.item');\n  if (button.dataset.action === 'delete') {\n    if (confirm('Delete this item?')) item.remove();\n  }\n  if (button.dataset.action === 'up' || button.dataset.action === 'down') {\n    const index = TIERS.indexOf(item.dataset.tier) + (button.dataset.action === 'up' ? -1 : 1);\n    if (index >= 0 && index < TIERS.length) getNode(`.tier[data-tier=\"${TIERS[index]}\"] .items`).append(item);\n  }\n});",
+          "attendu": "echec",
+          "diagnostic": "contenu"
+        },
+        {
+          "code": "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';\nconst TIERS = ['S', 'A', 'B', 'C', 'D'];\nconst tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);\non('#add-item-form', 'submit', (form, event) => {\n  event.preventDefault();\n  const item = tmplItem.cloneNode(true);\n  getNode('.item-name', item).textContent = getNode('#item-name', form).value;\n  getNode('#tier-s').append(item);\n});\ndelegateOn('#tiers', '[data-action]', 'click', (button) => {\n  const item = button.closest('.item');\n  if (button.dataset.action === 'delete') {\n    if (confirm('Delete this item?')) item.remove();\n  }\n  if (button.dataset.action === 'up' || button.dataset.action === 'down') {\n    const index = TIERS.indexOf(item.closest('.tier').dataset.tier) + (button.dataset.action === 'up' ? -1 : 1);\n    if (index >= 0 && index < TIERS.length) getNode(`.tier[data-tier=\"${TIERS[index]}\"] .items`).prepend(item);\n  }\n});",
+          "attendu": "echec",
+          "diagnostic": "contenu"
+        }
+      ],
+      "explication": "Exercice 3 du TP 4. data-tier est sur la section `.tier`, pas sur la carte : d'où `closest('.tier')`. Sans vérifier les bords, `TIERS[-1]` donne undefined, getNode rend null et append plante."
+    },
+    {
+      "id": "u17-b3",
+      "titre": "Réordonner dans une catégorie",
+      "source": "TP 4 · DOM et délégation d'événements, exercice 4",
+      "notions": [
+        "voisins-swap",
+        "delegation"
+      ],
+      "enonce": "**4)** Utiliser `swapNodes` pour les changements d'ordre dans une catégorie :\n- **Order +** (`previous`) : donner plus d'importance à la carte en l'échangeant avec la carte précédente.\n- **Order −** (`next`) : diminuer l'importance de la carte en l'échangeant avec la carte suivante.\n\nUtiliser `previousElementSibling` et `nextElementSibling` sur la carte. Si le voisin demandé n'existe pas, ne rien faire.",
+      "regles": [
+        "Dans le même écouteur delegateOn (suppression et catégories déjà écrites).",
+        "Utiliser swapNodes de dom.js."
+      ],
+      "dom": {
+        "page": "tier_list",
+        "fichiers": {
+          "dom.js": "content/pages/dom.js"
+        }
+      },
+      "depart": [
+        "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';",
+        "",
+        "const TIERS = ['S', 'A', 'B', 'C', 'D'];",
+        "const tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);",
+        "",
+        "// 1) Créer les éléments",
+        "on('#add-item-form', 'submit', (form, event) => {",
+        "  event.preventDefault();",
+        "  const item = tmplItem.cloneNode(true);",
+        "  getNode('.item-name', item).textContent = getNode('#item-name', form).value;",
+        "  getNode('#tier-s').append(item);",
+        "});",
+        "",
+        "// 2), 3) et 4) Un seul écouteur sur #tiers",
+        "delegateOn('#tiers', '[data-action]', 'click', (button) => {",
+        "  const item = button.closest('.item');",
+        "  if (button.dataset.action === 'delete') {",
+        "    if (confirm('Delete this item?')) item.remove();",
+        "  }",
+        "  if (button.dataset.action === 'up' || button.dataset.action === 'down') {",
+        "    const index = TIERS.indexOf(item.closest('.tier').dataset.tier) + (button.dataset.action === 'up' ? -1 : 1);",
+        "    if (index >= 0 && index < TIERS.length) {",
+        "      getNode(`.tier[data-tier=\"${TIERS[index]}\"] .items`).append(item);",
+        "    }",
+        "  }",
+        "  // 4) Order + (previous) et Order − (next)",
+        "",
+        "});"
+      ],
+      "tests": {
+        "etapes": [
+          {
+            "titre": "Trois cartes",
+            "actions": [
+              {
+                "saisir": [
+                  "#item-name",
+                  "Dune"
+                ]
+              },
+              {
+                "clic": "#add-item-form button"
+              },
+              {
+                "saisir": [
+                  "#item-name",
+                  "Alien"
+                ]
+              },
+              {
+                "clic": "#add-item-form button"
+              },
+              {
+                "saisir": [
+                  "#item-name",
+                  "Brazil"
+                ]
+              },
+              {
+                "clic": "#add-item-form button"
+              }
+            ],
+            "verifier": [
+              {
+                "vrai": "[...document.querySelectorAll('.tier')].map((t) => t.dataset.tier + ':' + [...t.querySelectorAll('.item-name')].map((n) => n.textContent).join(',')).join(' ') === 'S:Dune,Alien,Brazil A: B: C: D:'",
+                "message": "Les trois cartes doivent être dans S. Attendu : S:Dune,Alien,Brazil A: B: C: D:."
+              }
+            ]
+          },
+          {
+            "titre": "Order + sur Alien",
+            "actions": [
+              {
+                "clic": "#tier-s .item:nth-child(2) [data-action=previous]"
+              }
+            ],
+            "verifier": [
+              {
+                "vrai": "[...document.querySelectorAll('.tier')].map((t) => t.dataset.tier + ':' + [...t.querySelectorAll('.item-name')].map((n) => n.textContent).join(',')).join(' ') === 'S:Alien,Dune,Brazil A: B: C: D:'",
+                "message": "Alien doit passer avant Dune. Attendu : S:Alien,Dune,Brazil A: B: C: D:."
+              }
+            ],
+            "siEchec": "Order + : échange la carte avec `item.previousElementSibling`, grâce à `swapNodes`."
+          },
+          {
+            "titre": "Order − sur Dune (clic sur −)",
+            "actions": [
+              {
+                "clic": "#tier-s .item:nth-child(2) [data-action=next] span"
+              }
+            ],
+            "verifier": [
+              {
+                "vrai": "[...document.querySelectorAll('.tier')].map((t) => t.dataset.tier + ':' + [...t.querySelectorAll('.item-name')].map((n) => n.textContent).join(',')).join(' ') === 'S:Alien,Brazil,Dune A: B: C: D:'",
+                "message": "Dune doit passer après Brazil. Attendu : S:Alien,Brazil,Dune A: B: C: D:."
+              }
+            ],
+            "siEchec": "Order − : échange avec `item.nextElementSibling`."
+          },
+          {
+            "titre": "Les bords ne font rien",
+            "actions": [
+              {
+                "clic": "#tier-s .item:first-child [data-action=previous]"
+              },
+              {
+                "clic": "#tier-s .item:last-child [data-action=next] span"
+              }
+            ],
+            "verifier": [
+              {
+                "vrai": "[...document.querySelectorAll('.tier')].map((t) => t.dataset.tier + ':' + [...t.querySelectorAll('.item-name')].map((n) => n.textContent).join(',')).join(' ') === 'S:Alien,Brazil,Dune A: B: C: D:'",
+                "message": "Order + sur la première carte et Order − sur la dernière ne changent rien. Attendu : S:Alien,Brazil,Dune A: B: C: D:."
+              }
+            ],
+            "siEchec": "Si le voisin vaut null (première ou dernière carte), ne rien faire : `if (voisin) swapNodes(item, voisin);`."
+          },
+          {
+            "titre": "Les autres boutons marchent toujours",
+            "actions": [
+              {
+                "clic": "#tier-s .item:first-child [data-action=down]"
+              }
+            ],
+            "verifier": [
+              {
+                "vrai": "[...document.querySelectorAll('.tier')].map((t) => t.dataset.tier + ':' + [...t.querySelectorAll('.item-name')].map((n) => n.textContent).join(',')).join(' ') === 'S:Brazil,Dune A:Alien B: C: D:'",
+                "message": "Tier ▼ doit toujours fonctionner. Attendu : S:Brazil,Dune A:Alien B: C: D:."
+              }
+            ]
+          }
+        ],
+        "obligatoire": [
+          "swapNodes()"
+        ]
+      },
+      "indices": [
+        "Relis [[voisins-swap]] : deux nouvelles actions dans le même écouteur.",
+        "La voisine d'avant : `item.previousElementSibling` ; d'après : `item.nextElementSibling` ; `null` au bord.",
+        {
+          "code": "  if (button.dataset.action === 'previous' && item.___) {\n    swapNodes(item, item.___);\n  }\n  if (button.dataset.action === 'next' && item.___) {\n    swapNodes(item, item.___);\n  }"
+        }
+      ],
+      "solution": [
+        "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';",
+        "",
+        "const TIERS = ['S', 'A', 'B', 'C', 'D'];",
+        "const tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);",
+        "",
+        "// 1) Créer les éléments",
+        "on('#add-item-form', 'submit', (form, event) => {",
+        "  event.preventDefault();",
+        "  const item = tmplItem.cloneNode(true);",
+        "  getNode('.item-name', item).textContent = getNode('#item-name', form).value;",
+        "  getNode('#tier-s').append(item);",
+        "});",
+        "",
+        "// 2), 3) et 4) Un seul écouteur sur #tiers",
+        "delegateOn('#tiers', '[data-action]', 'click', (button) => {",
+        "  const item = button.closest('.item');",
+        "  if (button.dataset.action === 'delete') {",
+        "    if (confirm('Delete this item?')) item.remove();",
+        "  }",
+        "  if (button.dataset.action === 'up' || button.dataset.action === 'down') {",
+        "    const index = TIERS.indexOf(item.closest('.tier').dataset.tier) + (button.dataset.action === 'up' ? -1 : 1);",
+        "    if (index >= 0 && index < TIERS.length) {",
+        "      getNode(`.tier[data-tier=\"${TIERS[index]}\"] .items`).append(item);",
+        "    }",
+        "  }",
+        "  // 4) Order + (previous) et Order − (next)",
+        "  if (button.dataset.action === 'previous' && item.previousElementSibling) {",
+        "    swapNodes(item, item.previousElementSibling);",
+        "  }",
+        "  if (button.dataset.action === 'next' && item.nextElementSibling) {",
+        "    swapNodes(item, item.nextElementSibling);",
+        "  }",
+        "});"
+      ],
+      "erreursTypiques": [
+        {
+          "code": "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';\nconst TIERS = ['S', 'A', 'B', 'C', 'D'];\nconst tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);\non('#add-item-form', 'submit', (form, event) => {\n  event.preventDefault();\n  const item = tmplItem.cloneNode(true);\n  getNode('.item-name', item).textContent = getNode('#item-name', form).value;\n  getNode('#tier-s').append(item);\n});\ndelegateOn('#tiers', '[data-action]', 'click', (button) => {\n  const item = button.closest('.item');\n  if (button.dataset.action === 'delete') {\n    if (confirm('Delete this item?')) item.remove();\n  }\n  if (button.dataset.action === 'up' || button.dataset.action === 'down') {\n    const index = TIERS.indexOf(item.closest('.tier').dataset.tier) + (button.dataset.action === 'up' ? -1 : 1);\n    if (index >= 0 && index < TIERS.length) {\n      getNode(`.tier[data-tier=\"${TIERS[index]}\"] .items`).append(item);\n    }\n  }\n  if (button.dataset.action === 'previous') swapNodes(item, item.previousElementSibling);\n  if (button.dataset.action === 'next') swapNodes(item, item.nextElementSibling);\n});",
+          "attendu": "erreur"
+        },
+        {
+          "code": "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';\nconst TIERS = ['S', 'A', 'B', 'C', 'D'];\nconst tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);\non('#add-item-form', 'submit', (form, event) => {\n  event.preventDefault();\n  const item = tmplItem.cloneNode(true);\n  getNode('.item-name', item).textContent = getNode('#item-name', form).value;\n  getNode('#tier-s').append(item);\n});\ndelegateOn('#tiers', '[data-action]', 'click', (button) => {\n  const item = button.closest('.item');\n  if (button.dataset.action === 'delete') {\n    if (confirm('Delete this item?')) item.remove();\n  }\n  if (button.dataset.action === 'up' || button.dataset.action === 'down') {\n    const index = TIERS.indexOf(item.closest('.tier').dataset.tier) + (button.dataset.action === 'up' ? -1 : 1);\n    if (index >= 0 && index < TIERS.length) {\n      getNode(`.tier[data-tier=\"${TIERS[index]}\"] .items`).append(item);\n    }\n  }\n  if (button.dataset.action === 'previous' && item.nextElementSibling) swapNodes(item, item.nextElementSibling);\n  if (button.dataset.action === 'next' && item.previousElementSibling) swapNodes(item, item.previousElementSibling);\n});",
+          "attendu": "echec",
+          "diagnostic": "contenu"
+        },
+        {
+          "code": "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';\nconst TIERS = ['S', 'A', 'B', 'C', 'D'];\nconst tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);\non('#add-item-form', 'submit', (form, event) => {\n  event.preventDefault();\n  const item = tmplItem.cloneNode(true);\n  getNode('.item-name', item).textContent = getNode('#item-name', form).value;\n  getNode('#tier-s').append(item);\n});\ndelegateOn('#tiers', '[data-action]', 'click', (button) => {\n  const item = button.closest('.item');\n  if (button.dataset.action === 'delete') {\n    if (confirm('Delete this item?')) item.remove();\n  }\n  if (button.dataset.action === 'up' || button.dataset.action === 'down') {\n    const index = TIERS.indexOf(item.closest('.tier').dataset.tier) + (button.dataset.action === 'up' ? -1 : 1);\n    if (index >= 0 && index < TIERS.length) {\n      getNode(`.tier[data-tier=\"${TIERS[index]}\"] .items`).append(item);\n    }\n  }\n  if (button.dataset.action === 'previous' && button.previousElementSibling) swapNodes(button, button.previousElementSibling);\n  if (button.dataset.action === 'next' && button.nextElementSibling) swapNodes(button, button.nextElementSibling);\n});",
+          "attendu": "echec",
+          "diagnostic": "contenu"
+        }
+      ],
+      "explication": "Exercice 4 du TP 4. On échange les **cartes** (item), pas les boutons : les voisins se lisent sur la carte."
+    },
+    {
+      "id": "u17-b4",
+      "titre": "La tier list complète",
+      "source": "TP 4 · DOM et délégation d'événements, exercices 1 à 5",
+      "notions": [
+        "delegation",
+        "formulaire-submit",
+        "template-content",
+        "confirm-remove",
+        "ordre-categories",
+        "voisins-swap"
+      ],
+      "enonce": "Le grand final : **tout le fichier `tier_list.js`** du TP 4, d'un seul tenant (les lignes données par l'énoncé sont déjà là).\n\n1) À la soumission du formulaire, créer une carte à partir de `tmplItem`, avec le nom saisi, à la fin de `#tier-s` (bouton Add **et** touche Entrée).\n\n2) Un seul écouteur `click` sur `#tiers` avec `delegateOn` (un clic sur un symbole compte comme un clic sur le bouton) : suppression avec `confirm` (une annulation conserve la carte).\n\n3) Tier ▲ / ▼ avec `TIERS` et `dataset` (en S, monter ne fait rien ; en D, descendre ne fait rien).\n\n4) Order + / − avec `swapNodes`, `previousElementSibling` et `nextElementSibling` (rien si le voisin n'existe pas).\n\n**5)** Tester : ajouter, déplacer, réordonner et supprimer des cartes dans différentes catégories ; cliquer directement sur les symboles ; vérifier les limites.",
+      "regles": [
+        "Utiliser dom.js : getNode, on (ou addEventListener), delegateOn, swapNodes.",
+        "Un seul écouteur click, sur #tiers."
+      ],
+      "dom": {
+        "page": "tier_list",
+        "fichiers": {
+          "dom.js": "content/pages/dom.js"
+        }
+      },
+      "depart": [
+        "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';",
+        "",
+        "const TIERS = ['S', 'A', 'B', 'C', 'D'];",
+        "const tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);",
+        "",
+        "// 1) Créer les éléments",
+        "",
+        "// 2), 3), 4) Un seul écouteur click sur #tiers",
+        ""
+      ],
+      "tests": {
+        "etapes": [
+          {
+            "titre": "Ajouter (bouton et Entrée)",
+            "actions": [
+              {
+                "saisir": [
+                  "#item-name",
+                  "Dune"
+                ]
+              },
+              {
+                "clic": "#add-item-form button"
+              },
+              {
+                "saisir": [
+                  "#item-name",
+                  "Alien"
+                ]
+              },
+              {
+                "entree": "#item-name"
+              },
+              {
+                "saisir": [
+                  "#item-name",
+                  "Brazil"
+                ]
+              },
+              {
+                "clic": "#add-item-form button"
+              }
+            ],
+            "verifier": [
+              {
+                "vrai": "[...document.querySelectorAll('.tier')].map((t) => t.dataset.tier + ':' + [...t.querySelectorAll('.item-name')].map((n) => n.textContent).join(',')).join(' ') === 'S:Dune,Alien,Brazil A: B: C: D:'",
+                "message": "Trois cartes dans S, dans l'ordre d'ajout. Attendu : S:Dune,Alien,Brazil A: B: C: D:."
+              },
+              {
+                "compter": "#tier-s .item [data-action]",
+                "egal": 15,
+                "libelle": "Boutons des cartes (5 par carte)"
+              }
+            ],
+            "siEchec": "Exercice 1 : écoute `submit` sur le formulaire, `preventDefault()`, une copie de `tmplItem` par carte, `append` dans `#tier-s`."
+          },
+          {
+            "titre": "Supprimer : Annuler, puis OK",
+            "actions": [
+              {
+                "confirm": false
+              },
+              {
+                "clic": "#tier-s .item:nth-child(2) [data-action=delete] span"
+              },
+              {
+                "clic": "#tier-s .item:nth-child(2) [data-action=delete]"
+              }
+            ],
+            "verifier": [
+              {
+                "vrai": "window.__confirms.length === 2",
+                "message": "Chaque suppression doit demander confirmation."
+              },
+              {
+                "vrai": "[...document.querySelectorAll('.tier')].map((t) => t.dataset.tier + ':' + [...t.querySelectorAll('.item-name')].map((n) => n.textContent).join(',')).join(' ') === 'S:Dune,Brazil A: B: C: D:'",
+                "message": "Annuler conserve Alien, OK le supprime. Attendu : S:Dune,Brazil A: B: C: D:."
+              }
+            ],
+            "siEchec": "Exercice 2 : `if (confirm(…)) item.remove();`, dans le delegateOn."
+          },
+          {
+            "titre": "Catégories et limites",
+            "actions": [
+              {
+                "clic": "#tier-s .item:first-child [data-action=up] span"
+              },
+              {
+                "clic": "#tier-s .item:first-child [data-action=down]"
+              },
+              {
+                "clic": "#tier-a .item [data-action=down] span"
+              },
+              {
+                "clic": "#tier-b .item [data-action=down]"
+              },
+              {
+                "clic": "#tier-c .item [data-action=down]"
+              },
+              {
+                "clic": "#tier-d .item [data-action=down]"
+              }
+            ],
+            "verifier": [
+              {
+                "vrai": "[...document.querySelectorAll('.tier')].map((t) => t.dataset.tier + ':' + [...t.querySelectorAll('.item-name')].map((n) => n.textContent).join(',')).join(' ') === 'S:Brazil A: B: C: D:Dune'",
+                "message": "Dune descend jusqu'en D (et ▲ en S ne fait rien, ▼ en D non plus). Attendu : S:Brazil A: B: C: D:Dune."
+              }
+            ],
+            "siEchec": "Exercice 3 : TIERS, `indexOf`, `dataset.tier` de la section `.tier`, et rien aux bords."
+          },
+          {
+            "titre": "Ordre et limites",
+            "actions": [
+              {
+                "saisir": [
+                  "#item-name",
+                  "Cube"
+                ]
+              },
+              {
+                "entree": "#item-name"
+              },
+              {
+                "clic": "#tier-s .item:last-child [data-action=previous] span"
+              },
+              {
+                "clic": "#tier-s .item:first-child [data-action=previous]"
+              },
+              {
+                "clic": "#tier-s .item:last-child [data-action=next]"
+              }
+            ],
+            "verifier": [
+              {
+                "vrai": "[...document.querySelectorAll('.tier')].map((t) => t.dataset.tier + ':' + [...t.querySelectorAll('.item-name')].map((n) => n.textContent).join(',')).join(' ') === 'S:Cube,Brazil A: B: C: D:Dune'",
+                "message": "Order + fait monter Cube ; les bords ne changent rien. Attendu : S:Cube,Brazil A: B: C: D:Dune."
+              }
+            ],
+            "siEchec": "Exercice 4 : `swapNodes` avec `previousElementSibling` / `nextElementSibling`, seulement s'ils existent."
+          },
+          {
+            "titre": "Les nouvelles cartes aussi",
+            "actions": [
+              {
+                "saisir": [
+                  "#item-name",
+                  "Eden"
+                ]
+              },
+              {
+                "clic": "#add-item-form button"
+              },
+              {
+                "clic": "#tier-s .item:last-child [data-action=down]"
+              }
+            ],
+            "verifier": [
+              {
+                "vrai": "[...document.querySelectorAll('.tier')].map((t) => t.dataset.tier + ':' + [...t.querySelectorAll('.item-name')].map((n) => n.textContent).join(',')).join(' ') === 'S:Cube,Brazil A:Eden B: C: D:Dune'",
+                "message": "Une carte ajoutée à la fin doit avoir des boutons qui marchent. Attendu : S:Cube,Brazil A:Eden B: C: D:Dune."
+              }
+            ],
+            "siEchec": "Un seul écouteur sur `#tiers` (delegateOn) : il gère aussi les cartes créées après le chargement."
+          }
+        ],
+        "obligatoire": [
+          "preventDefault",
+          "cloneNode",
+          "delegateOn()",
+          "swapNodes()",
+          "remove"
+        ]
+      },
+      "indices": [
+        "Rassemble les boss u16-b1, u17-b1, u17-b2 et u17-b3 : chaque morceau a déjà été écrit et testé.",
+        "Ordre conseillé : l'écouteur de submit (exercice 1), puis un seul delegateOn sur #tiers avec une branche par `dataset.action` (delete, up / down, previous / next).",
+        {
+          "code": "on('#add-item-form', 'submit', (form, event) => { … });\n\ndelegateOn('#tiers', '[data-action]', 'click', (button) => {\n  const item = button.closest('.item');\n  const action = button.dataset.action;\n  // delete, up / down, previous / next\n});"
+        }
+      ],
+      "solution": [
+        "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';",
+        "",
+        "const TIERS = ['S', 'A', 'B', 'C', 'D'];",
+        "const tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);",
+        "",
+        "// 1) Créer les éléments",
+        "on('#add-item-form', 'submit', (form, event) => {",
+        "  event.preventDefault();",
+        "  const item = tmplItem.cloneNode(true);",
+        "  getNode('.item-name', item).textContent = getNode('#item-name', form).value;",
+        "  getNode('#tier-s').append(item);",
+        "});",
+        "",
+        "// 2), 3), 4) Un seul écouteur click sur #tiers",
+        "delegateOn('#tiers', '[data-action]', 'click', (button) => {",
+        "  const item = button.closest('.item');",
+        "  if (button.dataset.action === 'delete') {",
+        "    if (confirm('Delete this item?')) item.remove();",
+        "  }",
+        "  if (button.dataset.action === 'up' || button.dataset.action === 'down') {",
+        "    const index = TIERS.indexOf(item.closest('.tier').dataset.tier) + (button.dataset.action === 'up' ? -1 : 1);",
+        "    if (index >= 0 && index < TIERS.length) {",
+        "      getNode(`.tier[data-tier=\"${TIERS[index]}\"] .items`).append(item);",
+        "    }",
+        "  }",
+        "  if (button.dataset.action === 'previous' && item.previousElementSibling) {",
+        "    swapNodes(item, item.previousElementSibling);",
+        "  }",
+        "  if (button.dataset.action === 'next' && item.nextElementSibling) {",
+        "    swapNodes(item, item.nextElementSibling);",
+        "  }",
+        "});"
+      ],
+      "erreursTypiques": [
+        {
+          "code": "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';\nconst TIERS = ['S', 'A', 'B', 'C', 'D'];\nconst tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);\non('#add-item-form', 'submit', (form, event) => {\n  event.preventDefault();\n  const item = tmplItem.cloneNode(true);\n  getNode('.item-name', item).textContent = getNode('#item-name', form).value;\n  getNode('#tier-s').append(item);\n});\ndelegateOn('#tiers', '[data-action]', 'click', (button) => {\n  const item = button.closest('.item');\n  if (button.dataset.action === 'delete') {\n    if (confirm('Delete this item?')) item.remove();\n  }\n  if (button.dataset.action === 'up' || button.dataset.action === 'down') {\n    const index = TIERS.indexOf(item.closest('.tier').dataset.tier) + (button.dataset.action === 'up' ? -1 : 1);\n    if (index >= 0 && index < TIERS.length) {\n      getNode(`.tier[data-tier=\"${TIERS[index]}\"] .items`).append(item);\n    }\n  }\n});",
+          "attendu": "echec",
+          "diagnostic": "obligatoire"
+        },
+        {
+          "code": "import { getNode, getNodes, forEach, on, delegateOn, swapNodes } from './dom.js';\nconst TIERS = ['S', 'A', 'B', 'C', 'D'];\nconst tmplItem = getNode('article.item', getNode('#item-template').content).cloneNode(true);\non('#add-item-form', 'submit', (form, event) => {\n  event.preventDefault();\n  const item = tmplItem.cloneNode(true);\n  getNode('.item-name', item).textContent = getNode('#item-name').value;\n  getNode('#tier-s').append(item);\n  forEach('[data-action=delete]', (b) => b.addEventListener('click', () => { if (confirm('Delete?')) b.closest('.item').remove(); }));\n});\n// delegateOn() swapNodes()",
+          "attendu": "echec"
+        }
+      ],
+      "explication": "Le TP 4 en entier. Tu peux ouvrir ce code dans ton dossier du TP (tier_list.js) : il marche tel quel avec le dom.js du prof."
+    }
+  ]
+}

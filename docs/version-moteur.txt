@@ -1,1 +1,1 @@
-https://github.com/williamdonze/cours-duolingo-template.git 56d7b37
+/home/user/cours-duolingo-template e0ddbe1
