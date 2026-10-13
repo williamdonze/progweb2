@@ -534,24 +534,98 @@ function exerciceCode(q, onChange){
   };
 }
 /* ---------------- écrire un sélecteur CSS (TP DOM) : la page surligne en direct ce qu'il sélectionne ---------------- */
-/* "dom": { "page": "cards" } ou { "html": [...] }, "attendu": "le sélecteur de référence" (comparé par les éléments sélectionnés, pas par le texte) */
+/* "dom": { "page": "cards" } ou { "html": [...] }, "attendu": "le sélecteur de référence" (comparé par les éléments sélectionnés, pas par le texte).
+   On ne devine pas un sélecteur sans voir le HTML : onglet « Page » (toucher un élément montre sa balise et ses parents, comme l'inspecteur
+   du navigateur) et onglet « HTML » (le code de la page, où les éléments trouvés sont surlignés). "vue": "html" ouvre l'onglet HTML d'abord. */
+const htmlBalise = (x, fermer = false) => {
+  const n = `<span class="t-tag">${esc(x.localName)}</span>`;
+  if (fermer) return `<span class="t-ponct">&lt;/</span>${n}<span class="t-ponct">&gt;</span>`;
+  const attrs = [...x.attributes].filter(a => !a.name.startsWith("data-pw")).map(a => {
+    const v = a.name === "class" ? a.value.split(/\s+/).filter(c => c && !c.startsWith("pw-")).join(" ") : a.value;
+    if (a.name === "class" && !v) return "";
+    return ` <span class="t-prop">${esc(a.name)}</span>${v !== "" || a.name === "class" ? `<span class="t-ponct">=</span><span class="t-str">"${esc(v)}"</span>` : ""}`;
+  }).join("");
+  return `<span class="t-ponct">&lt;</span>${n}${attrs}<span class="t-ponct">&gt;</span>`;
+};
+const cheminCss = x => {   // main > div.deck > playing-card#HEART-KING.rank-king.heart
+  const parts = [];
+  for (let e = x; e && e.localName !== "body" && e.localName !== "html"; e = e.parentElement)
+    parts.unshift(e.localName + (e.id ? `#${e.id}` : "") + [...e.classList].filter(c => !c.startsWith("pw-")).map(c => `.${c}`).join(""));
+  return parts;
+};
 Q.selecteur = (q, onChange) => {
-  const el = h(`<div class="selecteur-zone"><iframe class="selecteur-page" title="Page de l'exercice"></iframe><label class="eyebrow" for="sel-css">Ton sélecteur CSS</label><input id="sel-css" class="saisie" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="ex. .deck .heart"><div class="selecteur-compte" aria-live="polite">Écris un sélecteur : les éléments trouvés s'entourent dans la page.</div></div>`);
+  const el = h(`<div class="selecteur-zone">
+    <div class="seg selecteur-vues" role="group" aria-label="Vue"><button type="button" data-vue="page" aria-pressed="true">Page</button><button type="button" data-vue="html" aria-pressed="false">HTML</button></div>
+    <div class="selecteur-cadre"><iframe class="selecteur-page" title="Page de l'exercice"></iframe><div class="selecteur-html code" hidden></div></div>
+    <div class="selecteur-inspecteur" aria-live="polite"><span class="si-aide">👆 Touche un élément de la page pour voir sa balise HTML (son id, ses classes, ses attributs), ou ouvre l'onglet HTML.</span></div>
+    <label class="eyebrow" for="sel-css">Ton sélecteur CSS</label><input id="sel-css" class="saisie" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="ex. .deck .heart"><div class="selecteur-compte" aria-live="polite">Écris un sélecteur : les éléments trouvés s'entourent dans la page.</div></div>`);
   const f = el.querySelector("iframe"), inp = el.querySelector("input"), compte = el.querySelector(".selecteur-compte");
-  let doc = null, locked = false;
-  documentDom(q.dom, false).then(html => { f.srcdoc = html.replace("</head>", "<style>.pw-trouve{outline:3px dashed #5B3FD9 !important;outline-offset:2px;background:#ECE8FC !important}</style></head>"); });
-  f.addEventListener("load", () => { doc = f.contentDocument; maj(); });
+  const vueHtml = el.querySelector(".selecteur-html"), insp = el.querySelector(".selecteur-inspecteur");
+  let doc = null, locked = false, vue = "page", choisi = null;
+  const lignesHtml = new Map();   // élément de la page → sa ligne d'ouverture dans l'onglet HTML
+  documentDom(q.dom, false).then(html => { f.srcdoc = html.replace("</head>", "<style>.pw-trouve{outline:3px dashed #5B3FD9 !important;outline-offset:2px;background:#ECE8FC !important}.pw-choisi{outline:3px solid #E8A33D !important;outline-offset:3px}*{cursor:pointer}</style></head>"); });
+  // l'onglet HTML : le code de la page, indenté, une ligne par balise (le texte court reste sur la ligne de sa balise)
+  const construireHtml = () => {
+    const out = [];
+    const ligne = (prof, html, x) => { const d = document.createElement("div"); d.className = "l"; d.innerHTML = `<span>${"  ".repeat(prof)}${html}</span>`; if (x) { lignesHtml.set(x, d); d.addEventListener("click", () => inspecter(x, false)); } out.push(d); };
+    const parcourir = (x, prof) => {
+      const enfants = [...x.childNodes].filter(c => c.nodeType === 1 || (c.nodeType === 3 && c.textContent.trim()) || c.nodeType === 8);
+      const texteSeul = enfants.length === 1 && enfants[0].nodeType === 3;
+      if (texteSeul || !enfants.length) { ligne(prof, htmlBalise(x) + esc(texteSeul ? enfants[0].textContent.trim() : "") + htmlBalise(x, true), x); return; }
+      ligne(prof, htmlBalise(x), x);
+      for (const c of enfants) {
+        if (c.nodeType === 1) parcourir(c, prof + 1);
+        else if (c.nodeType === 8) ligne(prof + 1, `<span class="t-com">&lt;!--${esc(c.textContent)}--&gt;</span>`);
+        else ligne(prof + 1, esc(c.textContent.trim()));
+      }
+      ligne(prof, htmlBalise(x, true));
+    };
+    [...doc.body.children].filter(x => x.localName !== "script" && x.localName !== "style").forEach(x => parcourir(x, 0));
+    vueHtml.replaceChildren(...out);
+  };
+  const montrer = v => {
+    vue = v;
+    el.querySelectorAll(".selecteur-vues button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.vue === v)));
+    f.hidden = v !== "page"; vueHtml.hidden = v !== "html";
+    defiler();
+  };
+  el.querySelectorAll(".selecteur-vues button").forEach(b => b.addEventListener("click", () => montrer(b.dataset.vue)));
+  // l'inspecteur : la balise de l'élément touché et le chemin de ses parents (chaque parent se touche pour remonter)
+  const inspecter = (x, depuisPage = true) => {
+    if (!doc) return;
+    doc.querySelectorAll(".pw-choisi").forEach(y => y.classList.remove("pw-choisi"));
+    lignesHtml.forEach(d => d.classList.remove("choisi"));
+    choisi = x; x.classList.add("pw-choisi");
+    const d = lignesHtml.get(x); if (d) d.classList.add("choisi");
+    const chemin = cheminCss(x);
+    insp.innerHTML = `<code class="si-balise">${htmlBalise(x)}</code><div class="si-chemin">${chemin.map((c, i) => `<button type="button" data-i="${i}">${esc(c)}</button>`).join('<span aria-hidden="true">›</span>')}</div>`;
+    insp.querySelectorAll(".si-chemin button").forEach(b => b.addEventListener("click", () => { let y = x; for (let k = chemin.length - 1; k > +b.dataset.i; k--) y = y.parentElement; inspecter(y, depuisPage); }));
+    if (!depuisPage) defiler(x);
+  };
+  const defiler = (cible) => {   // amène l'élément (choisi, ou le premier trouvé) dans la vue, sans faire défiler l'appli
+    const x = cible || doc && doc.querySelector(".pw-trouve") || choisi;
+    if (!x || !doc) return;
+    if (vue === "page") { const se = doc.scrollingElement; if (se) se.scrollTop = Math.max(0, x.getBoundingClientRect().top + se.scrollTop - 12); }
+    else { const d = lignesHtml.get(x); if (d) vueHtml.scrollTop = Math.max(0, d.offsetTop - 12); }
+  };
+  f.addEventListener("load", () => {
+    doc = f.contentDocument; construireHtml();
+    doc.addEventListener("click", e => { e.preventDefault(); e.stopPropagation(); if (e.target.nodeType === 1 && e.target !== doc.body && e.target !== doc.documentElement) inspecter(e.target); }, true);
+    doc.addEventListener("submit", e => e.preventDefault(), true);
+    if (q.vue === "html") montrer("html");
+    maj();
+  });
   const trouver = sel => { try { return [...doc.querySelectorAll(sel)]; } catch(e) { return null; } };
   const maj = () => {
     if (!doc || locked) return;
     doc.querySelectorAll(".pw-trouve").forEach(x => x.classList.remove("pw-trouve"));
+    lignesHtml.forEach(d => d.classList.remove("trouve"));
     const v = inp.value.trim();
-    if (!v) { compte.textContent = "Écris un sélecteur : les éléments trouvés s'entourent dans la page."; compte.classList.remove("ko"); onChange(); return; }
+    if (!v) { compte.textContent = "Écris un sélecteur : les éléments trouvés s'entourent dans la page (et dans le HTML)."; compte.classList.remove("ko"); onChange(); return; }
     const els = trouver(v);
     if (!els) { compte.textContent = "Sélecteur invalide (vérifie la syntaxe : . pour une classe, # pour un id, [ ] pour un attribut)."; compte.classList.add("ko"); onChange(); return; }
-    els.forEach(x => x.classList.add("pw-trouve"));
-    const vue = els.find(x => x.localName === "playing-card") || els[0];   // amène le premier élément trouvé dans la vue (sans faire défiler l'appli)
-    if (vue && doc.scrollingElement) doc.scrollingElement.scrollTop = Math.max(0, vue.getBoundingClientRect().top + doc.scrollingElement.scrollTop - 12);
+    els.forEach(x => { x.classList.add("pw-trouve"); const d = lignesHtml.get(x); if (d) d.classList.add("trouve"); });
+    defiler(els.find(x => x.localName === "playing-card") || els[0]);
     const cartes = els.filter(x => x.localName === "playing-card").length;
     compte.classList.remove("ko");
     compte.textContent = `${pluriel(els.length, "élément trouvé", "éléments trouvés")}${els.length !== cartes && cartes ? ` (dont ${cartes} carte${cartes > 1 ? "s" : ""} : les autres sont des éléments à l'intérieur des cartes ou ailleurs)` : ""}.`;

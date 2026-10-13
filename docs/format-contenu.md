@@ -214,7 +214,7 @@ Champs communs : `id` (**obligatoire**, unique, stable), `type`, `question` (tex
 | `types-chaine` | `depart` (expression), `maillons[]`, `choix?` | indique le type après chaque maillon (calculé) |
 | `objet` | `cles[]`, `etiquettes[]`, `bonnes{ cle: [étiquettes acceptées] }`, `nom?`, `code?` | remplit un objet `{ … }` avec les bonnes étiquettes |
 | `fisher-yates` | `tableau`, `tirages[]` (j pour i = n-1, n-2, …, 1) | touche les deux cases à échanger à chaque tour |
-| `selecteur` | `dom` (la page, voir plus bas), `attendu` (sélecteur de référence), `nombre?` (vérifié par le testeur) | écrit un sélecteur CSS ; la page surligne en direct les éléments trouvés et les compte. Comparé par **éléments** sélectionnés, pas par le texte : tout sélecteur équivalent est juste |
+| `selecteur` | `dom` (la page, voir plus bas), `attendu` (sélecteur de référence), `nombre?` (vérifié par le testeur), `vue?` (`"html"` : ouvre l'onglet HTML d'abord) | écrit un sélecteur CSS ; la page surligne en direct les éléments trouvés et les compte. On ne devine pas un sélecteur sans voir le HTML : onglet **Page** (toucher un élément montre sa balise et le chemin de ses parents, comme l'inspecteur du navigateur) et onglet **HTML** (le code de la page, éléments trouvés surlignés). Comparé par **éléments** sélectionnés, pas par le texte : tout sélecteur équivalent est juste |
 
 ### Avec du code (exécuté et testé dans le bac à sable)
 
